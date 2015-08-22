@@ -9,14 +9,20 @@ type Manager struct {
 	manager C.manager_t
 }
 
-func NewManager() Manager {
-	var m Manager
-	m.manager = C.manager_init()
+func CreateManager() *Manager {
+	m := &Manager{}
+	m.manager = C.manager_create()
 	return m
 }
-func (m Manager) Free() {
-	C.manager_free(m.manager)
+
+func DestroyManager() {
+	C.manager_destroy()
 }
-func (m Manager) Bar() {
-	C.manager_bar(m.manager)
+
+func GetManagerVersionAsString() string {
+	return C.GoString(C.manager_getVersionAsString())
+}
+
+func GetManagerVersionLongAsString() string {
+	return C.GoString(C.manager_getVersionLongAsString())
 }

@@ -1,20 +1,30 @@
 #include "manager.h"
-#include <iostream>
 #include <openzwave/Manager.h>
 
-manager_t manager_init() {
-	int* ret = new int();
-	return (void*)ret;
+// Static public member functions.
+manager_t manager_create()
+{
+	OpenZWave::Manager* man = OpenZWave::Manager::Create();
+	return (manager_t)man;
 }
 
-void manager_free(manager_t f) {
-	int* foo = (int*)f;
-	delete foo;
+manager_t manager_get()
+{
+	OpenZWave::Manager* man = OpenZWave::Manager::Get();
+	return (manager_t)man;
 }
 
-void manager_bar(manager_t f) {
-	int* foo = (int*)f;
-	*foo = *foo + 1;
+void manager_destroy()
+{
+	OpenZWave::Manager::Destroy();
+}
 
-    std::cout << "manager printing numbers: " << OpenZWave::Manager::getVersionAsString() << std::endl;
+const char* manager_getVersionAsString()
+{
+	return OpenZWave::Manager::getVersionAsString().c_str();
+}
+
+const char* manager_getVersionLongAsString()
+{
+	return OpenZWave::Manager::getVersionLongAsString().c_str();
 }

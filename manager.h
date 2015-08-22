@@ -5,10 +5,15 @@
 extern "C" {
 #endif
 
+	// Types.
 	typedef void* manager_t;
-	manager_t manager_init(void);
-	void manager_free(manager_t);
-	void manager_bar(manager_t);
+
+	// Static public member functions.
+	manager_t manager_create();
+	manager_t manager_get();
+	void manager_destroy();
+	const char* manager_getVersionAsString();
+	const char* manager_getVersionLongAsString();
 
 #ifdef __cplusplus
 }
