@@ -7,8 +7,8 @@ import (
 
 func main() {
 	fmt.Println("gozwave example starting")
-	foo := gozwave.New()
-	foo.Bar()
-	foo.Free()
+	manager := gozwave.NewManager()
+	manager.Bar()
+	manager.Free()
 	fmt.Println("finished")
 }
