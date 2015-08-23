@@ -39,6 +39,16 @@ func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
 	}
 }
 
+func collectNodeInfo(nodeInfoCollector *NodeInfoCollector) {
+	for {
+		nodeInfo, ok := <-nodeInfoCollector.nodeInfo
+		if !ok {
+			return
+		}
+		fmt.Println("collectNodeInfo NodeInfo:", nodeInfo)
+	}
+}
+
 func main() {
 	var controllerPath string
 	flag.StringVar(&controllerPath, "controller", "/dev/ttyACM0", "the path to your controller device")
@@ -65,6 +75,9 @@ func main() {
 	}
 
 	manager.AddDriver(controllerPath)
+
+	// Collect the node info from the channel.
+	go collectNodeInfo(&nodeInfoCollector)
 
 	// Now wait for the user to quit.
 	sig := make(chan os.Signal, 1)
