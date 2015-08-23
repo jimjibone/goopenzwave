@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"gitlab.com/jimjibone/gozwave"
 	"os"
@@ -8,6 +9,10 @@ import (
 )
 
 func main() {
+	var controllerPath string
+	flag.StringVar(&controllerPath, "controller", "/dev/ttyACM0", "the path to your controller device")
+	flag.Parse()
+
 	fmt.Println("gozwave example starting with openzwave version:", gozwave.GetManagerVersionAsString())
 	options := gozwave.CreateOptions("./config/", "", "")
 	options.AddOptionInt("SaveLogLevel", 8)
@@ -24,13 +29,14 @@ func main() {
 	// 	fmt.Println("watcher callback was called")
 	// })
 
-	manager.AddDriver("/dev/tty.usbmodem411")
+	manager.AddDriver(controllerPath)
 
 	// Now wait for the user to quit.
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
 	<-sig
 
+	// All done now finish up.
 	manager.RemoveDriver("/dev/tty.usbmodem411")
 	manager.RemoveWatcher()
 	gozwave.DestroyManager()
