@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"gitlab.com/jimjibone/gozwave"
+	"os"
+	"os/signal"
 )
 
 func main() {
@@ -16,8 +18,21 @@ func main() {
 	options.AddOptionBool("ValidateValueChanges", true)
 	options.Lock()
 
-	gozwave.CreateManager()
+	manager := gozwave.CreateManager()
+	manager.AddWatcher()
+	// func() {
+	// 	fmt.Println("watcher callback was called")
+	// })
 
+	manager.AddDriver("/dev/tty.usbmodem411")
+
+	// Now wait for the user to quit.
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt)
+	<-sig
+
+	manager.RemoveDriver("/dev/tty.usbmodem411")
+	manager.RemoveWatcher()
 	gozwave.DestroyManager()
 	gozwave.DestroyOptions()
 	fmt.Println("finished")
