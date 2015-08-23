@@ -75,8 +75,10 @@ bool options_getOptionAsString(options_t o, const char* name, char* value_out, s
     std::string _name(name);
     std::string _value;
     bool result = opts->GetOptionAsString(_name, &_value);
-    assert(_value.size() < *value_size);
+    assert(_value.size()+1 < *value_size);
     memcpy(value_out, _value.c_str(), _value.size());
+    value_out[_value.size()+1] = 0;
+    *value_size = _value.size() + 1;
     return result;
 }
 
