@@ -42,8 +42,9 @@ extern "C" {
 	// Groups.
 
 	// Notifications.
-	bool manager_addWatcher(manager_t m/*, function to call, context*/);
-	bool manager_removeWatcher(manager_t m/*, function to call, context*/);
+	extern void goNotificationCB( /*notification data, */ void *userdata);
+	bool manager_addWatcher(manager_t m, void *userdata);
+	bool manager_removeWatcher(manager_t m, void *userdata);
 	//...
 
 	// Controller commands.

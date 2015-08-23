@@ -8,6 +8,10 @@ import (
 	"os/signal"
 )
 
+func watcherFunc(userdata interface{}) {
+	fmt.Println("gozwave watcher called with userdata:", userdata)
+}
+
 func main() {
 	var controllerPath string
 	flag.StringVar(&controllerPath, "controller", "/dev/ttyACM0", "the path to your controller device")
@@ -24,10 +28,11 @@ func main() {
 	options.Lock()
 
 	manager := gozwave.CreateManager()
-	manager.AddWatcher()
-	// func() {
-	// 	fmt.Println("watcher callback was called")
-	// })
+	watcher, ok := manager.AddWatcher(watcherFunc, "beefs")
+	if ok == false {
+		fmt.Println("ERROR: failed to add watcher")
+		return
+	}
 
 	manager.AddDriver(controllerPath)
 
@@ -38,7 +43,7 @@ func main() {
 
 	// All done now finish up.
 	manager.RemoveDriver("/dev/tty.usbmodem411")
-	manager.RemoveWatcher()
+	manager.RemoveWatcher(watcher)
 	gozwave.DestroyManager()
 	gozwave.DestroyOptions()
 	fmt.Println("finished")

@@ -96,21 +96,22 @@ bool manager_removeDriver(manager_t m, const char *controllerPath)
 // Notifications.
 //
 
-static void manager_notificationHandler(OpenZWave::Notification const* notification, void* context)
+static void manager_notificationHandler(OpenZWave::Notification const* notification, void* userdata)
 {
 	std::cout << "manager_notificationHandler was called" << std::endl;
+	goNotificationCB( /*notification data, */ userdata);
 }
 
-bool manager_addWatcher(manager_t m/*, function to call, context*/)
+bool manager_addWatcher(manager_t m, void *userdata)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	return man->AddWatcher(manager_notificationHandler, NULL);
+	return man->AddWatcher(manager_notificationHandler, userdata);
 }
 
-bool manager_removeWatcher(manager_t m/*, function to call, context*/)
+bool manager_removeWatcher(manager_t m, void *userdata)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	return man->RemoveWatcher(manager_notificationHandler, NULL);
+	return man->RemoveWatcher(manager_notificationHandler, userdata);
 }
 
 //
