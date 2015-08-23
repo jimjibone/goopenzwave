@@ -3,6 +3,7 @@ package gozwave
 // #cgo LDFLAGS: -lopenzwave -L/usr/local/lib
 // #cgo CPPFLAGS: -I/usr/local/include -I/usr/local/include/openzwave
 // #include "manager.h"
+// #include "notification.h"
 // #include <stdlib.h>
 import "C"
 import "unsafe"
@@ -59,7 +60,7 @@ func (m *Manager) RemoveDriver(controllerPath string) bool {
 // http://stackoverflow.com/questions/6125683/call-go-functions-from-c
 
 // This defines the signature of our user's progress handler.
-type NotificationHandler func( /*notification data, */ userdata interface{})
+type NotificationHandler func(notification *Notification, userdata interface{})
 
 // This is an internal type which will pack the users callback function and
 // userdata. It is an instance of this type that we will actually be sending to
@@ -70,15 +71,18 @@ type notificationContainer struct {
 }
 
 //export goNotificationCB
-func goNotificationCB( /*notification data, */ userdata unsafe.Pointer) {
+func goNotificationCB(notification C.notification_t, userdata unsafe.Pointer) {
 	// This is the function called from the C world by the OpenZWave
 	// notification system. The userdata value contains an instance of
 	// *notificationContainer, We unpack it and use it's values to call the
 	// actual function that our user supplied.
 	watcher := (*notificationContainer)(userdata)
 
+	// Convert the C notification_t to Go Notification.
+	noti := &Notification{notification: notification}
+
 	// Call watcher.f with our parameters and the user's own userdata value.
-	watcher.f( /*notification data, */ watcher.d)
+	watcher.f(noti, watcher.d)
 }
 
 func (m *Manager) AddWatcher(nh NotificationHandler, userdata interface{}) (unsafe.Pointer, bool) {

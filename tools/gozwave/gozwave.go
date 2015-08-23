@@ -8,7 +8,7 @@ import (
 	"os/signal"
 )
 
-func watcherFunc(userdata interface{}) {
+func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
 	fmt.Println("gozwave watcher called with userdata:", userdata)
 }
 

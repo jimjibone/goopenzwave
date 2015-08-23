@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "notification.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +43,7 @@ extern "C" {
 	// Groups.
 
 	// Notifications.
-	extern void goNotificationCB( /*notification data, */ void *userdata);
+	extern void goNotificationCB(notification_t notification, void *userdata);
 	bool manager_addWatcher(manager_t m, void *userdata);
 	bool manager_removeWatcher(manager_t m, void *userdata);
 	//...

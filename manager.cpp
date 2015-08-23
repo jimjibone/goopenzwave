@@ -99,7 +99,10 @@ bool manager_removeDriver(manager_t m, const char *controllerPath)
 static void manager_notificationHandler(OpenZWave::Notification const* notification, void* userdata)
 {
 	std::cout << "manager_notificationHandler was called" << std::endl;
-	goNotificationCB( /*notification data, */ userdata);
+	// Now we need to convert the OpenZWave::Notification data into a Go
+	// friendly type.
+	notification_t noti = (notification_t)notification;
+	goNotificationCB(noti, userdata);
 }
 
 bool manager_addWatcher(manager_t m, void *userdata)
