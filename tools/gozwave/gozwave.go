@@ -8,9 +8,35 @@ import (
 	"os/signal"
 )
 
+type NodeInfo struct {
+	HomeId uint32
+	NodeId uint8
+	Polled bool
+	//Values []ValueId
+}
+
+type NodeInfoCollector struct {
+	nodeInfo chan NodeInfo
+}
+
 func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
 	notistring := notification.GetAsString()
-	fmt.Println("gozwave watcher called with userdata:", userdata, "notification:", notistring)
+	fmt.Println("gozwave watcher called with notification:", notistring)
+
+	nodeInfo := NodeInfo{
+		HomeId: notification.GetHomeId(),
+		NodeId: notification.GetNodeId(),
+		Polled: false,
+	}
+
+	fmt.Println("gozwave watcher NodeInfo:", nodeInfo)
+
+	switch nodeInfoCltr := userdata.(type) {
+	case NodeInfoCollector:
+		nodeInfoCltr.nodeInfo <- nodeInfo
+	default:
+		panic("userdata is an unexpected type")
+	}
 }
 
 func main() {
