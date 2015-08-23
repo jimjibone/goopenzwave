@@ -54,8 +54,11 @@ func main() {
 	options.AddOptionBool("ValidateValueChanges", true)
 	options.Lock()
 
+	nodeInfoCollector := NodeInfoCollector{
+		nodeInfo: make(chan NodeInfo),
+	}
 	manager := gozwave.CreateManager()
-	watcher, ok := manager.AddWatcher(watcherFunc, "beefs")
+	watcher, ok := manager.AddWatcher(watcherFunc, nodeInfoCollector)
 	if ok == false {
 		fmt.Println("ERROR: failed to add watcher")
 		return
