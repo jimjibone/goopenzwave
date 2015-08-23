@@ -1,5 +1,6 @@
 #include "options.h"
 #include <openzwave/Options.h>
+#include <string.h>
 
 //
 // Static public member functions.

@@ -1,5 +1,6 @@
 #include "notification.h"
 #include <openzwave/Notification.h>
+#include <string.h>
 
 //
 // Public member functions.
