@@ -9,7 +9,8 @@ import (
 )
 
 func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
-	fmt.Println("gozwave watcher called with userdata:", userdata)
+	notistring := notification.GetAsString()
+	fmt.Println("gozwave watcher called with userdata:", userdata, "notification:", notistring)
 }
 
 func main() {
