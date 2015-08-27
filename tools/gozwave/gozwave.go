@@ -59,16 +59,7 @@ func processNotifications(m *gozwave.Manager) {
 	for {
 		select {
 		case notification := <-m.Notifications:
-			asString := notification.GetAsString()
-			fmt.Printf("processNotifications: %q\n", asString)
-
-			nodeInfo := NodeInfo{
-				HomeId: notification.GetHomeId(),
-				NodeId: notification.GetNodeId(),
-			}
-			nodeInfo.Values = append(nodeInfo.Values, notification.GetValueId())
-
-			fmt.Println("\tNodeInfo:", nodeInfo)
+			fmt.Println("processNotifications:", notification)
 		}
 	}
 }

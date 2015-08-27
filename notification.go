@@ -56,54 +56,85 @@ const (
 
 // Notification is a container for the C++ OpenZWave library Notification class.
 type Notification struct {
-	notification C.notification_t
+	Type         NotificationType
+	HomeID       uint32
+	NodeID       uint8
+	ValueID      ValueID
+	GroupIDX     uint8
+	Event        uint8
+	ButtonID     uint8
+	SceneID      uint8
+	Notification uint8
+	Byte         uint8
+	Name         string
 }
 
-func (n *Notification) GetType() NotificationType {
-	return NotificationType(C.notification_getType(n.notification))
-}
+func buildNotification(n C.notification_t) Notification {
+	notification := Notification{
+		Type:         NotificationType(C.notification_getType(n)),
+		HomeID:       uint32(C.notification_getHomeId(n)),
+		NodeID:       uint8(C.notification_getNodeId(n)),
+		ValueID:      ValueID{valueid: C.notification_getValueId(n)},
+		GroupIDX:     uint8(C.notification_getGroupIdx(n)),
+		Event:        uint8(C.notification_getEvent(n)),
+		ButtonID:     uint8(C.notification_getButtonId(n)),
+		SceneID:      uint8(C.notification_getSceneId(n)),
+		Notification: uint8(C.notification_getNotification(n)),
+		Byte:         uint8(C.notification_getByte(n)),
+	}
 
-func (n *Notification) GetHomeId() uint32 {
-	return uint32(C.notification_getHomeId(n.notification))
-}
-
-func (n *Notification) GetNodeId() uint8 {
-	return uint8(C.notification_getNodeId(n.notification))
-}
-
-func (n *Notification) GetValueId() *ValueId {
-	val := &ValueId{}
-	val.valueid = C.notification_getValueId(n.notification)
-	return val
-}
-
-func (n *Notification) GetGroupIdx() uint8 {
-	return uint8(C.notification_getGroupIdx(n.notification))
-}
-
-func (n *Notification) GetEvent() uint8 {
-	return uint8(C.notification_getEvent(n.notification))
-}
-
-func (n *Notification) GetButtonId() uint8 {
-	return uint8(C.notification_getButtonId(n.notification))
-}
-
-func (n *Notification) GetSceneId() uint8 {
-	return uint8(C.notification_getSceneId(n.notification))
-}
-
-func (n *Notification) GetNotification() uint8 {
-	return uint8(C.notification_getNotification(n.notification))
-}
-
-func (n *Notification) GetByte() uint8 {
-	return uint8(C.notification_getByte(n.notification))
-}
-
-func (n *Notification) GetAsString() string {
-	cstr := C.notification_getAsString(n.notification)
-	str := C.GoString(cstr)
+	cstr := C.notification_getAsString(n)
+	notification.Name = C.GoString(cstr)
 	C.free(unsafe.Pointer(cstr))
-	return str
+
+	return notification
 }
+
+// func (n *Notification) GetType() NotificationType {
+// 	return NotificationType(C.notification_getType(n.notification))
+// }
+
+// func (n *Notification) GetHomeId() uint32 {
+// 	return uint32(C.notification_getHomeId(n.notification))
+// }
+
+// func (n *Notification) GetNodeId() uint8 {
+// 	return uint8(C.notification_getNodeId(n.notification))
+// }
+
+// func (n *Notification) GetValueId() *ValueId {
+// 	val := &ValueId{}
+// 	val.valueid = C.notification_getValueId(n.notification)
+// 	return val
+// }
+
+// func (n *Notification) GetGroupIdx() uint8 {
+// 	return uint8(C.notification_getGroupIdx(n.notification))
+// }
+
+// func (n *Notification) GetEvent() uint8 {
+// 	return uint8(C.notification_getEvent(n.notification))
+// }
+
+// func (n *Notification) GetButtonId() uint8 {
+// 	return uint8(C.notification_getButtonId(n.notification))
+// }
+
+// func (n *Notification) GetSceneId() uint8 {
+// 	return uint8(C.notification_getSceneId(n.notification))
+// }
+
+// func (n *Notification) GetNotification() uint8 {
+// 	return uint8(C.notification_getNotification(n.notification))
+// }
+
+// func (n *Notification) GetByte() uint8 {
+// 	return uint8(C.notification_getByte(n.notification))
+// }
+
+// func (n *Notification) GetAsString() string {
+// 	cstr := C.notification_getAsString(n.notification)
+// 	str := C.GoString(cstr)
+// 	C.free(unsafe.Pointer(cstr))
+// 	return str
+// }

@@ -13,13 +13,13 @@ import (
 
 type Manager struct {
 	manager       C.manager_t
-	Notifications chan *Notification
+	Notifications chan Notification
 }
 
 func CreateManager() *Manager {
 	m := &Manager{}
 	m.manager = C.manager_create()
-	m.Notifications = make(chan *Notification, 10)
+	m.Notifications = make(chan Notification, 10)
 	return m
 }
 
@@ -84,7 +84,7 @@ func goNotificationCB(notification C.notification_t, userdata unsafe.Pointer) {
 	m := (*Manager)(userdata)
 
 	// Convert the C notification_t to Go Notification.
-	noti := &Notification{notification: notification}
+	noti := buildNotification(notification)
 
 	// Send the Notification on the channel.
 	m.Notifications <- noti
