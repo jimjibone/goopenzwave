@@ -6,15 +6,20 @@ package gozwave
 // #include "notification.h"
 // #include <stdlib.h>
 import "C"
-import "unsafe"
+import (
+	"fmt"
+	"unsafe"
+)
 
 type Manager struct {
-	manager C.manager_t
+	manager       C.manager_t
+	Notifications chan *Notification
 }
 
 func CreateManager() *Manager {
 	m := &Manager{}
 	m.manager = C.manager_create()
+	m.Notifications = make(chan *Notification, 10)
 	return m
 }
 
@@ -59,16 +64,16 @@ func (m *Manager) RemoveDriver(controllerPath string) bool {
 // Notification and callbacks from C:
 // http://stackoverflow.com/questions/6125683/call-go-functions-from-c
 
-// This defines the signature of our user's progress handler.
-type NotificationHandler func(notification *Notification, userdata interface{})
-
-// This is an internal type which will pack the users callback function and
-// userdata. It is an instance of this type that we will actually be sending to
-// the C code.
-type notificationContainer struct {
-	f NotificationHandler // The user's function pointer.
-	d interface{}         // The user's userdata.
-}
+// // This defines the signature of our user's progress handler.
+// type NotificationHandler func(notification *Notification, userdata interface{})
+//
+// // This is an internal type which will pack the users callback function and
+// // userdata. It is an instance of this type that we will actually be sending to
+// // the C code.
+// type notificationContainer struct {
+// 	f NotificationHandler // The user's function pointer.
+// 	d interface{}         // The user's userdata.
+// }
 
 //export goNotificationCB
 func goNotificationCB(notification C.notification_t, userdata unsafe.Pointer) {
@@ -76,28 +81,46 @@ func goNotificationCB(notification C.notification_t, userdata unsafe.Pointer) {
 	// notification system. The userdata value contains an instance of
 	// *notificationContainer, We unpack it and use it's values to call the
 	// actual function that our user supplied.
-	watcher := (*notificationContainer)(userdata)
+	m := (*Manager)(userdata)
 
 	// Convert the C notification_t to Go Notification.
 	noti := &Notification{notification: notification}
 
-	// Call watcher.f with our parameters and the user's own userdata value.
-	watcher.f(noti, watcher.d)
+	// Send the Notification on the channel.
+	m.Notifications <- noti
 }
 
-func (m *Manager) AddWatcher(nh NotificationHandler, userdata interface{}) (unsafe.Pointer, bool) {
-	watcher := unsafe.Pointer(&notificationContainer{nh, userdata})
-	result := C.manager_addWatcher(m.manager, watcher)
+func (m *Manager) StartNotifications() error {
+	themanager := unsafe.Pointer(m)
+	result := C.manager_addWatcher(m.manager, themanager)
 	if result {
-		return watcher, true
+		return nil
 	}
-	return nil, false
+	return fmt.Errorf("failed to add watcher")
 }
 
-func (m *Manager) RemoveWatcher(watcher unsafe.Pointer) bool {
-	result := C.manager_removeWatcher(m.manager, watcher)
+func (m *Manager) StopNotifications() error {
+	themanager := unsafe.Pointer(m)
+	result := C.manager_removeWatcher(m.manager, themanager)
 	if result {
-		return true
+		return nil
 	}
-	return false
+	return fmt.Errorf("failed to remove watcher")
 }
+
+// func (m *Manager) AddWatcher(nh NotificationHandler, userdata interface{}) (unsafe.Pointer, bool) {
+// 	watcher := unsafe.Pointer(&notificationContainer{nh, userdata})
+// 	result := C.manager_addWatcher(m.manager, watcher)
+// 	if result {
+// 		return watcher, true
+// 	}
+// 	return nil, false
+// }
+//
+// func (m *Manager) RemoveWatcher(watcher unsafe.Pointer) bool {
+// 	result := C.manager_removeWatcher(m.manager, watcher)
+// 	if result {
+// 		return true
+// 	}
+// 	return false
+// }

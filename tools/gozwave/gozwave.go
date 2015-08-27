@@ -11,8 +11,8 @@ import (
 type NodeInfo struct {
 	HomeId uint32
 	NodeId uint8
-	Polled bool
-	//Values []ValueId
+	// Polled bool
+	Values []*gozwave.ValueId
 }
 
 type NodeInfoCollector struct {
@@ -26,8 +26,9 @@ func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
 	nodeInfo := NodeInfo{
 		HomeId: notification.GetHomeId(),
 		NodeId: notification.GetNodeId(),
-		Polled: false,
+		// Polled: false,
 	}
+	nodeInfo.Values = append(nodeInfo.Values, notification.GetValueId())
 
 	fmt.Println("gozwave watcher NodeInfo:", nodeInfo)
 
@@ -39,13 +40,27 @@ func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
 	}
 }
 
-func collectNodeInfo(nodeInfoCollector *NodeInfoCollector) {
+func collectNodeInfo(nodeInfoCollector *NodeInfoCollector, nodes *map[uint8]*NodeInfo) {
 	for {
 		nodeInfo, ok := <-nodeInfoCollector.nodeInfo
 		if !ok {
 			return
 		}
 		fmt.Println("collectNodeInfo NodeInfo:", nodeInfo)
+		if node, found := (*nodes)[nodeInfo.NodeId]; found {
+			node.Values = append(node.Values, nodeInfo.Values...)
+		} else {
+			(*nodes)[nodeInfo.NodeId] = &nodeInfo
+		}
+	}
+}
+
+func processNotifications(m *gozwave.Manager) {
+	for {
+		select {
+		case notification := <-m.Notifications:
+			fmt.Println("procprocessNotifications: ", notification.GetAsString())
+		}
 	}
 }
 
@@ -64,20 +79,28 @@ func main() {
 	options.AddOptionBool("ValidateValueChanges", true)
 	options.Lock()
 
-	nodeInfoCollector := NodeInfoCollector{
-		nodeInfo: make(chan NodeInfo),
-	}
+	// nodeInfoCollector := NodeInfoCollector{
+	// 	nodeInfo: make(chan NodeInfo),
+	// }
 	manager := gozwave.CreateManager()
-	watcher, ok := manager.AddWatcher(watcherFunc, nodeInfoCollector)
-	if ok == false {
-		fmt.Println("ERROR: failed to add watcher")
-		return
+	// watcher, ok := manager.AddWatcher(watcherFunc, nodeInfoCollector)
+	// if ok == false {
+	// 	fmt.Println("ERROR: failed to add watcher")
+	// 	return
+	// }
+	err := manager.StartNotifications()
+	if err != nil {
+		fmt.Println("ERROR: failed to start notifications:", err)
 	}
 
 	manager.AddDriver(controllerPath)
 
+	// nodes := make(map[uint8]*NodeInfo)
+
 	// Collect the node info from the channel.
-	go collectNodeInfo(&nodeInfoCollector)
+	// go collectNodeInfo(&nodeInfoCollector, &nodes)
+
+	go processNotifications(manager)
 
 	// Now wait for the user to quit.
 	sig := make(chan os.Signal, 1)
@@ -86,7 +109,8 @@ func main() {
 
 	// All done now finish up.
 	manager.RemoveDriver("/dev/tty.usbmodem411")
-	manager.RemoveWatcher(watcher)
+	// manager.RemoveWatcher(watcher)
+	manager.StopNotifications()
 	gozwave.DestroyManager()
 	gozwave.DestroyOptions()
 	fmt.Println("finished")
