@@ -12,7 +12,7 @@ type NodeInfo struct {
 	HomeId uint32
 	NodeId uint8
 	// Polled bool
-	Values []*gozwave.ValueId
+	Values []*gozwave.ValueID
 }
 
 //type NodeInfoCollector struct {

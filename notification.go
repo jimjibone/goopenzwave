@@ -71,21 +71,46 @@ type Notification struct {
 
 func buildNotification(n C.notification_t) Notification {
 	notification := Notification{
-		Type:         NotificationType(C.notification_getType(n)),
-		HomeID:       uint32(C.notification_getHomeId(n)),
-		NodeID:       uint8(C.notification_getNodeId(n)),
-		ValueID:      ValueID{valueid: C.notification_getValueId(n)},
-		GroupIDX:     uint8(C.notification_getGroupIdx(n)),
-		Event:        uint8(C.notification_getEvent(n)),
-		ButtonID:     uint8(C.notification_getButtonId(n)),
-		SceneID:      uint8(C.notification_getSceneId(n)),
-		Notification: uint8(C.notification_getNotification(n)),
-		Byte:         uint8(C.notification_getByte(n)),
+		Type:    NotificationType(C.notification_getType(n)),
+		HomeID:  uint32(C.notification_getHomeId(n)),
+		NodeID:  uint8(C.notification_getNodeId(n)),
+		ValueID: ValueID{valueid: C.notification_getValueId(n)},
+		Byte:    uint8(C.notification_getByte(n)),
 	}
 
 	cstr := C.notification_getAsString(n)
 	notification.Name = C.GoString(cstr)
 	C.free(unsafe.Pointer(cstr))
+
+	switch notification.Type {
+	case NotificationTypeCreateButton:
+	case NotificationTypeDeleteButton:
+	case NotificationTypeButtonOn:
+	case NotificationTypeButtonOff:
+		notification.ButtonID = uint8(C.notification_getButtonId(n))
+		break
+
+	case NotificationTypeNodeEvent:
+		notification.Event = uint8(C.notification_getEvent(n))
+		break
+
+	case NotificationTypeGroup:
+		notification.GroupIDX = uint8(C.notification_getGroupIdx(n))
+		break
+
+	case NotificationTypeNotification:
+		notification.Notification = uint8(C.notification_getNotification(n))
+		break
+
+	case NotificationTypeControllerCommand:
+		notification.Event = uint8(C.notification_getEvent(n))
+		notification.Notification = uint8(C.notification_getNotification(n))
+		break
+
+	case NotificationTypeSceneEvent:
+		notification.SceneID = uint8(C.notification_getSceneId(n))
+		break
+	}
 
 	return notification
 }
