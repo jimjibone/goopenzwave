@@ -54,6 +54,72 @@ const (
 	NotificationCodeAlive       = NotificationCode(C.notification_code_alive)
 )
 
+func (nt NotificationType) String() string {
+	switch nt {
+	case NotificationTypeValueAdded:
+		return "ValueAdded"
+	case NotificationTypeValueRemoved:
+		return "ValueRemoved"
+	case NotificationTypeValueChanged:
+		return "ValueChanged"
+	case NotificationTypeValueRefreshed:
+		return "ValueRefreshed"
+	case NotificationTypeGroup:
+		return "Group"
+	case NotificationTypeNodeNew:
+		return "NodeNew"
+	case NotificationTypeNodeAdded:
+		return "NodeAdded"
+	case NotificationTypeNodeRemoved:
+		return "NodeRemoved"
+	case NotificationTypeNodeProtocolInfo:
+		return "NodeProtocolInfo"
+	case NotificationTypeNodeNaming:
+		return "NodeNaming"
+	case NotificationTypeNodeEvent:
+		return "NodeEvent"
+	case NotificationTypePollingDisabled:
+		return "PollingDisabled"
+	case NotificationTypePollingEnabled:
+		return "PollingEnabled"
+	case NotificationTypeSceneEvent:
+		return "SceneEvent"
+	case NotificationTypeCreateButton:
+		return "CreateButton"
+	case NotificationTypeDeleteButton:
+		return "DeleteButton"
+	case NotificationTypeButtonOn:
+		return "ButtonOn"
+	case NotificationTypeButtonOff:
+		return "ButtonOff"
+	case NotificationTypeDriverReady:
+		return "DriverReady"
+	case NotificationTypeDriverFailed:
+		return "DriverFailed"
+	case NotificationTypeDriverReset:
+		return "DriverReset"
+	case NotificationTypeEssentialNodeQueriesComplete:
+		return "EssentialNodeQueriesComplete"
+	case NotificationTypeNodeQueriesComplete:
+		return "NodeQueriesComplete"
+	case NotificationTypeAwakeNodesQueried:
+		return "AwakeNodesQueried"
+	case NotificationTypeAllNodesQueriedSomeDead:
+		return "AllNodesQueriedSomeDead"
+	case NotificationTypeAllNodesQueried:
+		return "AllNodesQueried"
+	case NotificationTypeNotification:
+		return "Notification"
+	case NotificationTypeDriverRemoved:
+		return "DriverRemoved"
+	case NotificationTypeControllerCommand:
+		return "ControllerCommand"
+	case NotificationTypeNodeReset:
+		return "NodeReset"
+	}
+	return "UNKNOWN"
+}
+
 // Notification is a container for the C++ OpenZWave library Notification class.
 type Notification struct {
 	Type         NotificationType
