@@ -5,7 +5,7 @@ package gozwave
 // #include "notification.h"
 // #include <stdlib.h>
 import "C"
-import "unsafe"
+import ()
 
 // NotificationType defines a type for the notification type enum.
 type NotificationType int
@@ -131,7 +131,6 @@ type Notification struct {
 	ButtonID     uint8
 	SceneID      uint8
 	Notification uint8
-	Name         string
 }
 
 func buildNotification(n C.notification_t) Notification {
@@ -142,39 +141,26 @@ func buildNotification(n C.notification_t) Notification {
 		ValueID: ValueID{valueid: C.notification_getValueId(n)},
 	}
 
-	cstr := C.notification_getAsString(n)
-	notification.Name = C.GoString(cstr)
-	C.free(unsafe.Pointer(cstr))
+	switch notification.Type {
+	case NotificationTypeCreateButton, NotificationTypeDeleteButton, NotificationTypeButtonOn, NotificationTypeButtonOff:
+		notification.ButtonID = uint8(C.notification_getButtonId(n))
 
-	// switch notification.Type {
-	// case NotificationTypeCreateButton:
-	// case NotificationTypeDeleteButton:
-	// case NotificationTypeButtonOn:
-	// case NotificationTypeButtonOff:
-	// 	notification.ButtonID = uint8(C.notification_getButtonId(n))
-	// 	break
+	case NotificationTypeNodeEvent:
+		notification.Event = uint8(C.notification_getEvent(n))
 
-	// case NotificationTypeNodeEvent:
-	// 	notification.Event = uint8(C.notification_getEvent(n))
-	// 	break
+	case NotificationTypeGroup:
+		notification.GroupIDX = uint8(C.notification_getGroupIdx(n))
 
-	// case NotificationTypeGroup:
-	// 	notification.GroupIDX = uint8(C.notification_getGroupIdx(n))
-	// 	break
+	case NotificationTypeNotification:
+		notification.Notification = uint8(C.notification_getNotification(n))
 
-	// case NotificationTypeNotification:
-	// 	notification.Notification = uint8(C.notification_getNotification(n))
-	// 	break
+	case NotificationTypeControllerCommand:
+		notification.Event = uint8(C.notification_getEvent(n))
+		notification.Notification = uint8(C.notification_getNotification(n))
 
-	// case NotificationTypeControllerCommand:
-	// 	notification.Event = uint8(C.notification_getEvent(n))
-	// 	notification.Notification = uint8(C.notification_getNotification(n))
-	// 	break
-
-	// case NotificationTypeSceneEvent:
-	// 	notification.SceneID = uint8(C.notification_getSceneId(n))
-	// 	break
-	// }
+	case NotificationTypeSceneEvent:
+		notification.SceneID = uint8(C.notification_getSceneId(n))
+	}
 
 	return notification
 }

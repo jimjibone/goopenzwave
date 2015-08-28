@@ -8,12 +8,12 @@ import (
 	"os/signal"
 )
 
-type NodeInfo struct {
-	HomeId uint32
-	NodeId uint8
-	// Polled bool
-	Values []*gozwave.ValueID
-}
+//type NodeInfo struct {
+//	HomeId uint32
+//	NodeId uint8
+//	// Polled bool
+//	Values []*gozwave.ValueID
+//}
 
 //type NodeInfoCollector struct {
 //	nodeInfo chan NodeInfo
@@ -55,11 +55,14 @@ type NodeInfo struct {
 //	}
 //}
 
+var allNotifications []gozwave.Notification
+
 func processNotifications(m *gozwave.Manager) {
 	for {
 		select {
 		case notification := <-m.Notifications:
-			fmt.Println("processNotifications:", notification)
+			fmt.Printf("processNotifications: %+v\n", notification)
+			allNotifications = append(allNotifications, notification)
 		}
 	}
 }
@@ -113,5 +116,11 @@ func main() {
 	manager.StopNotifications()
 	gozwave.DestroyManager()
 	gozwave.DestroyOptions()
+
+	fmt.Println("all notifications:")
+	for i := range allNotifications {
+		fmt.Printf("\t%d: %+v\n", i, allNotifications[i])
+	}
+
 	fmt.Println("finished")
 }
