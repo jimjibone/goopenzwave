@@ -36,53 +36,50 @@ bool options_lock(options_t o)
 bool options_addOptionBool(options_t o, const char* name, bool value)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
-    std::string _name(name);
-    return opts->AddOptionBool(_name, value);
+    std::string inStr(name);
+    return opts->AddOptionBool(inStr, value);
 }
 
 bool options_addOptionInt(options_t o, const char* name, int32_t value)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
-    std::string _name(name);
-    return opts->AddOptionInt(_name, value);
+    std::string inStr(name);
+    return opts->AddOptionInt(inStr, value);
 }
 
 bool options_addOptionString(options_t o, const char* name, const char* value, bool append)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
-    std::string _name(name);
+    std::string inStr(name);
     std::string _value(value);
-    return opts->AddOptionString(_name, _value, append);
+    return opts->AddOptionString(inStr, _value, append);
 }
 
-bool options_getOptionAsBool(options_t o, const char* name, bool* value_out)
+bool options_getOptionAsBool(options_t o, const char* name, bool* o_value)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
-    std::string _name(name);
-    return opts->GetOptionAsBool(_name, value_out);
+    std::string inStr(name);
+    return opts->GetOptionAsBool(inStr, o_value);
 }
 
-bool options_getOptionAsInt(options_t o, const char* name, int32_t* value_out)
+bool options_getOptionAsInt(options_t o, const char* name, int32_t* o_value)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
-    std::string _name(name);
-    return opts->GetOptionAsInt(_name, value_out);
+    std::string inStr(name);
+    return opts->GetOptionAsInt(inStr, o_value);
 }
 
-bool options_getOptionAsString(options_t o, const char* name, char* value_out, size_t* value_size)
+bool options_getOptionAsString(options_t o, const char* name, string_t* o_value)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
-    std::string _name(name);
-    std::string _value;
-    bool result = opts->GetOptionAsString(_name, &_value);
-    assert(_value.size()+1 < *value_size);
-    memcpy(value_out, _value.c_str(), _value.size());
-    value_out[_value.size()+1] = 0;
-    *value_size = _value.size() + 1;
+    std::string inStr(name);
+    std::string outStr;
+    bool result = opts->GetOptionAsString(inStr, &outStr);
+    string_copyStdString(o_value, outStr);
     return result;
 }
 
-// OptionType options_getOptionType(string const &_name);
+//TODO  OptionType options_getOptionType(string const &inStr);
 
 bool options_areLocked(options_t o)
 {

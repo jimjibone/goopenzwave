@@ -47,10 +47,7 @@ func GetOptions() *Options {
 // calls to AddOption can be made. The options must be locked before the
 // Manager::Create method is called.
 func (o *Options) Lock() bool {
-	if C.bool(C.options_lock(o.options)) {
-		return true
-	}
-	return false
+	return bool(C.options_lock(o.options))
 }
 
 // AddOptionBool add a boolean option to the program. Adds an option to the
@@ -58,12 +55,9 @@ func (o *Options) Lock() bool {
 // to AddOptionInt must be made before Lock.
 func (o *Options) AddOptionBool(name string, value bool) bool {
 	cName := C.CString(name)
-	result := C.bool(C.options_addOptionBool(o.options, cName, C.bool(value)))
+	result := bool(C.options_addOptionBool(o.options, cName, C.bool(value)))
 	C.free(unsafe.Pointer(cName))
-	if result {
-		return true
-	}
-	return false
+	return result
 }
 
 // AddOptionInt add an integer option to the program. Adds an option to the
@@ -71,12 +65,9 @@ func (o *Options) AddOptionBool(name string, value bool) bool {
 // to AddOptionInt must be made before Lock.
 func (o *Options) AddOptionInt(name string, value int32) bool {
 	cName := C.CString(name)
-	result := C.bool(C.options_addOptionInt(o.options, cName, C.int32_t(value)))
+	result := bool(C.options_addOptionInt(o.options, cName, C.int32_t(value)))
 	C.free(unsafe.Pointer(cName))
-	if result {
-		return true
-	}
-	return false
+	return result
 }
 
 // AddOptionString add a string option to the program. Adds an option to the
@@ -85,66 +76,44 @@ func (o *Options) AddOptionInt(name string, value int32) bool {
 func (o *Options) AddOptionString(name string, value string, append bool) bool {
 	cName := C.CString(name)
 	cValue := C.CString(value)
-	result := C.bool(C.options_addOptionString(o.options, cName, cValue, C.bool(append)))
+	result := bool(C.options_addOptionString(o.options, cName, cValue, C.bool(append)))
 	C.free(unsafe.Pointer(cName))
 	C.free(unsafe.Pointer(cValue))
-	if result {
-		return true
-	}
-	return false
+	return result
 }
 
 // GetOptionAsBool get the value of a boolean option.
-func (o *Options) GetOptionAsBool(name string) (valueOut bool, ok bool) {
+func (o *Options) GetOptionAsBool(name string) (bool, bool) {
 	cName := C.CString(name)
-	var cValue *C.bool
-	result := C.bool(C.options_getOptionAsBool(o.options, cName, cValue))
+	var cValue C.bool
+	result := bool(C.options_getOptionAsBool(o.options, cName, &cValue))
 	C.free(unsafe.Pointer(cName))
-	if *cValue {
-		valueOut = true
-	} else {
-		valueOut = false
-	}
-	if result {
-		ok = true
-	} else {
-		ok = false
-	}
-	return valueOut, ok
+	return result, bool(cValue)
 }
 
 // GetOptionAsInt get the value of an integer option.
-func (o *Options) GetOptionAsInt(name string) (valueOut int, ok bool) {
+func (o *Options) GetOptionAsInt(name string) (bool, int32) {
 	cName := C.CString(name)
-	var cValue *C.int32_t
-	result := C.bool(C.options_getOptionAsInt(o.options, cName, cValue))
+	var cValue C.int32_t
+	result := bool(C.options_getOptionAsInt(o.options, cName, &cValue))
 	C.free(unsafe.Pointer(cName))
-	valueOut = int(*cValue)
-	if result {
-		ok = true
-	} else {
-		ok = false
-	}
-	return valueOut, ok
+	return result, int32(cValue)
 }
 
 // GetOptionAsString get the value of a string option.
-// func (o *Options) GetOptionAsString(name string) (valueOut int, ok bool) {
-// 	cName := C.CString(name)
-// 	var cValue *C.int
-// 	ok = C.bool(C.options_getOptionAsInt(o.options, cName, cValue))
-// 	C.free(unsafe.Pointer(cName))
-// 	valueOut = C.GoInt(cValue)
-// 	return
-// }
+func (o *Options) GetOptionAsString(name string) (bool, string) {
+	cName := C.CString(name)
+	cString := C.string_emptyString()
+	result := bool(C.options_getOptionAsString(o.options, cName, cString))
+	goString := C.GoString(cString.data)
+	C.string_freeString(cString)
+	return result, goString
+}
 
 // GetOptionType get the type of value stored in an option.
-//////// OptionType options_getOptionType(string const &_name);
+//TODO OptionType options_getOptionType(string const &_name);
 
 // AreLocked test whether the options have been locked.
 func (o *Options) AreLocked() bool {
-	if C.bool(C.options_areLocked(o.options)) {
-		return true
-	}
-	return false
+	return bool(C.options_areLocked(o.options))
 }
