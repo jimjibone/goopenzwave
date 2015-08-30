@@ -73,6 +73,7 @@ func main() {
 	flag.Parse()
 
 	fmt.Println("gozwave example starting with openzwave version:", gozwave.GetManagerVersionAsString())
+
 	options := gozwave.CreateOptions("./config/", "", "")
 	options.AddOptionInt("SaveLogLevel", 8)
 	options.AddOptionInt("QueueLogLevel", 9)
