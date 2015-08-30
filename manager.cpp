@@ -890,9 +890,8 @@ void manager_removeAssociation(manager_t m, uint32_t homeId, uint8_t nodeId, uin
 
 static void manager_notificationHandler(OpenZWave::Notification const* notification, void* userdata)
 {
-	std::cout << "manager_notificationHandler was called: " << ((OpenZWave::Notification*)notification)->GetAsString() << std::endl;
-	// Now we need to convert the OpenZWave::Notification data into a Go
-	// friendly type.
+	// Note that OpenZWave will delete the notification object when it thinks we
+	// are done with it. Probably when we return control to it.
 	notification_t noti = (notification_t)notification;
 	goNotificationCB(noti, userdata);
 }

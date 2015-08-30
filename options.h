@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "string_helpers.h"
+#include "loglevel.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +23,7 @@ extern "C" {
     bool options_lock(options_t o);
     bool options_addOptionBool(options_t o, const char* name, bool value);
     bool options_addOptionInt(options_t o, const char* name, int32_t value);
+    bool options_addOptionLogLevel(options_t o, const char* name, loglevel_t level);
     bool options_addOptionString(options_t o, const char* name, const char* value, bool append);
     bool options_getOptionAsBool(options_t o, const char* name, bool* o_value);
     bool options_getOptionAsInt(options_t o, const char* name, int32_t* o_value);

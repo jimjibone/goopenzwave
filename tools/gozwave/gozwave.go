@@ -8,53 +8,6 @@ import (
 	"os/signal"
 )
 
-//type NodeInfo struct {
-//	HomeId uint32
-//	NodeId uint8
-//	// Polled bool
-//	Values []*gozwave.ValueID
-//}
-
-//type NodeInfoCollector struct {
-//	nodeInfo chan NodeInfo
-//}
-//
-//func watcherFunc(notification *gozwave.Notification, userdata interface{}) {
-//	notistring := notification.GetAsString()
-//	fmt.Println("gozwave watcher called with notification:", notistring)
-//
-//	nodeInfo := NodeInfo{
-//		HomeId: notification.GetHomeId(),
-//		NodeId: notification.GetNodeId(),
-//		// Polled: false,
-//	}
-//	nodeInfo.Values = append(nodeInfo.Values, notification.GetValueId())
-//
-//	fmt.Println("gozwave watcher NodeInfo:", nodeInfo)
-//
-//	switch nodeInfoCltr := userdata.(type) {
-//	case NodeInfoCollector:
-//		nodeInfoCltr.nodeInfo <- nodeInfo
-//	default:
-//		panic("userdata is an unexpected type")
-//	}
-//}
-//
-//func collectNodeInfo(nodeInfoCollector *NodeInfoCollector, nodes *map[uint8]*NodeInfo) {
-//	for {
-//		nodeInfo, ok := <-nodeInfoCollector.nodeInfo
-//		if !ok {
-//			return
-//		}
-//		fmt.Println("collectNodeInfo NodeInfo:", nodeInfo)
-//		if node, found := (*nodes)[nodeInfo.NodeId]; found {
-//			node.Values = append(node.Values, nodeInfo.Values...)
-//		} else {
-//			(*nodes)[nodeInfo.NodeId] = &nodeInfo
-//		}
-//	}
-//}
-
 var allNotifications []gozwave.Notification
 
 func processNotifications(m *gozwave.Manager) {
@@ -75,8 +28,8 @@ func main() {
 	fmt.Println("gozwave example starting with openzwave version:", gozwave.GetManagerVersionAsString())
 
 	options := gozwave.CreateOptions("./config/", "", "")
-	options.AddOptionInt("SaveLogLevel", 8)
-	options.AddOptionInt("QueueLogLevel", 9)
+	options.AddOptionLogLevel("SaveLogLevel", gozwave.LogLevelNone)
+	options.AddOptionLogLevel("QueueLogLevel", gozwave.LogLevelNone)
 	options.AddOptionInt("DumpTrigger", 4)
 	options.AddOptionInt("PollInterval", 500)
 	options.AddOptionBool("IntervalBetweenPolls", true)

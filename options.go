@@ -70,6 +70,16 @@ func (o *Options) AddOptionInt(name string, value int32) bool {
 	return result
 }
 
+// AddOptionLogLevel add a log level option to the program. Adds an option to
+// the program whose value can then be read from a file or command line. All
+// calls to AddOptionLogLevel must be made before Lock.
+func (o *Options) AddOptionLogLevel(name string, value LogLevel) bool {
+	cName := C.CString(name)
+	result := bool(C.options_addOptionLogLevel(o.options, cName, C.loglevel_t(value)))
+	C.free(unsafe.Pointer(cName))
+	return result
+}
+
 // AddOptionString add a string option to the program. Adds an option to the
 // program whose value can then be read from a file or command line. All calls
 // to AddOptionString must be made before Lock.

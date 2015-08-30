@@ -47,6 +47,13 @@ bool options_addOptionInt(options_t o, const char* name, int32_t value)
     return opts->AddOptionInt(inStr, value);
 }
 
+bool options_addOptionLogLevel(options_t o, const char* name, loglevel_t level)
+{
+    OpenZWave::Options *opts = (OpenZWave::Options*)o;
+    std::string inStr(name);
+    return opts->AddOptionInt(inStr, loglevel_toLogLevel(level));
+}
+
 bool options_addOptionString(options_t o, const char* name, const char* value, bool append)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;

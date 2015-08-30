@@ -705,10 +705,9 @@ func (m *Manager) RemoveAssociation(homeId uint32, nodeId uint8, groupIdx uint8,
 
 //export goNotificationCB
 func goNotificationCB(notification C.notification_t, userdata unsafe.Pointer) {
-	// This is the function called from the C world by the OpenZWave
-	// notification system. The userdata value contains an instance of
-	// *notificationContainer, We unpack it and use it's values to call the
-	// actual function that our user supplied.
+	// This function is called by OpenZWave (via a C wrapper) when a
+	// notification is available. All data must be extracted from the
+	// notification object before we return as OpenZWave will delete the object.
 	m := (*Manager)(userdata)
 
 	// Convert the C notification_t to Go Notification.
