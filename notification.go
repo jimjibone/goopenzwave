@@ -5,7 +5,9 @@ package gozwave
 // #include "notification.h"
 // #include <stdlib.h>
 import "C"
-import ()
+import (
+	"fmt"
+)
 
 // NotificationType defines a type for the notification type enum.
 type NotificationType int
@@ -126,15 +128,39 @@ type Notification struct {
 	HomeID       uint32
 	NodeID       uint8
 	ValueID      ValueID
-	GroupIDX     uint8
-	Event        uint8
-	ButtonID     uint8
-	SceneID      uint8
-	Notification uint8
+	GroupIDX     *uint8
+	Event        *uint8
+	ButtonID     *uint8
+	SceneID      *uint8
+	Notification *uint8
 }
 
-func buildNotification(n C.notification_t) Notification {
-	notification := Notification{
+func (n *Notification) String() string {
+	var pointed []string
+	if n.GroupIDX != nil {
+		pointed = append(pointed, fmt.Sprintf("GroupIDX: %d", *(n.GroupIDX)))
+	}
+	if n.Event != nil {
+		pointed = append(pointed, fmt.Sprintf("Event: %d", *(n.Event)))
+	}
+	if n.ButtonID != nil {
+		pointed = append(pointed, fmt.Sprintf("ButtonID: %d", *(n.ButtonID)))
+	}
+	if n.SceneID != nil {
+		pointed = append(pointed, fmt.Sprintf("SceneID: %d", *(n.SceneID)))
+	}
+	if n.Notification != nil {
+		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
+	}
+	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %+v", n.Type, n.HomeID, n.NodeID, n.ValueID)
+	for i := range pointed {
+		output = fmt.Sprintf("%s, %s", output, pointed[i])
+	}
+	return output
+}
+
+func buildNotification(n C.notification_t) *Notification {
+	notification := &Notification{
 		Type:    NotificationType(C.notification_getType(n)),
 		HomeID:  uint32(C.notification_getHomeId(n)),
 		NodeID:  uint8(C.notification_getNodeId(n)),
@@ -143,73 +169,45 @@ func buildNotification(n C.notification_t) Notification {
 
 	switch notification.Type {
 	case NotificationTypeCreateButton, NotificationTypeDeleteButton, NotificationTypeButtonOn, NotificationTypeButtonOff:
-		notification.ButtonID = uint8(C.notification_getButtonId(n))
+		if notification.ButtonID == nil {
+			notification.ButtonID = new(uint8)
+		}
+		*(notification.ButtonID) = uint8(C.notification_getButtonId(n))
 
 	case NotificationTypeNodeEvent:
-		notification.Event = uint8(C.notification_getEvent(n))
+		if notification.Event == nil {
+			notification.Event = new(uint8)
+		}
+		*(notification.Event) = uint8(C.notification_getEvent(n))
 
 	case NotificationTypeGroup:
-		notification.GroupIDX = uint8(C.notification_getGroupIdx(n))
+		if notification.GroupIDX == nil {
+			notification.GroupIDX = new(uint8)
+		}
+		*(notification.GroupIDX) = uint8(C.notification_getGroupIdx(n))
 
 	case NotificationTypeNotification:
-		notification.Notification = uint8(C.notification_getNotification(n))
+		if notification.Notification == nil {
+			notification.Notification = new(uint8)
+		}
+		*(notification.Notification) = uint8(C.notification_getNotification(n))
 
 	case NotificationTypeControllerCommand:
-		notification.Event = uint8(C.notification_getEvent(n))
-		notification.Notification = uint8(C.notification_getNotification(n))
+		if notification.Event == nil {
+			notification.Event = new(uint8)
+		}
+		*(notification.Event) = uint8(C.notification_getEvent(n))
+		if notification.Notification == nil {
+			notification.Notification = new(uint8)
+		}
+		*(notification.Notification) = uint8(C.notification_getNotification(n))
 
 	case NotificationTypeSceneEvent:
-		notification.SceneID = uint8(C.notification_getSceneId(n))
+		if notification.SceneID == nil {
+			notification.SceneID = new(uint8)
+		}
+		*(notification.SceneID) = uint8(C.notification_getSceneId(n))
 	}
 
 	return notification
 }
-
-// func (n *Notification) GetType() NotificationType {
-// 	return NotificationType(C.notification_getType(n.notification))
-// }
-
-// func (n *Notification) GetHomeId() uint32 {
-// 	return uint32(C.notification_getHomeId(n.notification))
-// }
-
-// func (n *Notification) GetNodeId() uint8 {
-// 	return uint8(C.notification_getNodeId(n.notification))
-// }
-
-// func (n *Notification) GetValueId() *ValueId {
-// 	val := &ValueId{}
-// 	val.valueid = C.notification_getValueId(n.notification)
-// 	return val
-// }
-
-// func (n *Notification) GetGroupIdx() uint8 {
-// 	return uint8(C.notification_getGroupIdx(n.notification))
-// }
-
-// func (n *Notification) GetEvent() uint8 {
-// 	return uint8(C.notification_getEvent(n.notification))
-// }
-
-// func (n *Notification) GetButtonId() uint8 {
-// 	return uint8(C.notification_getButtonId(n.notification))
-// }
-
-// func (n *Notification) GetSceneId() uint8 {
-// 	return uint8(C.notification_getSceneId(n.notification))
-// }
-
-// func (n *Notification) GetNotification() uint8 {
-// 	return uint8(C.notification_getNotification(n.notification))
-// }
-
-// func (n *Notification) GetByte() uint8 {
-// 	return uint8(C.notification_getByte(n.notification))
-// }
-
-// func (n *Notification) GetAsString() string {
-// 	cstr := C.notification_getAsString(n.notification)
-// 	str := C.GoString(cstr)
-// 	C.free(unsafe.Pointer(cstr))
-// 	return str
-// }

@@ -13,7 +13,7 @@ import (
 
 type Manager struct {
 	manager       C.manager_t
-	Notifications chan Notification
+	Notifications chan *Notification
 }
 
 type ManagerVersion struct {
@@ -28,7 +28,7 @@ type ManagerVersion struct {
 func CreateManager() *Manager {
 	m := &Manager{}
 	m.manager = C.manager_create()
-	m.Notifications = make(chan Notification, 10)
+	m.Notifications = make(chan *Notification, 10)
 	return m
 }
 

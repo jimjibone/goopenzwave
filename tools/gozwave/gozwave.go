@@ -8,14 +8,11 @@ import (
 	"os/signal"
 )
 
-var allNotifications []gozwave.Notification
-
 func processNotifications(m *gozwave.Manager) {
 	for {
 		select {
 		case notification := <-m.Notifications:
-			fmt.Printf("processNotifications: %+v\n", notification)
-			allNotifications = append(allNotifications, notification)
+			fmt.Println(notification)
 		}
 	}
 }
@@ -27,6 +24,7 @@ func main() {
 
 	fmt.Println("gozwave example starting with openzwave version:", gozwave.GetManagerVersionAsString())
 
+	// Setup the OpenZWave library.
 	options := gozwave.CreateOptions("./config/", "", "")
 	options.AddOptionLogLevel("SaveLogLevel", gozwave.LogLevelNone)
 	options.AddOptionLogLevel("QueueLogLevel", gozwave.LogLevelNone)
@@ -36,27 +34,15 @@ func main() {
 	options.AddOptionBool("ValidateValueChanges", true)
 	options.Lock()
 
-	// nodeInfoCollector := NodeInfoCollector{
-	// 	nodeInfo: make(chan NodeInfo),
-	// }
+	// Start the library and listen for notifications.
 	manager := gozwave.CreateManager()
-	// watcher, ok := manager.AddWatcher(watcherFunc, nodeInfoCollector)
-	// if ok == false {
-	// 	fmt.Println("ERROR: failed to add watcher")
-	// 	return
-	// }
 	err := manager.StartNotifications()
 	if err != nil {
 		fmt.Println("ERROR: failed to start notifications:", err)
 	}
-
 	manager.AddDriver(controllerPath)
 
-	// nodes := make(map[uint8]*NodeInfo)
-
-	// Collect the node info from the channel.
-	// go collectNodeInfo(&nodeInfoCollector, &nodes)
-
+	// Now listen to the many notifications.
 	go processNotifications(manager)
 
 	// Now wait for the user to quit.
@@ -66,15 +52,9 @@ func main() {
 
 	// All done now finish up.
 	manager.RemoveDriver(controllerPath)
-	// manager.RemoveWatcher(watcher)
 	manager.StopNotifications()
 	gozwave.DestroyManager()
 	gozwave.DestroyOptions()
-
-	fmt.Println("all notifications:")
-	for i := range allNotifications {
-		fmt.Printf("\t%d: %+v\n", i, allNotifications[i])
-	}
 
 	fmt.Println("finished")
 }
