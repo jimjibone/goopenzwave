@@ -122,12 +122,32 @@ func (nt NotificationType) String() string {
 	return "UNKNOWN"
 }
 
+func (nc NotificationCode) String() string {
+	switch nc {
+	case NotificationCodeMsgComplete:
+		return "CodeMsgComplete"
+	case NotificationCodeTimeout:
+		return "CodeTimeout"
+	case NotificationCodeNoOperation:
+		return "CodeNoOperation"
+	case NotificationCodeAwake:
+		return "CodeAwake"
+	case NotificationCodeSleep:
+		return "CodeSleep"
+	case NotificationCodeDead:
+		return "CodeDead"
+	case NotificationCodeAlive:
+		return "CodeAlive"
+	}
+	return "UNKNOWN"
+}
+
 // Notification is a container for the C++ OpenZWave library Notification class.
 type Notification struct {
 	Type         NotificationType
 	HomeID       uint32
 	NodeID       uint8
-	ValueID      ValueID
+	ValueID      *ValueID
 	GroupIDX     *uint8
 	Event        *uint8
 	ButtonID     *uint8
@@ -152,7 +172,7 @@ func (n *Notification) String() string {
 	if n.Notification != nil {
 		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
 	}
-	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %+v", n.Type, n.HomeID, n.NodeID, n.ValueID)
+	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID)
 	for i := range pointed {
 		output = fmt.Sprintf("%s, %s", output, pointed[i])
 	}
@@ -164,7 +184,7 @@ func buildNotification(n C.notification_t) *Notification {
 		Type:    NotificationType(C.notification_getType(n)),
 		HomeID:  uint32(C.notification_getHomeId(n)),
 		NodeID:  uint8(C.notification_getNodeId(n)),
-		ValueID: ValueID{valueid: C.notification_getValueId(n)},
+		ValueID: &ValueID{valueid: C.notification_getValueId(n)},
 	}
 
 	switch notification.Type {

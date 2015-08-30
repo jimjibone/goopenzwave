@@ -5,6 +5,9 @@ package gozwave
 // #include "valueid.h"
 // #include <stdlib.h>
 import "C"
+import (
+	"fmt"
+)
 
 // ValueGenre defines a type for the valueid genre enum.
 type ValueIDGenre int
@@ -32,9 +35,56 @@ const (
 	ValueIDTypeMax      = ValueIDType(C.valueid_type_max)
 )
 
+func (v ValueIDGenre) String() string {
+	switch v {
+	case ValueIDGenreBasic:
+		return "GenreBasic"
+	case ValueIDGenreUser:
+		return "GenreUser"
+	case ValueIDGenreConfig:
+		return "GenreConfig"
+	case ValueIDGenreSystem:
+		return "GenreSystem"
+	case ValueIDGenreCount:
+		return "GenreCount"
+	}
+	return "UNKNOWN"
+}
+
+func (v ValueIDType) String() string {
+	switch v {
+	case ValueIDTypeBool:
+		return "TypeBool"
+	case ValueIDTypeByte:
+		return "TypeByte"
+	case ValueIDTypeDecimal:
+		return "TypeDecimal"
+	case ValueIDTypeInt:
+		return "TypeInt"
+	case ValueIDTypeList:
+		return "TypeList"
+	case ValueIDTypeSchedule:
+		return "TypeSchedule"
+	case ValueIDTypeShort:
+		return "TypeShort"
+	case ValueIDTypeString:
+		return "TypeString"
+	case ValueIDTypeButton:
+		return "TypeButton"
+	case ValueIDTypeRaw: // also ValueIDTypeMax
+		return "Type(Raw|Max)"
+	}
+	return "UNKNOWN"
+}
+
 // ValueID is a container for the C++ OpenZWave library ValueID class.
 type ValueID struct {
 	valueid C.valueid_t
+}
+
+func (v *ValueID) String() string {
+	return fmt.Sprintf("ValueID{HomeID: %d, NodeID: %d, Genre: %+v, CommandClassID: %d, Instance: %d, Index: %d, Type: %+v, ID: %d}",
+		v.GetHomeId(), v.GetNodeId(), v.GetGenre(), v.GetCommandClassId(), v.GetInstance(), v.GetIndex(), v.GetType(), v.GetId())
 }
 
 func (v *ValueID) GetHomeId() uint32 {
