@@ -511,7 +511,7 @@ func (m *Manager) GetValueAsRaw(valueid *ValueID) (bool, []byte) {
 	result := bool(C.manager_getValueAsRaw(m.manager, valueid.valueid, cBytes))
 	goBytes := make([]byte, int(cBytes.length))
 	for i := 0; i < int(cBytes.length); i++ {
-		goBytes[i] = byte(C.string_byteAt(cBytes, C.uint(i)))
+		goBytes[i] = byte(C.string_byteAt(cBytes, C.size_t(i)))
 	}
 	return result, goBytes
 }
@@ -535,7 +535,7 @@ func (m *Manager) GetValueListItems(valueid *ValueID) (bool, []string) {
 	result := bool(C.manager_getValueListItems(m.manager, valueid.valueid, cStringList))
 	goStringList := make([]string, int(cStringList.length))
 	for i := 0; i < int(cStringList.length); i++ {
-		cString := C.string_stringAt(cStringList, C.uint(i))
+		cString := C.string_stringAt(cStringList, C.size_t(i))
 		goStringList[i] = C.GoString(cString.data)
 	}
 	C.string_freeStringList(cStringList)
@@ -570,9 +570,9 @@ func (m *Manager) SetValueInt16(valueid *ValueID, value int16) bool {
 
 func (m *Manager) SetValueBytes(valueid *ValueID, value []byte) bool {
 	cBytes := C.string_emptyBytes()
-	C.string_initBytes(cBytes, C.uint(len(value)))
+	C.string_initBytes(cBytes, C.size_t(len(value)))
 	for i := range value {
-		C.string_setByteAt(cBytes, C.uint8_t(value[i]), C.uint(i))
+		C.string_setByteAt(cBytes, C.uint8_t(value[i]), C.size_t(i))
 	}
 	result := bool(C.manager_setValueBytes(m.manager, valueid.valueid, cBytes))
 	C.string_freeBytes(cBytes)

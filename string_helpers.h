@@ -12,7 +12,7 @@ extern "C" {
  */
 typedef struct {
     char *data;
-    unsigned int length;
+    size_t length;
 } string_t;
 
 /**
@@ -20,7 +20,7 @@ typedef struct {
  */
 typedef struct {
     uint8_t *data;
-    unsigned int length;
+    size_t length;
 } bytes_t;
 
 /**
@@ -28,21 +28,21 @@ typedef struct {
  */
 typedef struct {
     string_t **list;
-    unsigned int length;
+    size_t length;
 } stringlist_t;
 
 string_t* string_emptyString();
-void string_initString(string_t *string, unsigned int size);
+void string_initString(string_t *string, size_t size);
 void string_freeString(string_t *string);
 
 bytes_t* string_emptyBytes();
-void string_initBytes(bytes_t *bytes, unsigned int size);
-void string_setByteAt(bytes_t *bytes, uint8_t value, unsigned int position);
-uint8_t string_byteAt(bytes_t *bytes, unsigned int position);
+void string_initBytes(bytes_t *bytes, size_t size);
+void string_setByteAt(bytes_t *bytes, uint8_t value, size_t position);
+uint8_t string_byteAt(bytes_t *bytes, size_t position);
 void string_freeBytes(bytes_t *bytes);
 
 stringlist_t* string_emptyStringList();
-string_t* string_stringAt(stringlist_t *list, unsigned int position);
+string_t* string_stringAt(stringlist_t *list, size_t position);
 void string_freeStringList(stringlist_t *strings);
 
 #ifdef __cplusplus

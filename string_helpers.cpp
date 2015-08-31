@@ -9,7 +9,7 @@ string_t* string_emptyString()
     return string;
 }
 
-void string_initString(string_t *string, unsigned int size)
+void string_initString(string_t *string, size_t size)
 {
     if (string->data != NULL) {
         delete string->data;
@@ -41,7 +41,7 @@ bytes_t* string_emptyBytes()
     return bytes;
 }
 
-void string_initBytes(bytes_t *bytes, unsigned int size)
+void string_initBytes(bytes_t *bytes, size_t size)
 {
     if (bytes->data != NULL) {
         delete bytes->data;
@@ -57,12 +57,12 @@ void string_initBytes(bytes_t *bytes, unsigned int size)
     }
 }
 
-void string_setByteAt(bytes_t *bytes, uint8_t value, unsigned int position)
+void string_setByteAt(bytes_t *bytes, uint8_t value, size_t position)
 {
     bytes->data[position] = value;
 }
 
-uint8_t string_byteAt(bytes_t *bytes, unsigned int position)
+uint8_t string_byteAt(bytes_t *bytes, size_t position)
 {
     return bytes->data[position];
 }
@@ -82,7 +82,7 @@ stringlist_t* string_emptyStringList()
     return list;
 }
 
-string_t* string_stringAt(stringlist_t *list, unsigned int position)
+string_t* string_stringAt(stringlist_t *list, size_t position)
 {
     return list->list[position];
 }
