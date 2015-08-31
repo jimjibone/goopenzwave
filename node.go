@@ -4,6 +4,9 @@ import (
 	"fmt"
 )
 
+// Node contains all information available for a Node from the OpenZWave
+// library. Create a new Node by using the `NewNode` function with the HomeID
+// and NodeID as supplied from a Notification.
 type Node struct {
 	HomeID           uint32
 	NodeID           uint8
@@ -20,28 +23,11 @@ type Node struct {
 	ProductID        string
 }
 
-func NewNode(homeId uint32, nodeId uint8) *Node {
-	node := &Node{
-		HomeID: homeId,
-		NodeID: nodeId,
-	}
-	manager := GetManager()
-	node.BasicType = manager.GetNodeBasic(homeId, nodeId)
-	node.GenericType = manager.GetNodeGeneric(homeId, nodeId)
-	node.SpecificType = manager.GetNodeSpecific(homeId, nodeId)
-	node.NodeType = manager.GetNodeType(homeId, nodeId)
-	node.ManufacturerName = manager.GetNodeManufacturerName(homeId, nodeId)
-	node.ProductName = manager.GetNodeProductName(homeId, nodeId)
-	node.NodeName = manager.GetNodeName(homeId, nodeId)
-	node.Location = manager.GetNodeLocation(homeId, nodeId)
-	node.ManufacturerID = manager.GetNodeManufacturerId(homeId, nodeId)
-	node.ProductType = manager.GetNodeProductType(homeId, nodeId)
-	node.ProductID = manager.GetNodeProductId(homeId, nodeId)
-	return node
-}
-
 func (n *Node) String() string {
-	return fmt.Sprintf("Node{HomeID: %d, NodeID: %d, BasicType: %d, GenericType: %d, SpecificType: %d, NodeType: %q, ManufacturerName: %q, ProductName: %q, NodeName: %q, Location: %q, ManufacturerID: %q, ProductType: %q, ProductID: %q}",
+	return fmt.Sprintf("Node{HomeID: %d, NodeID: %d, BasicType: %d, "+
+		"GenericType: %d, SpecificType: %d, NodeType: %q, "+
+		"ManufacturerName: %q, ProductName: %q, NodeName: %q, Location: %q, "+
+		"ManufacturerID: %q, ProductType: %q, ProductID: %q}",
 		n.HomeID,
 		n.NodeID,
 		n.BasicType,
@@ -56,4 +42,26 @@ func (n *Node) String() string {
 		n.ProductType,
 		n.ProductID,
 	)
+}
+
+// NewNode will create a new Node object filled with the data available from the
+// Manager based on the homeID and nodeID.
+func NewNode(homeID uint32, nodeID uint8) *Node {
+	node := &Node{
+		HomeID: homeID,
+		NodeID: nodeID,
+	}
+	manager := GetManager()
+	node.BasicType = manager.GetNodeBasic(homeID, nodeID)
+	node.GenericType = manager.GetNodeGeneric(homeID, nodeID)
+	node.SpecificType = manager.GetNodeSpecific(homeID, nodeID)
+	node.NodeType = manager.GetNodeType(homeID, nodeID)
+	node.ManufacturerName = manager.GetNodeManufacturerName(homeID, nodeID)
+	node.ProductName = manager.GetNodeProductName(homeID, nodeID)
+	node.NodeName = manager.GetNodeName(homeID, nodeID)
+	node.Location = manager.GetNodeLocation(homeID, nodeID)
+	node.ManufacturerID = manager.GetNodeManufacturerId(homeID, nodeID)
+	node.ProductType = manager.GetNodeProductType(homeID, nodeID)
+	node.ProductID = manager.GetNodeProductId(homeID, nodeID)
+	return node
 }
