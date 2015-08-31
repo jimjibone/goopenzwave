@@ -11,6 +11,7 @@ import (
 type NodeInfo struct {
 	HomeID uint32
 	NodeID uint8
+	Node   *gozwave.Node
 	Values []*gozwave.ValueID
 }
 
@@ -30,6 +31,7 @@ func processNotifications(m *gozwave.Manager) {
 				nodeinfo := &NodeInfo{
 					HomeID: notification.HomeID,
 					NodeID: notification.NodeID,
+					Node:   gozwave.NewNode(notification.HomeID, notification.NodeID),
 				}
 				Nodes[nodeinfo.NodeID] = nodeinfo
 
@@ -95,7 +97,7 @@ func main() {
 	// Print out what we know about the network.
 	fmt.Println("Nodes:")
 	for id, node := range Nodes {
-		fmt.Printf("\t%d: %+v\n", id, *node)
+		fmt.Printf("\t%d: %s\n", id, node.Node)
 	}
 
 	fmt.Println("finished")
