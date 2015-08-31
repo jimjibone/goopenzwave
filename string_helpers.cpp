@@ -1,5 +1,6 @@
 #include "string_helpers.h"
 #include <stdlib.h>
+#include <assert.h>
 
 string_t* string_emptyString()
 {
@@ -108,8 +109,9 @@ void string_copyStdString(string_t *cstr, std::string &string)
     // Copy string into a new cstr->data.
     cstr->length = string.size() + 1;
     cstr->data = (char*)malloc(sizeof(char) * cstr->length);
-    string.copy(cstr->data, string.size(), 0);
-    cstr->data[cstr->length] = '\0';
+    size_t len = string.copy(cstr->data, string.size(), 0);
+    assert(cstr->length == len+1);
+    cstr->data[len] = '\0';
 }
 
 std::string string_toStdString(string_t *string)
@@ -123,8 +125,9 @@ string_t* string_fromStdString(std::string &string)
     string_t *cstr = (string_t*)malloc(sizeof(string_t));
     cstr->length = string.size() + 1;
     cstr->data = (char*)malloc(sizeof(char) * cstr->length);
-    string.copy(cstr->data, string.size(), 0);
-    cstr->data[cstr->length] = '\0';
+    size_t len = string.copy(cstr->data, string.size(), 0);
+    assert(cstr->length == len+1);
+    cstr->data[len] = '\0';
     return cstr;
 }
 
