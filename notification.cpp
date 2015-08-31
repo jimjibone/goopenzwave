@@ -160,12 +160,9 @@ uint8_t notification_getByte(notification_t n)
     return noti->GetEvent();
 }
 
-const char* notification_getAsString(notification_t n)
+string_t* notification_getAsString(notification_t n)
 {
     OpenZWave::Notification *noti = (OpenZWave::Notification*)n;
-    std::string not_string = noti->GetAsString();
-    char *not_cstring = new char[not_string.size()+1];
-    memcpy(not_cstring, not_string.c_str(), not_string.size());
-    not_cstring[not_string.size()] = 0;
-    return not_cstring;
+    std::string str = noti->GetAsString();
+    return string_fromStdString(str);
 }
