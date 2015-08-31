@@ -184,7 +184,7 @@ func buildNotification(n C.notification_t) *Notification {
 		Type:    NotificationType(C.notification_getType(n)),
 		HomeID:  uint32(C.notification_getHomeId(n)),
 		NodeID:  uint8(C.notification_getNodeId(n)),
-		ValueID: &ValueID{valueid: C.notification_getValueId(n)},
+		ValueID: buildValueID(C.notification_getValueId(n)),
 	}
 
 	switch notification.Type {

@@ -106,3 +106,19 @@ uint64_t valueid_getId(valueid_t v)
     OpenZWave::ValueID *valid = (OpenZWave::ValueID*)v;
     return valid->GetId();
 }
+
+//
+// Go helper functions.
+//
+
+valueid_t valueid_create(uint32_t homeId, uint64_t id)
+{
+    OpenZWave::ValueID *valueid = new OpenZWave::ValueID(homeId, id);
+    return (valueid_t)valueid;
+}
+
+void valueid_free(valueid_t valueid)
+{
+    OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
+    delete val;
+}

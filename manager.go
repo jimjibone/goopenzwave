@@ -162,23 +162,33 @@ func (m *Manager) SetPollInterval(milliseconds int32, intervalBetweenPolls bool)
 }
 
 func (m *Manager) EnablePoll(valueid *ValueID, intensity uint8) bool {
-	return bool(C.manager_enablePoll(m.manager, valueid.valueid, C.uint8_t(intensity)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_enablePoll(m.manager, cValueid, C.uint8_t(intensity)))
 }
 
 func (m *Manager) DisablePoll(valueid *ValueID) bool {
-	return bool(C.manager_disablePoll(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_disablePoll(m.manager, cValueid))
 }
 
 func (m *Manager) IsPolled(valueid *ValueID) bool {
-	return bool(C.manager_isPolled(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_isPolled(m.manager, cValueid))
 }
 
 func (m *Manager) SetPollIntensity(valueid *ValueID, intensity uint8) {
-	C.manager_setPollIntensity(m.manager, valueid.valueid, C.uint8_t(intensity))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	C.manager_setPollIntensity(m.manager, cValueid, C.uint8_t(intensity))
 }
 
 func (m *Manager) GetPollIntensity(valueid *ValueID) uint8 {
-	return uint8(C.manager_getPollIntensity(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return uint8(C.manager_getPollIntensity(m.manager, cValueid))
 }
 
 //
@@ -406,109 +416,147 @@ func (m *Manager) GetNodePlusTypeString(homeId uint32, nodeId uint8) string {
 //
 
 func (m *Manager) GetValueLabel(valueid *ValueID) string {
-	cString := C.manager_getValueLabel(m.manager, valueid.valueid)
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	cString := C.manager_getValueLabel(m.manager, cValueid)
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return goString
 }
 
 func (m *Manager) SetValueLabel(valueid *ValueID, value string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	C.manager_setValueLabel(m.manager, valueid.valueid, cString)
+	C.manager_setValueLabel(m.manager, cValueid, cString)
 	C.free(unsafe.Pointer(cString))
 }
 
 func (m *Manager) GetValueUnits(valueid *ValueID) string {
-	cString := C.manager_getValueUnits(m.manager, valueid.valueid)
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	cString := C.manager_getValueUnits(m.manager, cValueid)
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return goString
 }
 
 func (m *Manager) SetValueUnits(valueid *ValueID, value string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	C.manager_setValueUnits(m.manager, valueid.valueid, cString)
+	C.manager_setValueUnits(m.manager, cValueid, cString)
 	C.free(unsafe.Pointer(cString))
 }
 
 func (m *Manager) GetValueHelp(valueid *ValueID) string {
-	cString := C.manager_getValueHelp(m.manager, valueid.valueid)
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	cString := C.manager_getValueHelp(m.manager, cValueid)
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return goString
 }
 
 func (m *Manager) SetValueHelp(valueid *ValueID, value string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	C.manager_setValueHelp(m.manager, valueid.valueid, cString)
+	C.manager_setValueHelp(m.manager, cValueid, cString)
 	C.free(unsafe.Pointer(cString))
 }
 
 func (m *Manager) GetValueMin(valueid *ValueID) int32 {
-	return int32(C.manager_getValueMin(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return int32(C.manager_getValueMin(m.manager, cValueid))
 }
 
 func (m *Manager) GetValueMax(valueid *ValueID) int32 {
-	return int32(C.manager_getValueMax(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return int32(C.manager_getValueMax(m.manager, cValueid))
 }
 
 func (m *Manager) IsValueReadOnly(valueid *ValueID) bool {
-	return bool(C.manager_isValueReadOnly(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_isValueReadOnly(m.manager, cValueid))
 }
 
 func (m *Manager) IsValueWriteOnly(valueid *ValueID) bool {
-	return bool(C.manager_isValueWriteOnly(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_isValueWriteOnly(m.manager, cValueid))
 }
 
 func (m *Manager) IsValueSet(valueid *ValueID) bool {
-	return bool(C.manager_isValueSet(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_isValueSet(m.manager, cValueid))
 }
 
 func (m *Manager) IsValuePolled(valueid *ValueID) bool {
-	return bool(C.manager_isValuePolled(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_isValuePolled(m.manager, cValueid))
 }
 
 func (m *Manager) GetValueAsBool(valueid *ValueID) (bool, bool) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cBool C.bool
-	result := bool(C.manager_getValueAsBool(m.manager, valueid.valueid, &cBool))
+	result := bool(C.manager_getValueAsBool(m.manager, cValueid, &cBool))
 	return result, bool(cBool)
 }
 
 func (m *Manager) GetValueAsByte(valueid *ValueID) (bool, byte) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cByte C.uint8_t
-	result := bool(C.manager_getValueAsByte(m.manager, valueid.valueid, &cByte))
+	result := bool(C.manager_getValueAsByte(m.manager, cValueid, &cByte))
 	return result, byte(cByte)
 }
 
 func (m *Manager) GetValueAsFloat(valueid *ValueID) (bool, float32) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cFloat C.float
-	result := bool(C.manager_getValueAsFloat(m.manager, valueid.valueid, &cFloat))
+	result := bool(C.manager_getValueAsFloat(m.manager, cValueid, &cFloat))
 	return result, float32(cFloat)
 }
 
 func (m *Manager) GetValueAsInt(valueid *ValueID) (bool, int32) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cInt C.int32_t
-	result := bool(C.manager_getValueAsInt(m.manager, valueid.valueid, &cInt))
+	result := bool(C.manager_getValueAsInt(m.manager, cValueid, &cInt))
 	return result, int32(cInt)
 }
 
 func (m *Manager) GetValueAsShort(valueid *ValueID) (bool, int16) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cShort C.int16_t
-	result := bool(C.manager_getValueAsShort(m.manager, valueid.valueid, &cShort))
+	result := bool(C.manager_getValueAsShort(m.manager, cValueid, &cShort))
 	return result, int16(cShort)
 }
 
 func (m *Manager) GetValueAsString(valueid *ValueID) (bool, string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.string_emptyString()
-	result := bool(C.manager_getValueAsString(m.manager, valueid.valueid, cString))
+	result := bool(C.manager_getValueAsString(m.manager, cValueid, cString))
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return result, goString
 }
 
 func (m *Manager) GetValueAsRaw(valueid *ValueID) (bool, []byte) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cBytes := C.string_emptyBytes()
-	result := bool(C.manager_getValueAsRaw(m.manager, valueid.valueid, cBytes))
+	result := bool(C.manager_getValueAsRaw(m.manager, cValueid, cBytes))
 	goBytes := make([]byte, int(cBytes.length))
 	for i := 0; i < int(cBytes.length); i++ {
 		goBytes[i] = byte(C.string_byteAt(cBytes, C.size_t(i)))
@@ -517,22 +565,28 @@ func (m *Manager) GetValueAsRaw(valueid *ValueID) (bool, []byte) {
 }
 
 func (m *Manager) GetValueListSelectionAsString(valueid *ValueID) (bool, string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.string_emptyString()
-	result := bool(C.manager_getValueListSelectionAsString(m.manager, valueid.valueid, cString))
+	result := bool(C.manager_getValueListSelectionAsString(m.manager, cValueid, cString))
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return result, goString
 }
 
 func (m *Manager) GetValueListSelectionAsInt32(valueid *ValueID) (bool, int32) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cInt C.int32_t
-	result := bool(C.manager_getValueListSelectionAsInt32(m.manager, valueid.valueid, &cInt))
+	result := bool(C.manager_getValueListSelectionAsInt32(m.manager, cValueid, &cInt))
 	return result, int32(cInt)
 }
 
 func (m *Manager) GetValueListItems(valueid *ValueID) (bool, []string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cStringList := C.string_emptyStringList()
-	result := bool(C.manager_getValueListItems(m.manager, valueid.valueid, cStringList))
+	result := bool(C.manager_getValueListItems(m.manager, cValueid, cStringList))
 	goStringList := make([]string, int(cStringList.length))
 	for i := 0; i < int(cStringList.length); i++ {
 		cString := C.string_stringAt(cStringList, C.size_t(i))
@@ -543,74 +597,102 @@ func (m *Manager) GetValueListItems(valueid *ValueID) (bool, []string) {
 }
 
 func (m *Manager) GetValueFloatPrecision(valueid *ValueID) (bool, uint8) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cPrecision C.uint8_t
-	result := bool(C.manager_getValueFloatPrecision(m.manager, valueid.valueid, &cPrecision))
+	result := bool(C.manager_getValueFloatPrecision(m.manager, cValueid, &cPrecision))
 	return result, uint8(cPrecision)
 }
 
 func (m *Manager) SetValueBool(valueid *ValueID, value bool) bool {
-	return bool(C.manager_setValueBool(m.manager, valueid.valueid, C.bool(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setValueBool(m.manager, cValueid, C.bool(value)))
 }
 
 func (m *Manager) SetValueUint8(valueid *ValueID, value uint8) bool {
-	return bool(C.manager_setValueUint8(m.manager, valueid.valueid, C.uint8_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setValueUint8(m.manager, cValueid, C.uint8_t(value)))
 }
 
 func (m *Manager) SetValueFloat(valueid *ValueID, value float32) bool {
-	return bool(C.manager_setValueFloat(m.manager, valueid.valueid, C.float(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setValueFloat(m.manager, cValueid, C.float(value)))
 }
 
 func (m *Manager) SetValueInt32(valueid *ValueID, value int32) bool {
-	return bool(C.manager_setValueInt32(m.manager, valueid.valueid, C.int32_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setValueInt32(m.manager, cValueid, C.int32_t(value)))
 }
 
 func (m *Manager) SetValueInt16(valueid *ValueID, value int16) bool {
-	return bool(C.manager_setValueInt16(m.manager, valueid.valueid, C.int16_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setValueInt16(m.manager, cValueid, C.int16_t(value)))
 }
 
 func (m *Manager) SetValueBytes(valueid *ValueID, value []byte) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cBytes := C.string_emptyBytes()
 	C.string_initBytes(cBytes, C.size_t(len(value)))
 	for i := range value {
 		C.string_setByteAt(cBytes, C.uint8_t(value[i]), C.size_t(i))
 	}
-	result := bool(C.manager_setValueBytes(m.manager, valueid.valueid, cBytes))
+	result := bool(C.manager_setValueBytes(m.manager, cValueid, cBytes))
 	C.string_freeBytes(cBytes)
 	return result
 }
 
 func (m *Manager) SetValueString(valueid *ValueID, value string) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	result := bool(C.manager_setValueString(m.manager, valueid.valueid, cString))
+	result := bool(C.manager_setValueString(m.manager, cValueid, cString))
 	C.free(unsafe.Pointer(cString))
 	return result
 }
 
 func (m *Manager) SetValueListSelection(valueid *ValueID, selectedItem string) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(selectedItem)
-	result := bool(C.manager_setValueListSelection(m.manager, valueid.valueid, cString))
+	result := bool(C.manager_setValueListSelection(m.manager, cValueid, cString))
 	C.free(unsafe.Pointer(cString))
 	return result
 }
 
 func (m *Manager) RefreshValue(valueid *ValueID) bool {
-	return bool(C.manager_refreshValue(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_refreshValue(m.manager, cValueid))
 }
 
 func (m *Manager) SetChangeVerified(valueid *ValueID, verify bool) {
-	C.manager_setChangeVerified(m.manager, valueid.valueid, C.bool(verify))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	C.manager_setChangeVerified(m.manager, cValueid, C.bool(verify))
 }
 
 func (m *Manager) GetChangeVerified(valueid *ValueID) bool {
-	return bool(C.manager_getChangeVerified(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_getChangeVerified(m.manager, cValueid))
 }
 
 func (m *Manager) PressButton(valueid *ValueID) bool {
-	return bool(C.manager_pressButton(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_pressButton(m.manager, cValueid))
 }
 
 func (m *Manager) ReleaseButton(valueid *ValueID) bool {
-	return bool(C.manager_releaseButton(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_releaseButton(m.manager, cValueid))
 }
 
 //
@@ -618,26 +700,36 @@ func (m *Manager) ReleaseButton(valueid *ValueID) bool {
 //
 
 func (m *Manager) GetNumSwitchPoints(valueid *ValueID) uint8 {
-	return uint8(C.manager_getNumSwitchPoints(m.manager, valueid.valueid))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return uint8(C.manager_getNumSwitchPoints(m.manager, cValueid))
 }
 
 func (m *Manager) SetSwitchPoint(valueid *ValueID, hours, minutes uint8, setback int8) bool {
-	return bool(C.manager_setSwitchPoint(m.manager, valueid.valueid, C.uint8_t(hours), C.uint8_t(minutes), C.int8_t(setback)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSwitchPoint(m.manager, cValueid, C.uint8_t(hours), C.uint8_t(minutes), C.int8_t(setback)))
 }
 
 func (m *Manager) RemoveSwitchPoint(valueid *ValueID, hours, minutes uint8) bool {
-	return bool(C.manager_removeSwitchPoint(m.manager, valueid.valueid, C.uint8_t(hours), C.uint8_t(minutes)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_removeSwitchPoint(m.manager, cValueid, C.uint8_t(hours), C.uint8_t(minutes)))
 }
 
 func (m *Manager) ClearSwitchPoints(valueid *ValueID) {
-	C.manager_clearSwitchPoints(m.manager, valueid.valueid)
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	C.manager_clearSwitchPoints(m.manager, cValueid)
 }
 
 func (m *Manager) GetSwitchPoint(valueid *ValueID, idx uint8) (bool, uint8, uint8, int8) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cHours C.uint8_t
 	var cMinutes C.uint8_t
 	var cSetback C.int8_t
-	result := bool(C.manager_getSwitchPoint(m.manager, valueid.valueid, C.uint8_t(idx), &cHours, &cMinutes, &cSetback))
+	result := bool(C.manager_getSwitchPoint(m.manager, cValueid, C.uint8_t(idx), &cHours, &cMinutes, &cSetback))
 	return result, uint8(cHours), uint8(cMinutes), int8(cSetback)
 }
 
@@ -857,131 +949,179 @@ func (m *Manager) RemoveScene(sceneId uint8) bool {
 }
 
 func (m *Manager) AddSceneValueBool(sceneId uint8, valueid *ValueID, value bool) bool {
-	return bool(C.manager_addSceneValueBool(m.manager, C.uint8_t(sceneId), valueid.valueid, C.bool(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_addSceneValueBool(m.manager, C.uint8_t(sceneId), cValueid, C.bool(value)))
 }
 
 func (m *Manager) AddSceneValueUint8(sceneId uint8, valueid *ValueID, value uint8) bool {
-	return bool(C.manager_addSceneValueUint8(m.manager, C.uint8_t(sceneId), valueid.valueid, C.uint8_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_addSceneValueUint8(m.manager, C.uint8_t(sceneId), cValueid, C.uint8_t(value)))
 }
 
 func (m *Manager) AddSceneValueFloat(sceneId uint8, valueid *ValueID, value float32) bool {
-	return bool(C.manager_addSceneValueFloat(m.manager, C.uint8_t(sceneId), valueid.valueid, C.float(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_addSceneValueFloat(m.manager, C.uint8_t(sceneId), cValueid, C.float(value)))
 }
 
 func (m *Manager) AddSceneValueInt32(sceneId uint8, valueid *ValueID, value int32) bool {
-	return bool(C.manager_addSceneValueInt32(m.manager, C.uint8_t(sceneId), valueid.valueid, C.int32_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_addSceneValueInt32(m.manager, C.uint8_t(sceneId), cValueid, C.int32_t(value)))
 }
 
 func (m *Manager) AddSceneValueInt16(sceneId uint8, valueid *ValueID, value int16) bool {
-	return bool(C.manager_addSceneValueInt16(m.manager, C.uint8_t(sceneId), valueid.valueid, C.int16_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_addSceneValueInt16(m.manager, C.uint8_t(sceneId), cValueid, C.int16_t(value)))
 }
 
 func (m *Manager) AddSceneValueString(sceneId uint8, valueid *ValueID, value string) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	result := bool(C.manager_addSceneValueString(m.manager, C.uint8_t(sceneId), valueid.valueid, cString))
+	result := bool(C.manager_addSceneValueString(m.manager, C.uint8_t(sceneId), cValueid, cString))
 	C.free(unsafe.Pointer(cString))
 	return result
 }
 
 func (m *Manager) AddSceneValueListSelectionString(sceneId uint8, valueid *ValueID, value string) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	result := bool(C.manager_addSceneValueListSelectionString(m.manager, C.uint8_t(sceneId), valueid.valueid, cString))
+	result := bool(C.manager_addSceneValueListSelectionString(m.manager, C.uint8_t(sceneId), cValueid, cString))
 	C.free(unsafe.Pointer(cString))
 	return result
 }
 
 func (m *Manager) AddSceneValueListSelectionInt32(sceneId uint8, valueid *ValueID, value int32) bool {
-	return bool(C.manager_addSceneValueListSelectionInt32(m.manager, C.uint8_t(sceneId), valueid.valueid, C.int32_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_addSceneValueListSelectionInt32(m.manager, C.uint8_t(sceneId), cValueid, C.int32_t(value)))
 }
 
 func (m *Manager) GetSceneValueAsBool(sceneId uint8, valueid *ValueID) (bool, bool) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cBool C.bool
-	result := bool(C.manager_sceneGetValueAsBool(m.manager, C.uint8_t(sceneId), valueid.valueid, &cBool))
+	result := bool(C.manager_sceneGetValueAsBool(m.manager, C.uint8_t(sceneId), cValueid, &cBool))
 	return result, bool(cBool)
 }
 
 func (m *Manager) GetSceneValueAsByte(sceneId uint8, valueid *ValueID) (bool, byte) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cByte C.uint8_t
-	result := bool(C.manager_sceneGetValueAsByte(m.manager, C.uint8_t(sceneId), valueid.valueid, &cByte))
+	result := bool(C.manager_sceneGetValueAsByte(m.manager, C.uint8_t(sceneId), cValueid, &cByte))
 	return result, byte(cByte)
 }
 
 func (m *Manager) GetSceneValueAsFloat(sceneId uint8, valueid *ValueID) (bool, float32) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cFloat C.float
-	result := bool(C.manager_sceneGetValueAsFloat(m.manager, C.uint8_t(sceneId), valueid.valueid, &cFloat))
+	result := bool(C.manager_sceneGetValueAsFloat(m.manager, C.uint8_t(sceneId), cValueid, &cFloat))
 	return result, float32(cFloat)
 }
 
 func (m *Manager) GetSceneValueAsInt(sceneId uint8, valueid *ValueID) (bool, int32) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cInt C.int32_t
-	result := bool(C.manager_sceneGetValueAsInt(m.manager, C.uint8_t(sceneId), valueid.valueid, &cInt))
+	result := bool(C.manager_sceneGetValueAsInt(m.manager, C.uint8_t(sceneId), cValueid, &cInt))
 	return result, int32(cInt)
 }
 
 func (m *Manager) GetSceneValueAsShort(sceneId uint8, valueid *ValueID) (bool, int16) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cShort C.int16_t
-	result := bool(C.manager_sceneGetValueAsShort(m.manager, C.uint8_t(sceneId), valueid.valueid, &cShort))
+	result := bool(C.manager_sceneGetValueAsShort(m.manager, C.uint8_t(sceneId), cValueid, &cShort))
 	return result, int16(cShort)
 }
 
 func (m *Manager) GetSceneValueAsString(sceneId uint8, valueid *ValueID) (bool, string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.string_emptyString()
-	result := bool(C.manager_sceneGetValueAsString(m.manager, C.uint8_t(sceneId), valueid.valueid, cString))
+	result := bool(C.manager_sceneGetValueAsString(m.manager, C.uint8_t(sceneId), cValueid, cString))
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return result, goString
 }
 
 func (m *Manager) GetSceneValueListSelectionString(sceneId uint8, valueid *ValueID) (bool, string) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.string_emptyString()
-	result := bool(C.manager_sceneGetValueListSelectionString(m.manager, C.uint8_t(sceneId), valueid.valueid, cString))
+	result := bool(C.manager_sceneGetValueListSelectionString(m.manager, C.uint8_t(sceneId), cValueid, cString))
 	goString := C.GoString(cString.data)
 	C.string_freeString(cString)
 	return result, goString
 }
 
 func (m *Manager) GetSceneValueListSelectionInt32(sceneId uint8, valueid *ValueID) (bool, int32) {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	var cInt C.int32_t
-	result := bool(C.manager_sceneGetValueListSelectionInt32(m.manager, C.uint8_t(sceneId), valueid.valueid, &cInt))
+	result := bool(C.manager_sceneGetValueListSelectionInt32(m.manager, C.uint8_t(sceneId), cValueid, &cInt))
 	return result, int32(cInt)
 }
 
 func (m *Manager) SetSceneValueBool(sceneId uint8, valueid *ValueID, value bool) bool {
-	return bool(C.manager_setSceneValueBool(m.manager, C.uint8_t(sceneId), valueid.valueid, C.bool(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSceneValueBool(m.manager, C.uint8_t(sceneId), cValueid, C.bool(value)))
 }
 
 func (m *Manager) SetSceneValueUint8(sceneId uint8, valueid *ValueID, value uint8) bool {
-	return bool(C.manager_setSceneValueUint8(m.manager, C.uint8_t(sceneId), valueid.valueid, C.uint8_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSceneValueUint8(m.manager, C.uint8_t(sceneId), cValueid, C.uint8_t(value)))
 }
 
 func (m *Manager) SetSceneValueFloat(sceneId uint8, valueid *ValueID, value float32) bool {
-	return bool(C.manager_setSceneValueFloat(m.manager, C.uint8_t(sceneId), valueid.valueid, C.float(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSceneValueFloat(m.manager, C.uint8_t(sceneId), cValueid, C.float(value)))
 }
 
 func (m *Manager) SetSceneValueInt32(sceneId uint8, valueid *ValueID, value int32) bool {
-	return bool(C.manager_setSceneValueInt32(m.manager, C.uint8_t(sceneId), valueid.valueid, C.int32_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSceneValueInt32(m.manager, C.uint8_t(sceneId), cValueid, C.int32_t(value)))
 }
 
 func (m *Manager) SetSceneValueInt16(sceneId uint8, valueid *ValueID, value int16) bool {
-	return bool(C.manager_setSceneValueInt16(m.manager, C.uint8_t(sceneId), valueid.valueid, C.int16_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSceneValueInt16(m.manager, C.uint8_t(sceneId), cValueid, C.int16_t(value)))
 }
 
 func (m *Manager) SetSceneValueString(sceneId uint8, valueid *ValueID, value string) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	result := bool(C.manager_setSceneValueString(m.manager, C.uint8_t(sceneId), valueid.valueid, cString))
+	result := bool(C.manager_setSceneValueString(m.manager, C.uint8_t(sceneId), cValueid, cString))
 	C.free(unsafe.Pointer(cString))
 	return result
 }
 
 func (m *Manager) SetSceneValueListSelectionString(sceneId uint8, valueid *ValueID, value string) bool {
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
 	cString := C.CString(value)
-	result := bool(C.manager_setSceneValueListSelectionString(m.manager, C.uint8_t(sceneId), valueid.valueid, cString))
+	result := bool(C.manager_setSceneValueListSelectionString(m.manager, C.uint8_t(sceneId), cValueid, cString))
 	C.free(unsafe.Pointer(cString))
 	return result
 }
 
 func (m *Manager) SetSceneValueListSelectionInt32(sceneId uint8, valueid *ValueID, value int32) bool {
-	return bool(C.manager_setSceneValueListSelectionInt32(m.manager, C.uint8_t(sceneId), valueid.valueid, C.int32_t(value)))
+	cValueid := valueid.toC()
+	defer C.valueid_free(cValueid)
+	return bool(C.manager_setSceneValueListSelectionInt32(m.manager, C.uint8_t(sceneId), cValueid, C.int32_t(value)))
 }
 
 func (m *Manager) GetSceneLabel(sceneId uint8) string {

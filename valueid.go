@@ -9,10 +9,10 @@ import (
 	"fmt"
 )
 
-// ValueGenre defines a type for the valueid genre enum.
+// ValueIDGenre defines a type for the valueid genre enum.
 type ValueIDGenre int
 
-// ValueType defines a type for the valueid type enum.
+// ValueIDType defines a type for the valueid type enum.
 type ValueIDType int
 
 const (
@@ -77,44 +77,40 @@ func (v ValueIDType) String() string {
 	return "UNKNOWN"
 }
 
-// ValueID is a container for the C++ OpenZWave library ValueID class.
+// ValueID contains all information available for a ValueID from the OpenZWave
+// library. You should not create a new ValueID manually, but receive it from
+// the gozwave package after a Notification has been received from the OpenZWave
+// library.
 type ValueID struct {
-	valueid C.valueid_t
+	HomeID         uint32
+	NodeID         uint8
+	Genre          ValueIDGenre
+	CommandClassID uint8
+	Instance       uint8
+	Index          uint8
+	Type           ValueIDType
+	ID             uint64
+}
+
+func buildValueID(v C.valueid_t) *ValueID {
+	valueid := &ValueID{
+		HomeID:         uint32(C.valueid_getHomeId(v)),
+		NodeID:         uint8(C.valueid_getNodeId(v)),
+		Genre:          ValueIDGenre(C.valueid_getGenre(v)),
+		CommandClassID: uint8(C.valueid_getCommandClassId(v)),
+		Instance:       uint8(C.valueid_getInstance(v)),
+		Index:          uint8(C.valueid_getIndex(v)),
+		Type:           ValueIDType(C.valueid_getType(v)),
+		ID:             uint64(C.valueid_getId(v)),
+	}
+	return valueid
+}
+
+func (v *ValueID) toC() C.valueid_t {
+	return C.valueid_create(C.uint32_t(v.HomeID), C.uint64_t(v.ID))
 }
 
 func (v *ValueID) String() string {
-	return fmt.Sprintf("ValueID{HomeID: %d, NodeID: %d, Genre: %+v, CommandClassID: %d, Instance: %d, Index: %d, Type: %+v, ID: %d}",
-		v.GetHomeId(), v.GetNodeId(), v.GetGenre(), v.GetCommandClassId(), v.GetInstance(), v.GetIndex(), v.GetType(), v.GetId())
-}
-
-func (v *ValueID) GetHomeId() uint32 {
-	return uint32(C.valueid_getHomeId(v.valueid))
-}
-
-func (v *ValueID) GetNodeId() uint8 {
-	return uint8(C.valueid_getNodeId(v.valueid))
-}
-
-func (v *ValueID) GetGenre() ValueIDGenre {
-	return ValueIDGenre(C.valueid_getGenre(v.valueid))
-}
-
-func (v *ValueID) GetCommandClassId() uint8 {
-	return uint8(C.valueid_getCommandClassId(v.valueid))
-}
-
-func (v *ValueID) GetInstance() uint8 {
-	return uint8(C.valueid_getInstance(v.valueid))
-}
-
-func (v *ValueID) GetIndex() uint8 {
-	return uint8(C.valueid_getIndex(v.valueid))
-}
-
-func (v *ValueID) GetType() ValueIDType {
-	return ValueIDType(C.valueid_getType(v.valueid))
-}
-
-func (v *ValueID) GetId() uint64 {
-	return uint64(C.valueid_getId(v.valueid))
+	return fmt.Sprintf("ValueID{HomeID: %d, NodeID: %d, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, ID: %d}",
+		v.HomeID, v.NodeID, v.Genre, v.CommandClassID, v.Instance, v.Index, v.Type, v.ID)
 }

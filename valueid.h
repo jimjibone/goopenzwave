@@ -46,6 +46,10 @@ extern "C" {
     valueid_type valueid_getType(valueid_t n);
     uint64_t valueid_getId(valueid_t n);
 
+    // Go helper functions.
+    valueid_t valueid_create(uint32_t homeId, uint64_t id);
+    void valueid_free(valueid_t valueid);
+
 #ifdef __cplusplus
 }
 #endif

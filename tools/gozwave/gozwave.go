@@ -13,6 +13,7 @@ type NodeInfo struct {
 	NodeID uint8
 	Node   *gozwave.Node
 	Values []*gozwave.ValueID
+	//TODO use (and create) Value type with embedded ValueID.
 }
 
 var Nodes map[uint8]*NodeInfo
@@ -97,7 +98,10 @@ func main() {
 	// Print out what we know about the network.
 	fmt.Println("Nodes:")
 	for id, node := range Nodes {
-		fmt.Printf("\t%d: %s\n", id, node.Node)
+		fmt.Printf("\t%d: Node: %s Values:\n", id, node.Node)
+		for i := range node.Values {
+			fmt.Printf("\t\t%d: %+v\n", i, node.Values[i])
+		}
 	}
 
 	fmt.Println("finished")
