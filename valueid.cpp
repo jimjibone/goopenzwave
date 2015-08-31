@@ -113,7 +113,7 @@ uint64_t valueid_getId(valueid_t v)
 
 valueid_t valueid_create(uint32_t homeId, uint64_t id)
 {
-    OpenZWave::ValueID *valueid = new OpenZWave::ValueID(homeId, id);
+    OpenZWave::ValueID *valueid = new OpenZWave::ValueID(homeId, (uint64)id);
     return (valueid_t)valueid;
 }
 

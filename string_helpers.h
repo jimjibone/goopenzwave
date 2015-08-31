@@ -1,6 +1,8 @@
 #ifndef GOZWAVE_STRING
 #define GOZWAVE_STRING
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 #include <string>
 #include <vector>
