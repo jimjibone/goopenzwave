@@ -12,7 +12,7 @@ type NodeInfo struct {
 	HomeID uint32
 	NodeID uint8
 	Node   *gozwave.Node
-	Values []*gozwave.ValueID
+	Values []*gozwave.Value
 	//TODO use (and create) Value type with embedded ValueID.
 }
 
@@ -45,7 +45,7 @@ func processNotifications(m *gozwave.Manager) {
 			case gozwave.NotificationTypeValueAdded:
 				// Find the NodeInfo in the map and add the ValueID to it.
 				if node, found := Nodes[notification.NodeID]; found {
-					node.Values = append(node.Values, notification.ValueID)
+					node.Values = append(node.Values, notification.Value)
 				}
 			}
 		}

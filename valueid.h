@@ -37,14 +37,14 @@ extern "C" {
     } valueid_type;
 
     // Public member functions.
-    uint32_t valueid_getHomeId(valueid_t n);
-    uint8_t valueid_getNodeId(valueid_t n);
-    valueid_genre valueid_getGenre(valueid_t n);
-    uint8_t valueid_getCommandClassId(valueid_t n);
-    uint8_t valueid_getInstance(valueid_t n);
-    uint8_t valueid_getIndex(valueid_t n);
-    valueid_type valueid_getType(valueid_t n);
-    uint64_t valueid_getId(valueid_t n);
+    uint32_t valueid_getHomeId(valueid_t v);
+    uint8_t valueid_getNodeId(valueid_t v);
+    valueid_genre valueid_getGenre(valueid_t v);
+    uint8_t valueid_getCommandClassId(valueid_t v);
+    uint8_t valueid_getInstance(valueid_t v);
+    uint8_t valueid_getIndex(valueid_t v);
+    valueid_type valueid_getType(valueid_t v);
+    uint64_t valueid_getId(valueid_t v);
 
     // Go helper functions.
     valueid_t valueid_create(uint32_t homeId, uint64_t id);
