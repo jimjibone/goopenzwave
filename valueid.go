@@ -114,3 +114,18 @@ func (v *ValueID) String() string {
 	return fmt.Sprintf("ValueID{HomeID: %d, NodeID: %d, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, ID: %d}",
 		v.HomeID, v.NodeID, v.Genre, v.CommandClassID, v.Instance, v.Index, v.Type, v.ID)
 }
+
+func (v *ValueID) InfoString() string {
+	manager := GetManager()
+	_, valueString := manager.GetValueAsString(v)
+	return fmt.Sprintf("Value{ValueID: %d, NodeID: %d, Genre: %s, "+
+		"CommandClassID: %d, Type: %d, RO: %t, WO: %t, "+
+		"Set: %t, Polled: %t, Label: %q, Units: %q, Help: %q, "+
+		"Min: %d, Max: %d, AsString: %q}",
+		v.ID, v.NodeID, v.Genre, v.CommandClassID, v.Type,
+		manager.IsValueReadOnly(v), manager.IsValueWriteOnly(v),
+		manager.IsValueSet(v), manager.IsValuePolled(v),
+		manager.GetValueLabel(v), manager.GetValueUnits(v),
+		manager.GetValueHelp(v), manager.GetValueMin(v), manager.GetValueMax(v),
+		valueString)
+}

@@ -147,7 +147,7 @@ type Notification struct {
 	Type         NotificationType
 	HomeID       uint32
 	NodeID       uint8
-	Value        *Value
+	ValueID      *ValueID
 	GroupIDX     *uint8
 	Event        *uint8
 	ButtonID     *uint8
@@ -172,7 +172,7 @@ func (n *Notification) String() string {
 	if n.Notification != nil {
 		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
 	}
-	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, Value: %s", n.Type, n.HomeID, n.NodeID, n.Value)
+	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID.InfoString())
 	for i := range pointed {
 		output = fmt.Sprintf("%s, %s", output, pointed[i])
 	}
@@ -181,10 +181,10 @@ func (n *Notification) String() string {
 
 func buildNotification(n C.notification_t) *Notification {
 	notification := &Notification{
-		Type:   NotificationType(C.notification_getType(n)),
-		HomeID: uint32(C.notification_getHomeId(n)),
-		NodeID: uint8(C.notification_getNodeId(n)),
-		Value:  buildValue(buildValueID(C.notification_getValueId(n))),
+		Type:    NotificationType(C.notification_getType(n)),
+		HomeID:  uint32(C.notification_getHomeId(n)),
+		NodeID:  uint8(C.notification_getNodeId(n)),
+		ValueID: buildValueID(C.notification_getValueId(n)),
 	}
 
 	switch notification.Type {
