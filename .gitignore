@@ -1,7 +1,6 @@
-gozwave
+/gominozw
 *.o
 *.a
 OZW_Log.txt
 zwcfg_*.xml
 zwscene.xml
-
