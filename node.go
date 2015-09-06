@@ -60,8 +60,8 @@ func NewNode(homeID uint32, nodeID uint8) *Node {
 	node.ProductName = manager.GetNodeProductName(homeID, nodeID)
 	node.NodeName = manager.GetNodeName(homeID, nodeID)
 	node.Location = manager.GetNodeLocation(homeID, nodeID)
-	node.ManufacturerID = manager.GetNodeManufacturerId(homeID, nodeID)
+	node.ManufacturerID = manager.GetNodeManufacturerID(homeID, nodeID)
 	node.ProductType = manager.GetNodeProductType(homeID, nodeID)
-	node.ProductID = manager.GetNodeProductId(homeID, nodeID)
+	node.ProductID = manager.GetNodeProductID(homeID, nodeID)
 	return node
 }
