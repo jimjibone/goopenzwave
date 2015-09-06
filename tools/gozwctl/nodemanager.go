@@ -29,26 +29,26 @@ func (n *NodeInfo) Summary() NodeSummary {
 		NodeInfoID:       n.ID(),
 		HomeID:           n.HomeID,
 		NodeID:           n.NodeID,
-		BasicType:        n.Node.BasicType,
-		GenericType:      n.Node.GenericType,
-		SpecificType:     n.Node.SpecificType,
-		NodeType:         n.Node.NodeType,
-		ManufacturerName: n.Node.ManufacturerName,
-		ProductName:      n.Node.ProductName,
-		NodeName:         n.Node.NodeName,
-		Location:         n.Node.Location,
-		ManufacturerID:   n.Node.ManufacturerID,
-		ProductType:      n.Node.ProductType,
-		ProductID:        n.Node.ProductID,
+		BasicType:        n.Node.GetBasicType(),
+		GenericType:      n.Node.GetGenericType(),
+		SpecificType:     n.Node.GetSpecificType(),
+		NodeType:         n.Node.GetType(),
+		ManufacturerName: n.Node.GetManufacturerName(),
+		ProductName:      n.Node.GetProductName(),
+		NodeName:         n.Node.GetName(),
+		Location:         n.Node.GetLocation(),
+		ManufacturerID:   n.Node.GetManufacturerID(),
+		ProductType:      n.Node.GetProductType(),
+		ProductID:        n.Node.GetProductID(),
 		Values:           n.Values.Summary(),
 	}
 }
 
-type Values map[uint64]*gozwave.ValueID
+type Values map[gozwave.ValueIDStringID]*gozwave.ValueID
 
-func (v *Values) Summary() []ValueSummary {
+func (v *Values) Summary() map[gozwave.ValueIDStringID]ValueSummary {
 	manager := gozwave.GetManager()
-	var summaries []ValueSummary
+	summaries := make(map[gozwave.ValueIDStringID]ValueSummary)
 	for _, valueid := range *v {
 		_, valueString := manager.GetValueAsString(valueid)
 		summary := ValueSummary{
@@ -68,7 +68,7 @@ func (v *Values) Summary() []ValueSummary {
 			Max:            manager.GetValueMax(valueid),
 			AsString:       valueString,
 		}
-		summaries = append(summaries, summary)
+		summaries[valueid.StringID()] = summary
 	}
 	return summaries
 }
@@ -76,21 +76,21 @@ func (v *Values) Summary() []ValueSummary {
 type NodeInfos map[NodeInfoID]*NodeInfo
 
 type NodeSummary struct {
-	NodeInfoID       NodeInfoID     `json:"node_info_id"`
-	HomeID           uint32         `json:"home_id"`
-	NodeID           uint8          `json:"node_id"`
-	BasicType        uint8          `json:"basic_type"`
-	GenericType      uint8          `json:"generic_type"`
-	SpecificType     uint8          `json:"specific_type"`
-	NodeType         string         `json:"node_type"`
-	ManufacturerName string         `json:"manufacturer_name"`
-	ProductName      string         `json:"product_name"`
-	NodeName         string         `json:"node_name"`
-	Location         string         `json:"location"`
-	ManufacturerID   string         `json:"manufacturer_id"`
-	ProductType      string         `json:"product_type"`
-	ProductID        string         `json:"product_id"`
-	Values           []ValueSummary `json:"values"`
+	NodeInfoID       NodeInfoID                               `json:"node_info_id"`
+	HomeID           uint32                                   `json:"home_id"`
+	NodeID           uint8                                    `json:"node_id"`
+	BasicType        uint8                                    `json:"basic_type"`
+	GenericType      uint8                                    `json:"generic_type"`
+	SpecificType     uint8                                    `json:"specific_type"`
+	NodeType         string                                   `json:"node_type"`
+	ManufacturerName string                                   `json:"manufacturer_name"`
+	ProductName      string                                   `json:"product_name"`
+	NodeName         string                                   `json:"node_name"`
+	Location         string                                   `json:"location"`
+	ManufacturerID   string                                   `json:"manufacturer_id"`
+	ProductType      string                                   `json:"product_type"`
+	ProductID        string                                   `json:"product_id"`
+	Values           map[gozwave.ValueIDStringID]ValueSummary `json:"values"`
 }
 
 type ValueSummary struct {
@@ -186,20 +186,63 @@ func NodeManagerUpdateNode(nodesummary NodeSummary) error {
 		return fmt.Errorf("could not find node (%s) in the node list", nodesummary.NodeInfoID)
 	}
 
-	manager := gozwave.GetManager()
-	if oldname := manager.GetNodeName(nodeinfo.HomeID, nodeinfo.NodeID); nodesummary.NodeName != oldname {
+	updated := false
+
+	// Node.Name
+	if oldvalue := nodeinfo.Node.GetName(); nodesummary.NodeName != oldvalue {
 		log.WithFields(log.Fields{
 			"node":     nodesummary.NodeInfoID,
-			"previous": oldname,
+			"previous": oldvalue,
 			"new":      nodesummary.NodeName,
 		}).Infoln("setting new name for node")
-		manager.SetNodeName(nodeinfo.HomeID, nodeinfo.NodeID, nodesummary.NodeName)
-	} else {
+		nodeinfo.Node.SetName(nodesummary.NodeName)
+		updated = true
+	}
+
+	// Node.Location
+	if oldvalue := nodeinfo.Node.GetLocation(); nodesummary.Location != oldvalue {
 		log.WithFields(log.Fields{
 			"node":     nodesummary.NodeInfoID,
-			"previous": oldname,
-			"new":      nodesummary.NodeName,
-		}).Warnln("new node name is identical to existing")
+			"previous": oldvalue,
+			"new":      nodesummary.Location,
+		}).Infoln("setting new location for node")
+		nodeinfo.Node.SetLocation(nodesummary.Location)
+		updated = true
+	}
+
+	// Node.Values
+	for oldvalueidstringid, oldvalueid := range nodeinfo.Values {
+		newvalue, found := nodesummary.Values[oldvalueidstringid]
+		if found {
+			manager := gozwave.GetManager()
+			_, oldvalueString := manager.GetValueAsString(oldvalueid)
+			if newvalue.AsString != oldvalueString {
+				log.WithFields(log.Fields{
+					"node":     nodesummary.NodeInfoID,
+					"value":    newvalue.Label,
+					"previous": oldvalueString,
+					"new":      newvalue.AsString,
+				}).Infoln("setting new value for node's value")
+				ok := manager.SetValueString(oldvalueid, newvalue.AsString)
+				if !ok {
+					log.WithFields(log.Fields{
+						"node":     nodesummary.NodeInfoID,
+						"value":    newvalue.Label,
+						"previous": oldvalueString,
+						"new":      newvalue.AsString,
+					}).Errorln("failed to set value as string")
+				}
+				updated = true
+			}
+		}
+	}
+
+	if updated == false {
+		log.WithFields(log.Fields{
+			"node":     nodesummary.NodeInfoID,
+			"previous": nodeinfo,
+			"new":      nodesummary,
+		}).Warnln("new node is identical to existing")
 	}
 
 	// NodeInfoID       NodeInfoID     `json:"node_info_id"`
@@ -233,7 +276,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			HomeID: notification.HomeID,
 			NodeID: notification.NodeID,
 			Node:   gozwave.NewNode(notification.HomeID, notification.NodeID),
-			Values: make(map[uint64]*gozwave.ValueID),
+			Values: make(map[gozwave.ValueIDStringID]*gozwave.ValueID),
 		}
 		nodeinfos[nodeinfo.ID()] = nodeinfo
 
@@ -260,25 +303,24 @@ func handleNotifcation(notification *gozwave.Notification) error {
 		// Find the NodeInfo in the map and add/change the ValueID.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			nodeinfo.Values[notification.ValueID.ID] = notification.ValueID
+			nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
 		}
 
-		// Broadcast this change to the clients if we have done the inital
-		// query.
-		// if (initialQueryComplete) {
-		// 	message := OutputMessage{
-		// 		Topic:   "node",
-		// 		Payload: nodeinfo,
-		// 	}
-		// 	clients.Broadcast(message)
-		// }
+		// Broadcast to all clients that the node has updated.
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			message := OutputMessage{
+				Topic:   "node-updated",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
 
 	case gozwave.NotificationTypeValueRemoved:
 		// Find the NodeInfo in the map and remove the ValueID.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if node, found := nodeinfos[nodeinfoid]; found {
-			if _, foundVal := node.Values[notification.ValueID.ID]; foundVal {
-				delete(node.Values, notification.ValueID.ID)
+			if _, foundVal := node.Values[notification.ValueID.StringID()]; foundVal {
+				delete(node.Values, notification.ValueID.StringID())
 			}
 		}
 

@@ -169,7 +169,8 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 					log.Errorln("error writing to websocket:", err)
 					continue
 				}
-				log.Infoln("sent data to websocket:", string(odata))
+				// log.Infoln("sent data to websocket:", string(odata))
+				log.Infoln("sent data to websocket:", ocontainer.Topic)
 
 			case "set-node":
 				var nodesummary NodeSummary
@@ -200,7 +201,8 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 				log.Errorln("error writing to websocket:", err)
 				continue
 			}
-			log.Infoln("sent data to websocket:", string(odata))
+			// log.Infoln("sent data to websocket:", string(odata))
+			log.Infoln("sent data to websocket:", outbound.Topic)
 		}
 
 	}
