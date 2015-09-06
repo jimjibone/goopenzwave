@@ -214,8 +214,7 @@ func NodeManagerUpdateNode(nodesummary NodeSummary) error {
 	for oldvalueidstringid, oldvalueid := range nodeinfo.Values {
 		newvalue, found := nodesummary.Values[oldvalueidstringid]
 		if found {
-			manager := gozwave.GetManager()
-			_, oldvalueString := manager.GetValueAsString(oldvalueid)
+			_, oldvalueString := oldvalueid.GetAsString()
 			if newvalue.AsString != oldvalueString {
 				log.WithFields(log.Fields{
 					"node":     nodesummary.NodeInfoID,
@@ -223,7 +222,7 @@ func NodeManagerUpdateNode(nodesummary NodeSummary) error {
 					"previous": oldvalueString,
 					"new":      newvalue.AsString,
 				}).Infoln("setting new value for node's value")
-				ok := manager.SetValueString(oldvalueid, newvalue.AsString)
+				ok := oldvalueid.SetString(newvalue.AsString)
 				if !ok {
 					log.WithFields(log.Fields{
 						"node":     nodesummary.NodeInfoID,
