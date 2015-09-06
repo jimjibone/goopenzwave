@@ -77,10 +77,13 @@ func (v ValueIDType) String() string {
 	return "UNKNOWN"
 }
 
-// ValueID contains all information available for a ValueID from the OpenZWave
-// library. You should not create a new ValueID manually, but receive it from
-// the gozwave package after a Notification has been received from the OpenZWave
-// library.
+// ValueIDStringID simply a string representing the ValueID's ID.
+type ValueIDStringID string
+
+// ValueID contains all appropriate information available for a ValueID from the
+// OpenZWave library. You should not create a new ValueID manually, but receive
+// it from the gozwave package after a Notification has been received from the
+// OpenZWave library.
 type ValueID struct {
 	HomeID         uint32
 	NodeID         uint8
@@ -91,8 +94,6 @@ type ValueID struct {
 	Type           ValueIDType
 	ID             uint64
 }
-
-type ValueIDStringID string
 
 func buildValueID(v C.valueid_t) *ValueID {
 	valueid := &ValueID{
@@ -108,210 +109,245 @@ func buildValueID(v C.valueid_t) *ValueID {
 	return valueid
 }
 
-func (v *ValueID) StringID() ValueIDStringID {
-	return ValueIDStringID(fmt.Sprintf("%d", v.ID))
-}
-
 func (v *ValueID) toC() C.valueid_t {
 	return C.valueid_create(C.uint32_t(v.HomeID), C.uint64_t(v.ID))
 }
 
-func (v *ValueID) String() string {
-	return fmt.Sprintf("ValueID{HomeID: %d, NodeID: %d, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, ID: %d}",
-		v.HomeID, v.NodeID, v.Genre, v.CommandClassID, v.Instance, v.Index, v.Type, v.ID)
+// StringID will create a string representation of the ID for use as a key.
+func (v *ValueID) StringID() ValueIDStringID {
+	return ValueIDStringID(fmt.Sprintf("%d", v.ID))
 }
 
-func (v *ValueID) InfoString() string {
+func (v *ValueID) String() string {
 	manager := GetManager()
 	_, valueString := manager.GetValueAsString(v)
-	return fmt.Sprintf("Value{ValueID: %d, NodeID: %d, Genre: %s, "+
-		"CommandClassID: %d, Type: %d, RO: %t, WO: %t, "+
-		"Set: %t, Polled: %t, Label: %q, Units: %q, Help: %q, "+
-		"Min: %d, Max: %d, AsString: %q}",
-		v.ID, v.NodeID, v.Genre, v.CommandClassID, v.Type,
-		manager.IsValueReadOnly(v), manager.IsValueWriteOnly(v),
-		manager.IsValueSet(v), manager.IsValuePolled(v),
-		manager.GetValueLabel(v), manager.GetValueUnits(v),
-		manager.GetValueHelp(v), manager.GetValueMin(v), manager.GetValueMax(v),
-		valueString)
+	return fmt.Sprintf("ValueID{Label: %q, String: %q, Units: %q, RO: %t, WO: %t, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, HomeID: %d, ID: %d}",
+		manager.GetValueLabel(v),
+		valueString,
+		manager.GetValueUnits(v),
+		manager.IsValueReadOnly(v),
+		manager.IsValueWriteOnly(v),
+		v.Genre,
+		v.CommandClassID,
+		v.Instance,
+		v.Index,
+		v.Type,
+		v.HomeID,
+		v.ID)
 }
 
-func (v *ValueID) GetValueLabel(valueid *ValueID) string {
+// GetLabel Gets the user-friendly label for the value.
+func (v *ValueID) GetLabel() string {
 	manager := GetManager()
-	return manager.GetValueLabel(valueid)
+	return manager.GetValueLabel(v)
 }
 
-func (v *ValueID) SetValueLabel(valueid *ValueID, label string) {
+// SetLabel Sets the user-friendly label for the value.
+func (v *ValueID) SetLabel(label string) {
 	manager := GetManager()
-	manager.SetValueLabel(valueid, label)
+	manager.SetValueLabel(v, label)
 }
 
-func (v *ValueID) GetValueUnits(valueid *ValueID) string {
+// GetUnits Gets the units that the value is measured in.
+func (v *ValueID) GetUnits() string {
 	manager := GetManager()
-	return manager.GetValueUnits(valueid)
+	return manager.GetValueUnits(v)
 }
 
-func (v *ValueID) SetValueUnits(valueid *ValueID, units string) {
+// SetUnits Sets the units that the value is measured in.
+func (v *ValueID) SetUnits(units string) {
 	manager := GetManager()
-	manager.SetValueUnits(valueid, units)
+	manager.SetValueUnits(v, units)
 }
 
-func (v *ValueID) GetValueHelp(valueid *ValueID) string {
+// GetHelp Gets a help string describing the value's purpose and usage.
+func (v *ValueID) GetHelp() string {
 	manager := GetManager()
-	return manager.GetValueHelp(valueid)
+	return manager.GetValueHelp(v)
 }
 
-func (v *ValueID) SetValueHelp(valueid *ValueID, help string) {
+// SetHelp Sets a help string describing the value's purpose and usage.
+func (v *ValueID) SetHelp(help string) {
 	manager := GetManager()
-	manager.SetValueHelp(valueid, help)
+	manager.SetValueHelp(v, help)
 }
 
-func (v *ValueID) GetValueMin(valueid *ValueID) int32 {
+// GetMin Gets the minimum that this value may contain.
+func (v *ValueID) GetMin() int32 {
 	manager := GetManager()
-	return manager.GetValueMin(valueid)
+	return manager.GetValueMin(v)
 }
 
-func (v *ValueID) GetValueMax(valueid *ValueID) int32 {
+// GetMax Gets the maximum that this value may contain.
+func (v *ValueID) GetMax() int32 {
 	manager := GetManager()
-	return manager.GetValueMax(valueid)
+	return manager.GetValueMax(v)
 }
 
-func (v *ValueID) IsValueReadOnly(valueid *ValueID) bool {
+// IsReadOnly Test whether the value is read-only.
+func (v *ValueID) IsReadOnly() bool {
 	manager := GetManager()
-	return manager.IsValueReadOnly(valueid)
+	return manager.IsValueReadOnly(v)
 }
 
-func (v *ValueID) IsValueWriteOnly(valueid *ValueID) bool {
+// IsWriteOnly Test whether the value is write-only.
+func (v *ValueID) IsWriteOnly() bool {
 	manager := GetManager()
-	return manager.IsValueWriteOnly(valueid)
+	return manager.IsValueWriteOnly(v)
 }
 
-func (v *ValueID) IsValueSet(valueid *ValueID) bool {
+// IsSet Test whether the value has been set.
+func (v *ValueID) IsSet() bool {
 	manager := GetManager()
-	return manager.IsValueSet(valueid)
+	return manager.IsValueSet(v)
 }
 
-func (v *ValueID) IsValuePolled(valueid *ValueID) bool {
+// IsPolled Test whether the value is currently being polled.
+func (v *ValueID) IsPolled() bool {
 	manager := GetManager()
-	return manager.IsValuePolled(valueid)
+	return manager.IsValuePolled(v)
 }
 
-func (v *ValueID) GetValueAsBool(valueid *ValueID) (bool, bool) {
+// GetAsBool Gets a value as a bool.
+func (v *ValueID) GetAsBool() (bool, bool) {
 	manager := GetManager()
-	return manager.GetValueAsBool(valueid)
+	return manager.GetValueAsBool(v)
 }
 
-func (v *ValueID) GetValueAsByte(valueid *ValueID) (bool, byte) {
+// GetAsByte Gets a value as an 8-bit unsigned integer.
+func (v *ValueID) GetAsByte() (bool, byte) {
 	manager := GetManager()
-	return manager.GetValueAsByte(valueid)
+	return manager.GetValueAsByte(v)
 }
 
-func (v *ValueID) GetValueAsFloat(valueid *ValueID) (bool, float32) {
+// GetAsFloat Gets a value as a float.
+func (v *ValueID) GetAsFloat() (bool, float32) {
 	manager := GetManager()
-	return manager.GetValueAsFloat(valueid)
+	return manager.GetValueAsFloat(v)
 }
 
-func (v *ValueID) GetValueAsInt(valueid *ValueID) (bool, int32) {
+// GetAsInt Gets a value as a 32-bit signed integer.
+func (v *ValueID) GetAsInt() (bool, int32) {
 	manager := GetManager()
-	return manager.GetValueAsInt(valueid)
+	return manager.GetValueAsInt(v)
 }
 
-func (v *ValueID) GetValueAsShort(valueid *ValueID) (bool, int16) {
+// GetAsShort Gets a value as a 16-bit signed integer.
+func (v *ValueID) GetAsShort() (bool, int16) {
 	manager := GetManager()
-	return manager.GetValueAsShort(valueid)
+	return manager.GetValueAsShort(v)
 }
 
-func (v *ValueID) GetValueAsString(valueid *ValueID) (bool, string) {
+// GetAsString Gets a value as a string. Creates a string representation of a value, regardless of type.
+func (v *ValueID) GetAsString() (bool, string) {
 	manager := GetManager()
-	return manager.GetValueAsString(valueid)
+	return manager.GetValueAsString(v)
 }
 
-func (v *ValueID) GetValueAsRaw(valueid *ValueID) (bool, []byte) {
+// GetAsRaw Gets a value as a collection of bytes.
+func (v *ValueID) GetAsRaw() (bool, []byte) {
 	manager := GetManager()
-	return manager.GetValueAsRaw(valueid)
+	return manager.GetValueAsRaw(v)
 }
 
-func (v *ValueID) GetValueListSelectionAsString(valueid *ValueID) (bool, string) {
+// GetListSelectionAsString Gets the selected item from a list (as a string).
+func (v *ValueID) GetListSelectionAsString() (bool, string) {
 	manager := GetManager()
-	return manager.GetValueListSelectionAsString(valueid)
+	return manager.GetValueListSelectionAsString(v)
 }
 
-func (v *ValueID) GetValueListSelectionAsInt32(valueid *ValueID) (bool, int32) {
+// GetListSelectionAsInt32 Gets the selected item from a list (as an integer).
+func (v *ValueID) GetListSelectionAsInt32() (bool, int32) {
 	manager := GetManager()
-	return manager.GetValueListSelectionAsInt32(valueid)
+	return manager.GetValueListSelectionAsInt32(v)
 }
 
-func (v *ValueID) GetValueListItems(valueid *ValueID) (bool, []string) {
+// GetListItems Gets the list of items from a list value.
+func (v *ValueID) GetListItems() (bool, []string) {
 	manager := GetManager()
-	return manager.GetValueListItems(valueid)
+	return manager.GetValueListItems(v)
 }
 
-func (v *ValueID) GetValueFloatPrecision(valueid *ValueID) (bool, uint8) {
+// GetFloatPrecision Gets a float value's precision.
+func (v *ValueID) GetFloatPrecision() (bool, uint8) {
 	manager := GetManager()
-	return manager.GetValueFloatPrecision(valueid)
+	return manager.GetValueFloatPrecision(v)
 }
 
-func (v *ValueID) SetValueBool(valueid *ValueID, value bool) bool {
+// SetBool Sets the state of a bool. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetBool(value bool) bool {
 	manager := GetManager()
-	return manager.SetValueBool(valueid, value)
+	return manager.SetValueBool(v, value)
 }
 
-func (v *ValueID) SetValueUint8(valueid *ValueID, value uint8) bool {
+// SetUint8 Sets the value of a byte. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetUint8(value uint8) bool {
 	manager := GetManager()
-	return manager.SetValueUint8(valueid, value)
+	return manager.SetValueUint8(v, value)
 }
 
-func (v *ValueID) SetValueFloat(valueid *ValueID, value float32) bool {
+// SetFloat Sets the value of a decimal. It is usually better to handle decimal values using strings rather than floats, to avoid floating point accuracy issues. Due to the possibility of a device being asleep, the command is assumed to succeed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetFloat(value float32) bool {
 	manager := GetManager()
-	return manager.SetValueFloat(valueid, value)
+	return manager.SetValueFloat(v, value)
 }
 
-func (v *ValueID) SetValueInt32(valueid *ValueID, value int32) bool {
+// SetInt32 Sets the value of a 32-bit signed integer. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetInt32(value int32) bool {
 	manager := GetManager()
-	return manager.SetValueInt32(valueid, value)
+	return manager.SetValueInt32(v, value)
 }
 
-func (v *ValueID) SetValueInt16(valueid *ValueID, value int16) bool {
+// SetInt16 Sets the value of a 16-bit signed integer. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetInt16(value int16) bool {
 	manager := GetManager()
-	return manager.SetValueInt16(valueid, value)
+	return manager.SetValueInt16(v, value)
 }
 
-func (v *ValueID) SetValueBytes(valueid *ValueID, value []byte) bool {
+// SetBytes Sets the value of a collection of bytes. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetBytes(value []byte) bool {
 	manager := GetManager()
-	return manager.SetValueBytes(valueid, value)
+	return manager.SetValueBytes(v, value)
 }
 
-func (v *ValueID) SetValueString(valueid *ValueID, value string) bool {
+// SetString Sets the value from a string, regardless of type. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetString(value string) bool {
 	manager := GetManager()
-	return manager.SetValueString(valueid, value)
+	return manager.SetValueString(v, value)
 }
 
-func (v *ValueID) SetValueListSelection(valueid *ValueID, selectedItem string) bool {
+// SetListSelection Sets the selected item in a list. Due to the possibility of a device being asleep, the command is assumed to suceed, and the value held by the node is updated directly. This will be reverted by a future status message from the device if the Z-Wave message actually failed to get through. Notification callbacks will be sent in both cases.
+func (v *ValueID) SetListSelection(selectedItem string) bool {
 	manager := GetManager()
-	return manager.SetValueListSelection(valueid, selectedItem)
+	return manager.SetValueListSelection(v, selectedItem)
 }
 
-func (v *ValueID) RefreshValue(valueid *ValueID) bool {
+// Refresh Refreshes the specified value from the Z-Wave network. A call to this function causes the library to send a message to the network to retrieve the current value of the specified ValueID (just like a poll, except only one-time, not recurring).
+func (v *ValueID) Refresh() bool {
 	manager := GetManager()
-	return manager.RefreshValue(valueid)
+	return manager.RefreshValue(v)
 }
 
-func (v *ValueID) SetChangeVerified(valueid *ValueID, verify bool) {
+// SetChangeVerified Sets a flag indicating whether value changes noted upon a refresh should be verified. If so, the library will immediately refresh the value a second time whenever a change is observed. This helps to filter out spurious data reported occasionally by some devices.
+func (v *ValueID) SetChangeVerified(verify bool) {
 	manager := GetManager()
-	manager.SetChangeVerified(valueid, verify)
+	manager.SetChangeVerified(v, verify)
 }
 
-func (v *ValueID) GetChangeVerified(valueid *ValueID) bool {
+// GetChangeVerified determine if value changes upon a refresh should be verified. If so, the library will immediately refresh the value a second time whenever a change is observed. This helps to filter out spurious data reported occasionally by some devices.
+func (v *ValueID) GetChangeVerified() bool {
 	manager := GetManager()
-	return manager.GetChangeVerified(valueid)
+	return manager.GetChangeVerified(v)
 }
 
-func (v *ValueID) PressButton(valueid *ValueID) bool {
+// PressButton Starts an activity in a device. Since buttons are write-only values that do not report a state, no notification callbacks are sent.
+func (v *ValueID) PressButton() bool {
 	manager := GetManager()
-	return manager.PressButton(valueid)
+	return manager.PressButton(v)
 }
 
-func (v *ValueID) ReleaseButton(valueid *ValueID) bool {
+// ReleaseButton Stops an activity in a device. Since buttons are write-only values that do not report a state, no notification callbacks are sent.
+func (v *ValueID) ReleaseButton() bool {
 	manager := GetManager()
-	return manager.ReleaseButton(valueid)
+	return manager.ReleaseButton(v)
 }
