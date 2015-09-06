@@ -243,15 +243,15 @@ func (m *Manager) IsNodeZWavePlus(homeID uint32, nodeID uint8) bool {
 	return bool(C.manager_isNodeZWavePlus(m.manager, C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-func (m *Manager) GetNodeBasic(homeID uint32, nodeID uint8) uint8 {
+func (m *Manager) GetNodeBasicType(homeID uint32, nodeID uint8) uint8 {
 	return uint8(C.manager_getNodeBasic(m.manager, C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-func (m *Manager) GetNodeGeneric(homeID uint32, nodeID uint8) uint8 {
+func (m *Manager) GetNodeGenericType(homeID uint32, nodeID uint8) uint8 {
 	return uint8(C.manager_getNodeGeneric(m.manager, C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-func (m *Manager) GetNodeSpecific(homeID uint32, nodeID uint8) uint8 {
+func (m *Manager) GetNodeSpecificType(homeID uint32, nodeID uint8) uint8 {
 	return uint8(C.manager_getNodeSpecific(m.manager, C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
