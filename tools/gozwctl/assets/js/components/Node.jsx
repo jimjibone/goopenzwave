@@ -186,17 +186,21 @@ var Value = React.createClass({
                             <fieldset>
                                 <legend>{this.props.value.label}</legend>
                                 <div className="pure-g">
-                                    <div className="pure-u-1 pure-u-md-1-3">
+                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Units</label>
-                                        <input className="pure-u-23-24" type="text" value={this.props.value.units} disabled/>
+                                        <input type="text" value={this.props.value.units} disabled/>
                                     </div>
-                                    <div className="pure-u-1 pure-u-md-1-3">
+                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Value</label>
-                                        <input className="pure-u-23-24" type="text" value={this.props.value.string} onChange={this.handleChange} disabled={disabled}/>
+                                        <input type="text" value={this.props.value.string} onChange={this.handleChange} disabled={disabled}/>
                                     </div>
-                                    <div className="pure-u-1 pure-u-md-1-3">
+                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                                        <label>Genre</label>
+                                        <input type="text" value={this.props.value.genre} disabled/>
+                                    </div>
+                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Type</label>
-                                        <input className="pure-u-23-24" type="text" value={this.props.value.type} onChange={this.handleChange} disabled={disabled}/>
+                                        <input type="text" value={this.props.value.type} disabled/>
                                     </div>
                                 </div>
                             </fieldset>
