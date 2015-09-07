@@ -37,7 +37,7 @@ var Nodes = React.createClass({
         })
 
         return (
-            <div className="pure-g nodes">
+            <div className="nodes">
                 {this.state.nodes.map((node) => {
                     return (<Node key={node.node_info_id} node={node} />);
                 })}

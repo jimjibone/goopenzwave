@@ -161,28 +161,41 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 				}
 				odata, err := json.Marshal(ocontainer)
 				if err != nil {
-					log.Errorln("error marshaling output:", err)
+					log.Errorln("error marshaling get-nodes output:", err)
 					continue
 				}
 				err = conn.WriteMessage(websocket.TextMessage, odata)
 				if err != nil {
-					log.Errorln("error writing to websocket:", err)
+					log.Errorln("error writing nodes to websocket:", err)
 					continue
 				}
-				// log.Infoln("sent data to websocket:", string(odata))
-				log.Infoln("sent data to websocket:", ocontainer.Topic)
+				// log.Infoln("sent nodes data to websocket:", string(odata))
+				log.Infoln("sent nodes data to websocket:", ocontainer.Topic)
 
 			case "set-node":
 				var nodesummary NodeSummary
 				err = json.Unmarshal(inbound.Payload, &nodesummary)
 				if err != nil {
-					log.Errorln("error unmarshalling node payload:", err)
+					log.Errorln("error unmarshalling set-node payload:", err)
 					continue
 				}
 
 				err = NodeManagerUpdateNode(nodesummary)
 				if err != nil {
 					log.Errorln("error updating node:", err)
+					continue
+				}
+
+			case "toggle-node":
+				var nodeinfoid NodeInfoIDMessage
+				err = json.Unmarshal(inbound.Payload, &nodeinfoid)
+				if err != nil {
+					log.Errorln("error unmarshalling toggle-node payload:", err)
+				}
+
+				err = NodeManagerToggleNode(nodeinfoid)
+				if err != nil {
+					log.Errorln("error toggling node:", err)
 					continue
 				}
 

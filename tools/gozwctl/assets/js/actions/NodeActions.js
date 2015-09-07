@@ -18,6 +18,10 @@ class NodeActions {
 
     // fetchNode(home_id, node_id) {...}
 
+    sendNodeOnOff(node_info_id) {
+        this.dispatch(node_info_id);
+    }
+
     sendNode(node) {
         this.dispatch(node);
     }

@@ -111,6 +111,10 @@ type ValueSummary struct {
 	AsString       string               `json:"string"`
 }
 
+type NodeInfoIDMessage struct {
+	NodeInfoID NodeInfoID `json:"node_info_id"`
+}
+
 var (
 	nodeinfos            = make(NodeInfos)
 	running              = false
@@ -260,6 +264,19 @@ func NodeManagerUpdateNode(nodesummary NodeSummary) error {
 	// ProductID        string         `json:"product_id"`
 	// Values           []ValueSummary `json:"values"`
 
+	// TODO: return an error if one of the updates failed.
+	return nil
+}
+
+func NodeManagerToggleNode(nodeinfoid NodeInfoIDMessage) error {
+	nodeinfo, found := nodeinfos[nodeinfoid.NodeInfoID]
+	if !found {
+		return fmt.Errorf("could not find node (%s) in the node list", nodeinfoid.NodeInfoID)
+	}
+
+	_ = nodeinfo
+
+	log.Warnln("not toggling state of node")
 	return nil
 }
 

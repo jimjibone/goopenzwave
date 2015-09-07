@@ -11,6 +11,7 @@ class NodeStore {
         this.bindListeners({
             handleFetchNodes: NodeActions.FETCH_NODES,
             handleUpdateNodes: NodeActions.UPDATE_NODES,
+            handleSendNodeOnOff: NodeActions.SEND_NODE_ON_OFF,
             handleSendNode: NodeActions.SEND_NODE,
             handleUpdateNode: NodeActions.UPDATE_NODE,
             handleUpdateFailed: NodeActions.UPDATE_FAILED,
@@ -30,6 +31,13 @@ class NodeStore {
         console.log('NodeStore::handleUpdateNodes:', nodes);
         this.nodes = nodes;
         this.errorMessage = null;
+    }
+
+    handleSendNodeOnOff(node_info_id) {
+        // console.log('NodeStore::handleSendNodeOnOff:', node_info_id);
+        api.send('toggle-node', {
+            node_info_id: node_info_id
+        });
     }
 
     handleSendNode(node) {

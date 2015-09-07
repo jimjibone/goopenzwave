@@ -1,24 +1,33 @@
-$text-colour: #333;
-$link-colour: #1b98f8;
+@import "palette";
 
 body {
-    color: $text-colour;
+    background-color: $primary-color;
 }
 
-a {
-    text-decoration: none;
-    color: $link-colour;
+.heading, .nodes {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.heading {
+    color: $primary-color-text;
+    box-shadow: 0 0 1em $divider-color;
+    z-index: 1;
 }
 
 .nodes {
-    margin-left: 1em;
-    margin-right: 1em;
+    background-color: $primary-color-text;
+    color: $primary-text-color;
 
     .node {
-        margin-bottom: 0.5em;
-        padding-left: 0.5em;
-        padding-right: 0.5em;
-        border: 2px solid black;
-        border-radius: 5px;
+        border-bottom: 1px solid $divider-color;
+
+        .info {
+            color: $secondary-text-color;
+        }
+
+        .pure-button-primary {
+            background-color: $accent-color;
+        }
     }
 }

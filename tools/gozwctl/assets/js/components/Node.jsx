@@ -44,8 +44,9 @@ var Node = React.createClass({
         return (
             <div key={this.props.node.node_info_id} className="pure-u-1-1 node">
                 <div className="pure-g">
-                    <div className="pure-u-1-2">
+                    <div className="pure-u-1-1 pure-u-md-1-2">
                         <h3>{title}</h3>
+                        <button className="pure-button pure-button-primary" onClick={this.handleOnOff}>On/Off</button>
                         <form className="pure-form pure-form-aligned" onSubmit={this.handleSubmit}>
                             <fieldset>
                                 <div className="pure-control-group">
@@ -95,13 +96,17 @@ var Node = React.createClass({
                         </form>
                     </div>
 
-                    <div className="pure-u-1-2">
+                    <div className="pure-u-1-1 pure-u-md-1-2">
                         <h3>Values</h3>
                         {values}
                     </div>
                 </div>
             </div>
         );
+    },
+
+    handleOnOff(event) {
+        NodeActions.sendNodeOnOff(this.state.node.node_info_id);
     },
 
     handleNameChange(event) {
@@ -188,6 +193,10 @@ var Value = React.createClass({
                                     <div className="pure-u-1 pure-u-md-1-3">
                                         <label>Value</label>
                                         <input className="pure-u-23-24" type="text" value={this.props.value.string} onChange={this.handleChange} disabled={disabled}/>
+                                    </div>
+                                    <div className="pure-u-1 pure-u-md-1-3">
+                                        <label>Type</label>
+                                        <input className="pure-u-23-24" type="text" value={this.props.value.type} onChange={this.handleChange} disabled={disabled}/>
                                     </div>
                                 </div>
                             </fieldset>

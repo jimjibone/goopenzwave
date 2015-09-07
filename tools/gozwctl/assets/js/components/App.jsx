@@ -7,8 +7,8 @@ var App = React.createClass({
     render() {
         return (
             <div className="pure-g">
-                <div className="pure-u-1-1">
-                    <h1>gozwave Controller</h1>
+                <div className="pure-u-1-1 heading">
+                    <h1>gozwave</h1>
                 </div>
                 <div className="pure-u-1-1">
                     <Nodes />
