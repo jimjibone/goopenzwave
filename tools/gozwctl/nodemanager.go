@@ -5,13 +5,15 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"gitlab.com/jimjibone/gozwave"
 	"sync"
+	"time"
 )
 
 type NodeInfo struct {
-	HomeID uint32        `json:"home_id"`
-	NodeID uint8         `json:"node_id"`
-	Node   *gozwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
-	Values Values        `json:"values"`
+	HomeID  uint32        `json:"home_id"`
+	NodeID  uint8         `json:"node_id"`
+	Node    *gozwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
+	Values  Values        `json:"values"`
+	Time    time.Time     `json:"update-time"`
 }
 
 type NodeInfoID string
@@ -281,10 +283,117 @@ func NodeManagerToggleNode(nodeinfoid NodeInfoIDMessage) error {
 }
 
 func handleNotifcation(notification *gozwave.Notification) error {
-	log.Infoln("NodeManager: received notification:", notification)
-
 	// Switch based on notification type.
 	switch notification.Type {
+	case gozwave.NotificationTypeValueAdded:
+		// A new node value has been added to OpenZWave's list. These
+		// notifications occur after a node has been discovered, and details of
+		// its command classes have been received. Each command class may
+		// generate one or more values depending on the complexity of the item
+		// being represented.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notificaiton.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Value Added")
+
+		// Add the value to the correct node.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
+			nodeinfo.Time = time.Now()
+
+			// Broadcast to all clients that the node has updated.
+			message := OutputMessage{
+				Topic:   "node-updated",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
+
+	case gozwave.NotificationTypeValueRemoved:
+		// A node value has been removed from OpenZWave's list. This only occurs
+		// when a node is removed.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notificaiton.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Value Removed")
+
+		// Remove the value from the node.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if node, found := nodeinfos[nodeinfoid]; found {
+			if _, foundVal := node.Values[notification.ValueID.StringID()]; foundVal {
+				delete(node.Values, notification.ValueID.StringID())
+			}
+			nodeinfo.Time = time.Now()
+
+			// Broadcast to all clients that the node has updated.
+			message := OutputMessage{
+				Topic:   "node-updated",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
+
+	case gozwave.NotificationTypeValueChanged:
+		// A node value has been updated from the Z-Wave network and it is
+		// different from the previous value.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notificaiton.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Value Changed")
+
+		// Change the value of the correct node.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
+			nodeinfo.Time = time.Now()
+
+			// Broadcast to all clients that the node has updated.
+			message := OutputMessage{
+				Topic:   "node-updated",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
+
+	case gozwave.NotificationTypeValueRefreshed:
+		// A node value has been updated from the Z-Wave network.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notificaiton.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Value Refreshed")
+
+		// Update the update time of the correct node.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			nodeinfo.Time = time.Now()
+		}
+
+	case gozwave.NotificationTypeGroup:
+		...
+
+		//------------------------------------------------------------------------------
+
 	case gozwave.NotificationTypeNodeAdded:
 		// Create a NodeInfo from the notification then add it to the
 		// map.
@@ -344,6 +453,11 @@ func handleNotifcation(notification *gozwave.Notification) error {
 		// The initial node query has completed.
 		initialQueryComplete = true
 		// TODO: broadcast all node info to connected clients.
+
+	default:
+		log.WithFields(log.Fields{
+			"notification:", notification,
+		}).Warnln("unhandled notification received")
 	}
 
 	// TODO: return an error at some point.
