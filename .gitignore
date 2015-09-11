@@ -4,5 +4,5 @@ OZW_Log.txt
 zwcfg_*.xml
 zwscene.xml
 /tools/gominozw/gominozw
-/tools/gozwctl/public
-/tools/gozwctl/gozwctl
+/tools/gozwd/public
+/tools/gozwd/gozwd
