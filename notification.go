@@ -125,19 +125,19 @@ func (nt NotificationType) String() string {
 func (nc NotificationCode) String() string {
 	switch nc {
 	case NotificationCodeMsgComplete:
-		return "CodeMsgComplete"
+		return "MsgComplete"
 	case NotificationCodeTimeout:
-		return "CodeTimeout"
+		return "Timeout"
 	case NotificationCodeNoOperation:
-		return "CodeNoOperation"
+		return "NoOperation"
 	case NotificationCodeAwake:
-		return "CodeAwake"
+		return "Awake"
 	case NotificationCodeSleep:
-		return "CodeSleep"
+		return "Sleep"
 	case NotificationCodeDead:
-		return "CodeDead"
+		return "Dead"
 	case NotificationCodeAlive:
-		return "CodeAlive"
+		return "Alive"
 	}
 	return "UNKNOWN"
 }

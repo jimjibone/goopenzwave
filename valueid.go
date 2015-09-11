@@ -38,15 +38,15 @@ const (
 func (v ValueIDGenre) String() string {
 	switch v {
 	case ValueIDGenreBasic:
-		return "GenreBasic"
+		return "Basic"
 	case ValueIDGenreUser:
-		return "GenreUser"
+		return "User"
 	case ValueIDGenreConfig:
-		return "GenreConfig"
+		return "Config"
 	case ValueIDGenreSystem:
-		return "GenreSystem"
+		return "System"
 	case ValueIDGenreCount:
-		return "GenreCount"
+		return "Count"
 	}
 	return "UNKNOWN"
 }
@@ -54,25 +54,25 @@ func (v ValueIDGenre) String() string {
 func (v ValueIDType) String() string {
 	switch v {
 	case ValueIDTypeBool:
-		return "TypeBool"
+		return "Bool"
 	case ValueIDTypeByte:
-		return "TypeByte"
+		return "Byte"
 	case ValueIDTypeDecimal:
-		return "TypeDecimal"
+		return "Decimal"
 	case ValueIDTypeInt:
-		return "TypeInt"
+		return "Int"
 	case ValueIDTypeList:
-		return "TypeList"
+		return "List"
 	case ValueIDTypeSchedule:
-		return "TypeSchedule"
+		return "Schedule"
 	case ValueIDTypeShort:
-		return "TypeShort"
+		return "Short"
 	case ValueIDTypeString:
-		return "TypeString"
+		return "String"
 	case ValueIDTypeButton:
-		return "TypeButton"
+		return "Button"
 	case ValueIDTypeRaw: // also ValueIDTypeMax
-		return "Type(Raw|Max)"
+		return "Raw/Max"
 	}
 	return "UNKNOWN"
 }
