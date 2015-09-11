@@ -141,6 +141,7 @@ func (n *Node) GetType() string {
 	return manager.GetNodeType(n.HomeID, n.NodeID)
 }
 
+// TODO: implement node.GetNeighbors
 // GetNeighbors Get the bitmap of this node's neighbors.
 // func (n *Node) GetNeighbors() bool {
 // 	manager := GetManager()
