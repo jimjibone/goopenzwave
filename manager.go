@@ -93,7 +93,7 @@ func (m *Manager) GetOptions() *Options {
 //
 
 // AddDriver Creates a new driver for a Z-Wave controller. This method creates a Driver object for handling communications with a single Z-Wave controller. In the background, the driver first tries to read configuration data saved during a previous run. It then queries the controller directly for any missing information, and a refresh of the list of nodes that it controls. Once this information has been received, a DriverReady notification callback is sent, containing the Home ID of the controller. This Home ID is required by most of the OpenZWave Manager class methods.
-func (m *Manager) AddDriver(controllerPath string) error {
+func (m *Manager) AddDriver(controllerPath string) bool {
 	cControllerPath := C.CString(controllerPath)
 	result := bool(C.manager_addDriver(m.cptr, cControllerPath))
 	C.free(unsafe.Pointer(cControllerPath))
@@ -101,7 +101,7 @@ func (m *Manager) AddDriver(controllerPath string) error {
 }
 
 // RemoveDriver Removes the driver for a Z-Wave controller, and closes the controller. Drivers do not need to be explicitly removed before calling Destroy - this is handled automatically.
-func (m *Manager) RemoveDriver(controllerPath string) error {
+func (m *Manager) RemoveDriver(controllerPath string) bool {
 	cControllerPath := C.CString(controllerPath)
 	result := bool(C.manager_removeDriver(m.cptr, cControllerPath))
 	C.free(unsafe.Pointer(cControllerPath))
