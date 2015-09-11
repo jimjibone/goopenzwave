@@ -1,5 +1,5 @@
-#ifndef GOZWAVE_VALUEID
-#define GOZWAVE_VALUEID
+#ifndef GOOPENZWAVE_VALUEID
+#define GOOPENZWAVE_VALUEID
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -54,4 +54,4 @@ extern "C" {
 }
 #endif
 
-#endif // define GOZWAVE_VALUEID
+#endif // define GOOPENZWAVE_VALUEID

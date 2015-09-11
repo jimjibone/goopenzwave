@@ -8,7 +8,7 @@ var App = React.createClass({
         return (
             <div className="pure-g">
                 <div className="pure-u-1-1 heading">
-                    <h1>gozwave</h1>
+                    <h1>goopenzwave</h1>
                 </div>
                 <div className="pure-u-1-1">
                     <Nodes />

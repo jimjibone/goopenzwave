@@ -1,5 +1,5 @@
-#ifndef GOZWAVE_NOTIFICATION
-#define GOZWAVE_NOTIFICATION
+#ifndef GOOPENZWAVE_NOTIFICATION
+#define GOOPENZWAVE_NOTIFICATION
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -76,4 +76,4 @@ extern "C" {
 }
 #endif
 
-#endif // define GOZWAVE_NOTIFICATION
+#endif // define GOOPENZWAVE_NOTIFICATION

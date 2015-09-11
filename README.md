@@ -1,4 +1,4 @@
-# gozwave
+# goopenzwave
 
 Go bindings for the [OpenZWave](https://github.com/OpenZWave/open-zwave) library.
 
@@ -23,7 +23,7 @@ This package does not include the OpenZWave library, so you will need to install
 ## Installation
 
 ```
-go get gitlab.com/jimjibone/gozwave
+go get github.com/jimjibone/goopenzwave
 ```
 
 _Notice how there was no need to run `make` :wink:_
@@ -41,7 +41,7 @@ It shows how to set up the Manager with various options and listen for Notificat
 To install:
 
 ```
-go install gitlab.com/jimjibone/gozwave/tools/gominozw
+go install github.com/jimjibone/goopenzwave/tools/gominozw
 ```
 
 ### `gozw`

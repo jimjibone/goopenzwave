@@ -1,14 +1,14 @@
 {
   "name": "gozwctl",
   "version": "0.1.0",
-  "description": "gozwave web interface",
+  "description": "goopenzwave web interface",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/jimjibone/gozwave.git"
+    "url": "https://github.com/jimjibone/goopenzwave.git"
   },
   "keywords": [
     "openzwave",

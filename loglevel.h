@@ -1,5 +1,5 @@
-#ifndef GOZWAVE_LOGLEVEL
-#define GOZWAVE_LOGLEVEL
+#ifndef GOOPENZWAVE_LOGLEVEL
+#define GOOPENZWAVE_LOGLEVEL
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -31,4 +31,4 @@ typedef enum {
 OpenZWave::LogLevel loglevel_toLogLevel(loglevel_t level);
 #endif
 
-#endif // define GOZWAVE_LOGLEVEL
+#endif // define GOOPENZWAVE_LOGLEVEL

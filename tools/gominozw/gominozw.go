@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gitlab.com/jimjibone/gozwave"
+	"github.com/jimjibone/goopenzwave"
 	"os"
 	"os/signal"
 )
@@ -11,14 +11,14 @@ import (
 type NodeInfo struct {
 	HomeID uint32
 	NodeID uint8
-	Node   *gozwave.Node
-	Values map[uint64]*gozwave.ValueID
+	Node   *goopenzwave.Node
+	Values map[uint64]*goopenzwave.ValueID
 }
 
 var Nodes = make(map[uint8]*NodeInfo)
 var InitialQueryComplete = make(chan bool)
 
-func processNotifications(m *gozwave.Manager) {
+func processNotifications(m *goopenzwave.Manager) {
 	var sentInitialQueryComplete bool
 	for {
 		select {
@@ -27,30 +27,30 @@ func processNotifications(m *gozwave.Manager) {
 
 			// Switch based on notification type.
 			switch notification.Type {
-			case gozwave.NotificationTypeNodeAdded:
+			case goopenzwave.NotificationTypeNodeAdded:
 				// Create a NodeInfo from the notification then add it to the
 				// map.
 				nodeinfo := &NodeInfo{
 					HomeID: notification.HomeID,
 					NodeID: notification.NodeID,
-					Node:   gozwave.NewNode(notification.HomeID, notification.NodeID),
-					Values: make(map[uint64]*gozwave.ValueID),
+					Node:   goopenzwave.NewNode(notification.HomeID, notification.NodeID),
+					Values: make(map[uint64]*goopenzwave.ValueID),
 				}
 				Nodes[nodeinfo.NodeID] = nodeinfo
 
-			case gozwave.NotificationTypeNodeRemoved:
+			case goopenzwave.NotificationTypeNodeRemoved:
 				// Remove the NodeInfo from the map.
 				if _, found := Nodes[notification.NodeID]; found {
 					delete(Nodes, notification.NodeID)
 				}
 
-			case gozwave.NotificationTypeValueAdded, gozwave.NotificationTypeValueChanged:
+			case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
 				// Find the NodeInfo in the map and add/change the ValueID.
 				if node, found := Nodes[notification.NodeID]; found {
 					node.Values[notification.ValueID.ID] = notification.ValueID
 				}
 
-			case gozwave.NotificationTypeValueRemoved:
+			case goopenzwave.NotificationTypeValueRemoved:
 				// Find the NodeInfo in the map and remove the ValueID.
 				if node, found := Nodes[notification.NodeID]; found {
 					if _, foundVal := node.Values[notification.ValueID.ID]; foundVal {
@@ -58,7 +58,7 @@ func processNotifications(m *gozwave.Manager) {
 					}
 				}
 
-			case gozwave.NotificationTypeAwakeNodesQueried, gozwave.NotificationTypeAllNodesQueried, gozwave.NotificationTypeAllNodesQueriedSomeDead:
+			case goopenzwave.NotificationTypeAwakeNodesQueried, goopenzwave.NotificationTypeAllNodesQueried, goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
 				// The initial node query has completed.
 				if sentInitialQueryComplete == false {
 					InitialQueryComplete <- true
@@ -73,12 +73,12 @@ func main() {
 	flag.StringVar(&controllerPath, "controller", "/dev/ttyACM0", "the path to your controller device")
 	flag.Parse()
 
-	fmt.Println("gominozw example starting with openzwave version:", gozwave.GetManagerVersionAsString())
+	fmt.Println("gominozw example starting with openzwave version:", goopenzwave.GetManagerVersionAsString())
 
 	// Setup the OpenZWave library.
-	options := gozwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
-	options.AddOptionLogLevel("SaveLogLevel", gozwave.LogLevelNone)
-	options.AddOptionLogLevel("QueueLogLevel", gozwave.LogLevelNone)
+	options := goopenzwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
+	options.AddOptionLogLevel("SaveLogLevel", goopenzwave.LogLevelNone)
+	options.AddOptionLogLevel("QueueLogLevel", goopenzwave.LogLevelNone)
 	options.AddOptionInt("DumpTrigger", 4)
 	options.AddOptionInt("PollInterval", 500)
 	options.AddOptionBool("IntervalBetweenPolls", true)
@@ -86,7 +86,7 @@ func main() {
 	options.Lock()
 
 	// Start the library and listen for notifications.
-	manager := gozwave.CreateManager()
+	manager := goopenzwave.CreateManager()
 	err := manager.StartNotifications()
 	if err != nil {
 		fmt.Println("ERROR: failed to start notifications:", err)
@@ -140,6 +140,6 @@ func main() {
 	// All done now finish up.
 	manager.RemoveDriver(controllerPath)
 	manager.StopNotifications()
-	gozwave.DestroyManager()
-	gozwave.DestroyOptions()
+	goopenzwave.DestroyManager()
+	goopenzwave.DestroyOptions()
 }

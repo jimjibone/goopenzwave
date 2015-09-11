@@ -1,4 +1,4 @@
-package gozwave
+package goopenzwave
 
 // #cgo LDFLAGS: -lopenzwave -L/usr/local/lib
 // #cgo CPPFLAGS: -I/usr/local/include -I/usr/local/include/openzwave
@@ -82,7 +82,7 @@ type ValueIDStringID string
 
 // ValueID contains all appropriate information available for a ValueID from the
 // OpenZWave library. You should not create a new ValueID manually, but receive
-// it from the gozwave package after a Notification has been received from the
+// it from the goopenzwave package after a Notification has been received from the
 // OpenZWave library.
 type ValueID struct {
 	HomeID         uint32

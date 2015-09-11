@@ -1,4 +1,4 @@
-package gozwave
+package goopenzwave
 
 // #cgo LDFLAGS: -lopenzwave -L/usr/local/lib
 // #cgo CPPFLAGS: -I/usr/local/include -I/usr/local/include/openzwave

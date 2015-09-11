@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"gitlab.com/jimjibone/gozwave"
+	"github.com/jimjibone/goopenzwave"
 	"sync"
 	"time"
 )
@@ -11,7 +11,7 @@ import (
 type NodeInfo struct {
 	HomeID  uint32        `json:"home_id"`
 	NodeID  uint8         `json:"node_id"`
-	Node    *gozwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
+	Node    *goopenzwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
 	Values  Values        `json:"values"`
 	Time    time.Time     `json:"update-time"`
 }
@@ -46,11 +46,11 @@ func (n *NodeInfo) Summary() NodeSummary {
 	}
 }
 
-type Values map[gozwave.ValueIDStringID]*gozwave.ValueID
+type Values map[goopenzwave.ValueIDStringID]*goopenzwave.ValueID
 
-func (v *Values) Summary() map[gozwave.ValueIDStringID]ValueSummary {
-	manager := gozwave.GetManager()
-	summaries := make(map[gozwave.ValueIDStringID]ValueSummary)
+func (v *Values) Summary() map[goopenzwave.ValueIDStringID]ValueSummary {
+	manager := goopenzwave.GetManager()
+	summaries := make(map[goopenzwave.ValueIDStringID]ValueSummary)
 	for _, valueid := range *v {
 		_, valueString := manager.GetValueAsString(valueid)
 		summary := ValueSummary{
@@ -92,15 +92,15 @@ type NodeSummary struct {
 	ManufacturerID   string                                   `json:"manufacturer_id"`
 	ProductType      string                                   `json:"product_type"`
 	ProductID        string                                   `json:"product_id"`
-	Values           map[gozwave.ValueIDStringID]ValueSummary `json:"values"`
+	Values           map[goopenzwave.ValueIDStringID]ValueSummary `json:"values"`
 }
 
 type ValueSummary struct {
 	ValueID        uint64               `json:"value_id"`
 	NodeID         uint8                `json:"node_id"`
-	Genre          gozwave.ValueIDGenre `json:"genre"`
+	Genre          goopenzwave.ValueIDGenre `json:"genre"`
 	CommandClassID uint8                `json:"command_class_id"`
-	Type           gozwave.ValueIDType  `json:"type"`
+	Type           goopenzwave.ValueIDType  `json:"type"`
 	ReadOnly       bool                 `json:"read_only"`
 	WriteOnly      bool                 `json:"write_only"`
 	Set            bool                 `json:"set"`
@@ -126,9 +126,9 @@ var (
 
 func NodeManagerRun(controllerPath string, wg *sync.WaitGroup) error {
 	// Setup the OpenZWave library.
-	options := gozwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
-	options.AddOptionLogLevel("SaveLogLevel", gozwave.LogLevelNone)
-	options.AddOptionLogLevel("QueueLogLevel", gozwave.LogLevelNone)
+	options := goopenzwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
+	options.AddOptionLogLevel("SaveLogLevel", goopenzwave.LogLevelNone)
+	options.AddOptionLogLevel("QueueLogLevel", goopenzwave.LogLevelNone)
 	options.AddOptionInt("DumpTrigger", 4)
 	options.AddOptionInt("PollInterval", 500)
 	options.AddOptionBool("IntervalBetweenPolls", true)
@@ -136,7 +136,7 @@ func NodeManagerRun(controllerPath string, wg *sync.WaitGroup) error {
 	options.Lock()
 
 	// Start the library and listen for notifications.
-	manager := gozwave.CreateManager()
+	manager := goopenzwave.CreateManager()
 	err := manager.StartNotifications()
 	if err != nil {
 		return fmt.Errorf("failed to start notifications: %s", err)
@@ -148,8 +148,8 @@ func NodeManagerRun(controllerPath string, wg *sync.WaitGroup) error {
 		// All done now finish up.
 		manager.RemoveDriver(controllerPath)
 		manager.StopNotifications()
-		gozwave.DestroyManager()
-		gozwave.DestroyOptions()
+		goopenzwave.DestroyManager()
+		goopenzwave.DestroyOptions()
 		wg.Done()
 	}()
 
@@ -282,10 +282,10 @@ func NodeManagerToggleNode(nodeinfoid NodeInfoIDMessage) error {
 	return nil
 }
 
-func handleNotifcation(notification *gozwave.Notification) error {
+func handleNotifcation(notification *goopenzwave.Notification) error {
 	// Switch based on notification type.
 	switch notification.Type {
-	case gozwave.NotificationTypeValueAdded:
+	case goopenzwave.NotificationTypeValueAdded:
 		// A new node value has been added to OpenZWave's list. These
 		// notifications occur after a node has been discovered, and details of
 		// its command classes have been received. Each command class may
@@ -315,7 +315,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			clients.Broadcast(message)
 		}
 
-	case gozwave.NotificationTypeValueRemoved:
+	case goopenzwave.NotificationTypeValueRemoved:
 		// A node value has been removed from OpenZWave's list. This only occurs
 		// when a node is removed.
 		log.WithFields(log.Fields{
@@ -344,7 +344,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			clients.Broadcast(message)
 		}
 
-	case gozwave.NotificationTypeValueChanged:
+	case goopenzwave.NotificationTypeValueChanged:
 		// A node value has been updated from the Z-Wave network and it is
 		// different from the previous value.
 		log.WithFields(log.Fields{
@@ -371,7 +371,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			clients.Broadcast(message)
 		}
 
-	case gozwave.NotificationTypeValueRefreshed:
+	case goopenzwave.NotificationTypeValueRefreshed:
 		// A node value has been updated from the Z-Wave network.
 		log.WithFields(log.Fields{
 			"Home":     notification.HomeID,
@@ -389,30 +389,30 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			nodeinfo.Time = time.Now()
 		}
 
-	case gozwave.NotificationTypeGroup:
+	case goopenzwave.NotificationTypeGroup:
 		...
 
 		//------------------------------------------------------------------------------
 
-	case gozwave.NotificationTypeNodeAdded:
+	case goopenzwave.NotificationTypeNodeAdded:
 		// Create a NodeInfo from the notification then add it to the
 		// map.
 		nodeinfo := &NodeInfo{
 			HomeID: notification.HomeID,
 			NodeID: notification.NodeID,
-			Node:   gozwave.NewNode(notification.HomeID, notification.NodeID),
-			Values: make(map[gozwave.ValueIDStringID]*gozwave.ValueID),
+			Node:   goopenzwave.NewNode(notification.HomeID, notification.NodeID),
+			Values: make(map[goopenzwave.ValueIDStringID]*goopenzwave.ValueID),
 		}
 		nodeinfos[nodeinfo.ID()] = nodeinfo
 
-	case gozwave.NotificationTypeNodeRemoved:
+	case goopenzwave.NotificationTypeNodeRemoved:
 		// Remove the NodeInfo from the map.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if _, found := nodeinfos[nodeinfoid]; found {
 			delete(nodeinfos, nodeinfoid)
 		}
 
-	case gozwave.NotificationTypeNodeNaming:
+	case goopenzwave.NotificationTypeNodeNaming:
 		// Find the NodeInfo in the map and broadcast to all clients that the
 		// node has updated.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
@@ -424,7 +424,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			clients.Broadcast(message)
 		}
 
-	case gozwave.NotificationTypeValueAdded, gozwave.NotificationTypeValueChanged:
+	case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
 		// Find the NodeInfo in the map and add/change the ValueID.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
@@ -440,7 +440,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			clients.Broadcast(message)
 		}
 
-	case gozwave.NotificationTypeValueRemoved:
+	case goopenzwave.NotificationTypeValueRemoved:
 		// Find the NodeInfo in the map and remove the ValueID.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if node, found := nodeinfos[nodeinfoid]; found {
@@ -449,7 +449,7 @@ func handleNotifcation(notification *gozwave.Notification) error {
 			}
 		}
 
-	case gozwave.NotificationTypeAwakeNodesQueried, gozwave.NotificationTypeAllNodesQueried, gozwave.NotificationTypeAllNodesQueriedSomeDead:
+	case goopenzwave.NotificationTypeAwakeNodesQueried, goopenzwave.NotificationTypeAllNodesQueried, goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
 		// The initial node query has completed.
 		initialQueryComplete = true
 		// TODO: broadcast all node info to connected clients.

@@ -1,5 +1,5 @@
-#ifndef GOZWAVE_STRING
-#define GOZWAVE_STRING
+#ifndef GOOPENZWAVE_STRING
+#define GOOPENZWAVE_STRING
 
 #include <stdint.h>
 
@@ -55,4 +55,4 @@ string_t* string_fromStdString(std::string &string);
 void string_copyStdStringList(stringlist_t *clist, std::vector<std::string> &strings);
 #endif
 
-#endif // define GOZWAVE_STRING
+#endif // define GOOPENZWAVE_STRING

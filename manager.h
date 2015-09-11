@@ -1,5 +1,5 @@
-#ifndef GOZWAVE_MANAGER
-#define GOZWAVE_MANAGER
+#ifndef GOOPENZWAVE_MANAGER
+#define GOOPENZWAVE_MANAGER
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -280,4 +280,4 @@ extern "C" {
 }
 #endif
 
-#endif // define GOZWAVE_MANAGER
+#endif // define GOOPENZWAVE_MANAGER

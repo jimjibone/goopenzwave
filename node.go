@@ -1,4 +1,4 @@
-package gozwave
+package goopenzwave
 
 import (
 	"fmt"

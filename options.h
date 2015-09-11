@@ -1,5 +1,5 @@
-#ifndef GOZWAVE_OPTIONS
-#define GOZWAVE_OPTIONS
+#ifndef GOOPENZWAVE_OPTIONS
+#define GOOPENZWAVE_OPTIONS
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -35,4 +35,4 @@ extern "C" {
 }
 #endif
 
-#endif // define GOZWAVE_OPTIONS
+#endif // define GOOPENZWAVE_OPTIONS
