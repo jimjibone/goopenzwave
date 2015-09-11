@@ -34,7 +34,7 @@ var Node = React.createClass({
         var values = [];
         for (var value in this.state.node.values) {
             if (this.state.node.values.hasOwnProperty(value)) {
-                values.push(<Value stringid={value} value={this.state.node.values[value]} onChange={this.handleValueChange} />);
+                values.push(<Value stringid={value} value={this.state.node.values[value]} onChange={this.handleValueChange} onButton={this.handleValueButton} />);
             }
         }
         // {this.state.node.values.map((value) => {
@@ -59,35 +59,35 @@ var Node = React.createClass({
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Type</label>
-                                    <input type="text" value={this.state.node.node_type} disabled />
+                                    <input type="text" value={this.state.node.node_type} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Manufacturer</label>
-                                    <input type="text" value={this.state.node.manufacturer_name} disabled />
+                                    <input type="text" value={this.state.node.manufacturer_name} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Product Name</label>
-                                    <input type="text" value={this.state.node.product_name} disabled />
+                                    <input type="text" value={this.state.node.product_name} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Node ID</label>
-                                    <input type="text" value={this.state.node.node_id} disabled />
+                                    <input type="text" value={this.state.node.node_id} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Home ID</label>
-                                    <input type="text" value={this.state.node.home_id} disabled />
+                                    <input type="text" value={this.state.node.home_id} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Basic Type</label>
-                                    <input type="text" value={this.state.node.basic_type} disabled />
+                                    <input type="text" value={this.state.node.basic_type} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Generic Type</label>
-                                    <input type="text" value={this.state.node.generic_type} disabled />
+                                    <input type="text" value={this.state.node.generic_type} readOnly />
                                 </div>
                                 <div className="pure-control-group">
                                     <label>Specific Type</label>
-                                    <input type="text" value={this.state.node.specific_type} disabled />
+                                    <input type="text" value={this.state.node.specific_type} readOnly />
                                 </div>
                                 <div className="pure-controls">
                                     <button type="submit" className="pure-button pure-button-primary" disabled={!changed}>Update</button>
@@ -122,9 +122,16 @@ var Node = React.createClass({
     },
 
     handleValueChange(value_stringid, value_string) {
-        console.log('Node::handleValueChange:', value_stringid, value_string);
+        // console.log('Node::handleValueChange:', value_stringid, value_string);
         this.setState({ node: React.addons.update(this.state.node, {
             values: {[value_stringid]: {string: {$set: value_string}}}
+        })});
+    },
+
+    handleValueButton(value_stringid) {
+        // console.log('Node::handleValueButton:', value_stringid);
+        this.setState({ node: React.addons.update(this.state.node, {
+            values: {[value_stringid]: {button_press: {$set: true}}}
         })});
     },
 
@@ -161,6 +168,8 @@ var Node = React.createClass({
 
                         if (newValue.string !== currentValue.string) {
                             changed = true;
+                        } else if (newValue.button_press == true) {
+                            changed = true;
                         }
                     }
                 }
@@ -174,6 +183,10 @@ var Value = React.createClass({
     handleChange(event) {
         this.props.onChange(this.props.stringid, event.target.value);
     },
+    handleButton(event) {
+        event.preventDefault();
+        this.props.onButton(this.props.stringid);
+    },
 
     render() {
         var disabled = this.props.value.read_only;
@@ -185,10 +198,12 @@ var Value = React.createClass({
                         <form className="pure-form pure-form-stacked">
                             <fieldset>
                                 <legend>{this.props.value.label}</legend>
+                                {this.props.value.read_only ? <p>Read Only</p> : null}
+                                {this.props.value.write_only ? <p>Write Only</p> : null}
                                 <div className="pure-g">
                                     <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Units</label>
-                                        <input type="text" value={this.props.value.units} disabled/>
+                                        <input type="text" value={this.props.value.units} readOnly/>
                                     </div>
                                     <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Value</label>
@@ -196,12 +211,18 @@ var Value = React.createClass({
                                     </div>
                                     <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Genre</label>
-                                        <input type="text" value={this.props.value.genre} disabled/>
+                                        <input type="text" value={this.props.value.genre} readOnly/>
                                     </div>
                                     <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                                         <label>Type</label>
-                                        <input type="text" value={this.props.value.type} disabled/>
+                                        <input type="text" value={this.props.value.type} readOnly/>
                                     </div>
+                                    {this.props.value.write_only ?
+                                        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                                            <button className="pure-button" onClick={this.handleButton}>Press Button</button>
+                                        </div>
+                                        : null
+                                    }
                                 </div>
                             </fieldset>
                         </form>
