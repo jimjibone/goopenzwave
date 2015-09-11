@@ -9,11 +9,11 @@ import (
 )
 
 type NodeInfo struct {
-	HomeID  uint32        `json:"home_id"`
-	NodeID  uint8         `json:"node_id"`
-	Node    *goopenzwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
-	Values  Values        `json:"values"`
-	Time    time.Time     `json:"update-time"`
+	HomeID uint32            `json:"home_id"`
+	NodeID uint8             `json:"node_id"`
+	Node   *goopenzwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
+	Values Values            `json:"values"`
+	Time   time.Time         `json:"update-time"`
 }
 
 type NodeInfoID string
@@ -78,39 +78,39 @@ func (v *Values) Summary() map[goopenzwave.ValueIDStringID]ValueSummary {
 type NodeInfos map[NodeInfoID]*NodeInfo
 
 type NodeSummary struct {
-	NodeInfoID       NodeInfoID                               `json:"node_info_id"`
-	HomeID           uint32                                   `json:"home_id"`
-	NodeID           uint8                                    `json:"node_id"`
-	BasicType        uint8                                    `json:"basic_type"`
-	GenericType      uint8                                    `json:"generic_type"`
-	SpecificType     uint8                                    `json:"specific_type"`
-	NodeType         string                                   `json:"node_type"`
-	ManufacturerName string                                   `json:"manufacturer_name"`
-	ProductName      string                                   `json:"product_name"`
-	NodeName         string                                   `json:"node_name"`
-	Location         string                                   `json:"location"`
-	ManufacturerID   string                                   `json:"manufacturer_id"`
-	ProductType      string                                   `json:"product_type"`
-	ProductID        string                                   `json:"product_id"`
+	NodeInfoID       NodeInfoID                                   `json:"node_info_id"`
+	HomeID           uint32                                       `json:"home_id"`
+	NodeID           uint8                                        `json:"node_id"`
+	BasicType        uint8                                        `json:"basic_type"`
+	GenericType      uint8                                        `json:"generic_type"`
+	SpecificType     uint8                                        `json:"specific_type"`
+	NodeType         string                                       `json:"node_type"`
+	ManufacturerName string                                       `json:"manufacturer_name"`
+	ProductName      string                                       `json:"product_name"`
+	NodeName         string                                       `json:"node_name"`
+	Location         string                                       `json:"location"`
+	ManufacturerID   string                                       `json:"manufacturer_id"`
+	ProductType      string                                       `json:"product_type"`
+	ProductID        string                                       `json:"product_id"`
 	Values           map[goopenzwave.ValueIDStringID]ValueSummary `json:"values"`
 }
 
 type ValueSummary struct {
-	ValueID        uint64               `json:"value_id"`
-	NodeID         uint8                `json:"node_id"`
+	ValueID        uint64                   `json:"value_id"`
+	NodeID         uint8                    `json:"node_id"`
 	Genre          goopenzwave.ValueIDGenre `json:"genre"`
-	CommandClassID uint8                `json:"command_class_id"`
+	CommandClassID uint8                    `json:"command_class_id"`
 	Type           goopenzwave.ValueIDType  `json:"type"`
-	ReadOnly       bool                 `json:"read_only"`
-	WriteOnly      bool                 `json:"write_only"`
-	Set            bool                 `json:"set"`
-	Polled         bool                 `json:"polled"`
-	Label          string               `json:"label"`
-	Units          string               `json:"units"`
-	Help           string               `json:"help"`
-	Min            int32                `json:"min"`
-	Max            int32                `json:"max"`
-	AsString       string               `json:"string"`
+	ReadOnly       bool                     `json:"read_only"`
+	WriteOnly      bool                     `json:"write_only"`
+	Set            bool                     `json:"set"`
+	Polled         bool                     `json:"polled"`
+	Label          string                   `json:"label"`
+	Units          string                   `json:"units"`
+	Help           string                   `json:"help"`
+	Min            int32                    `json:"min"`
+	Max            int32                    `json:"max"`
+	AsString       string                   `json:"string"`
 }
 
 type NodeInfoIDMessage struct {
@@ -293,7 +293,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 		// being represented.
 		log.WithFields(log.Fields{
 			"Home":     notification.HomeID,
-			"Node":     notificaiton.NodeID,
+			"Node":     notification.NodeID,
 			"Genre":    notification.ValueID.Genre,
 			"Class":    notification.ValueID.CommandClassID,
 			"Instance": notification.ValueID.Instance,
@@ -320,7 +320,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 		// when a node is removed.
 		log.WithFields(log.Fields{
 			"Home":     notification.HomeID,
-			"Node":     notificaiton.NodeID,
+			"Node":     notification.NodeID,
 			"Genre":    notification.ValueID.Genre,
 			"Class":    notification.ValueID.CommandClassID,
 			"Instance": notification.ValueID.Instance,
@@ -330,9 +330,9 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 
 		// Remove the value from the node.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
-		if node, found := nodeinfos[nodeinfoid]; found {
-			if _, foundVal := node.Values[notification.ValueID.StringID()]; foundVal {
-				delete(node.Values, notification.ValueID.StringID())
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			if _, foundVal := nodeinfo.Values[notification.ValueID.StringID()]; foundVal {
+				delete(nodeinfo.Values, notification.ValueID.StringID())
 			}
 			nodeinfo.Time = time.Now()
 
@@ -349,7 +349,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 		// different from the previous value.
 		log.WithFields(log.Fields{
 			"Home":     notification.HomeID,
-			"Node":     notificaiton.NodeID,
+			"Node":     notification.NodeID,
 			"Genre":    notification.ValueID.Genre,
 			"Class":    notification.ValueID.CommandClassID,
 			"Instance": notification.ValueID.Instance,
@@ -375,7 +375,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 		// A node value has been updated from the Z-Wave network.
 		log.WithFields(log.Fields{
 			"Home":     notification.HomeID,
-			"Node":     notificaiton.NodeID,
+			"Node":     notification.NodeID,
 			"Genre":    notification.ValueID.Genre,
 			"Class":    notification.ValueID.CommandClassID,
 			"Instance": notification.ValueID.Instance,
@@ -390,7 +390,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 		}
 
 	case goopenzwave.NotificationTypeGroup:
-		...
+		// TODO this...
 
 		//------------------------------------------------------------------------------
 
@@ -424,30 +424,30 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 			clients.Broadcast(message)
 		}
 
-	case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
-		// Find the NodeInfo in the map and add/change the ValueID.
-		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
-		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
-		}
+	// case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
+	// 	// Find the NodeInfo in the map and add/change the ValueID.
+	// 	nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+	// 	if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+	// 		nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
+	// 	}
 
-		// Broadcast to all clients that the node has updated.
-		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			message := OutputMessage{
-				Topic:   "node-updated",
-				Payload: nodeinfo.Summary(),
-			}
-			clients.Broadcast(message)
-		}
+	// 	// Broadcast to all clients that the node has updated.
+	// 	if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+	// 		message := OutputMessage{
+	// 			Topic:   "node-updated",
+	// 			Payload: nodeinfo.Summary(),
+	// 		}
+	// 		clients.Broadcast(message)
+	// 	}
 
-	case goopenzwave.NotificationTypeValueRemoved:
-		// Find the NodeInfo in the map and remove the ValueID.
-		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
-		if node, found := nodeinfos[nodeinfoid]; found {
-			if _, foundVal := node.Values[notification.ValueID.StringID()]; foundVal {
-				delete(node.Values, notification.ValueID.StringID())
-			}
-		}
+	// case goopenzwave.NotificationTypeValueRemoved:
+	// 	// Find the NodeInfo in the map and remove the ValueID.
+	// 	nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+	// 	if node, found := nodeinfos[nodeinfoid]; found {
+	// 		if _, foundVal := node.Values[notification.ValueID.StringID()]; foundVal {
+	// 			delete(node.Values, notification.ValueID.StringID())
+	// 		}
+	// 	}
 
 	case goopenzwave.NotificationTypeAwakeNodesQueried, goopenzwave.NotificationTypeAllNodesQueried, goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
 		// The initial node query has completed.
@@ -456,7 +456,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 
 	default:
 		log.WithFields(log.Fields{
-			"notification:", notification,
+			"notification": notification,
 		}).Warnln("unhandled notification received")
 	}
 
