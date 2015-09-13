@@ -134,7 +134,7 @@ func NodeManagerRun(controllerPath string, wg *sync.WaitGroup) error {
 	options.Lock()
 
 	// Start the library and listen for notifications.
-	err := goopenzwave.Start(handleNotifcation)
+	err := goopenzwave.Start(handleNotification)
 	if err != nil {
 		log.Fatalln("failed to start goopenzwave package:", err)
 	}
@@ -283,7 +283,7 @@ func NodeManagerToggleNode(nodeinfoid NodeInfoIDMessage) error {
 	return nil
 }
 
-func handleNotifcation(notification *goopenzwave.Notification) {
+func handleNotification(notification *goopenzwave.Notification) {
 	// Switch based on notification type.
 	switch notification.Type {
 	case goopenzwave.NotificationTypeValueAdded:
