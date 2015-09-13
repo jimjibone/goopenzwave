@@ -4,11 +4,9 @@ Go bindings for the [OpenZWave](https://github.com/OpenZWave/open-zwave) library
 
 ## Warning
 
-This is still a fairly incomplete wrapper of the C++ OpenZWave code. It almost completely wraps the Manager class as well as the ValueID and Notification classes to allow for basic use of the library.
+This package is still fairly new and so the API is changing pretty rapidly, so be casreful if you decide to use it. I expect the API to become stable soon, however, as it is largely based on the OpenZWave library. Things may change to make usage more like idiomatic Go.
 
-Enough is available to implement the MinOZW example application in Go.
-
-More is planned.
+Most of the OpenZWave library is wrapped now, but should you find anything missing please create a new issue or fork it, implement it yourself and submit a pull request.
 
 ## Prerequisites
 
@@ -30,7 +28,7 @@ _Notice how there was no need to run `make` :wink:_
 
 ## Examples/Tools
 
-This package comes with an example, `gominozw`, and a tool, `gozw`.
+This package comes with an example, `gominozw`, and a tool, `gozwd`.
 
 ### `gominozw`
 
@@ -38,12 +36,26 @@ This is a replica of the original MinOZW utility, from the original OpenZWave re
 
 It shows how to set up the Manager with various options and listen for Notifications. Once the initial scan of devices is complete, polling for basic values is set up for the devices.
 
-To install:
+To install and use:
 
 ```
 go install github.com/jimjibone/goopenzwave/tools/gominozw
+gominozw --controller /path/to/your/controller
 ```
 
-### `gozw`
+### `gozwd`
 
-This has yet to be written, but it will serve a web app from which you can view devices and their values, as well as modify the state of them as appropriate.
+__This is still in progress.__
+
+It serves a web app from which you can view devices and their values, as well as
+modify the state of them as appropriate.
+
+To build, the best thing to do is to get the project, build it and then build the web assets (NodeJS and Gulp are required).
+
+```
+go get github.com/jimjibone/goopenzwave
+cd $GOPATH/github.com/jimjibone/goopenzwave/tools/gozwd
+npm install
+gulp # press ctrl-c once it completes
+./gozwd --controller /path/to/your/controller
+```
