@@ -5,6 +5,8 @@ class API {
         this.reconnection = null
         this.buffer = []
         this.handlers = {}
+        this.onConnectHandler = null
+        this.onDisconnectHandler = null
     }
 
     connect() {
@@ -20,6 +22,11 @@ class API {
             this.socket.onopen = function(event) {
                 // console.log('API::onopen:', event)
                 self.connected = true;
+
+                if (self.onConnectHandler != null) {
+                    self.onConnectHandler();
+                }
+
                 for (var i = 0; i < self.buffer.length; i++) {
                     var message = self.buffer[i];
                     self.send(message.topic, message.payload);
@@ -28,7 +35,13 @@ class API {
 
             this.socket.onclose = function(event) {
                 // console.log('API::onclose:', event)
-                self.connected = false;
+                if (self.connected) {
+                    self.connected = false;
+
+                    if (self.onDisconnectHandler != null) {
+                        self.onDisconnectHandler();
+                    }
+                }
 
                 // Attempt to reconnect.
                 setTimeout(function() {
@@ -73,6 +86,14 @@ class API {
             // console.log('API::send: buffering: ', message);
             this.buffer.push(message);
         }
+    }
+
+    onConnect(handler) {
+        this.onConnectHandler = handler;
+    }
+
+    onDisconnect(handler) {
+        this.onDisconnectHandler = handler;
     }
 
     addHandler(topic, handler) {
