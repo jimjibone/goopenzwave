@@ -1,11 +1,13 @@
-var API = {
-    socket: null,
-    connected: false,
-    reconnection: null,
-    buffer: [],
-    handlers: {},
+class API {
+    constructor() {
+        this.socket = null
+        this.connected = false
+        this.reconnection = null
+        this.buffer = []
+        this.handlers = {}
+    }
 
-    connect: function() {
+    connect() {
         // Check that the user's browser supports WebSockets.
         if (!window['WebSocket']) {
             // TODO: warn user that their browser does not support websockets.
@@ -54,9 +56,9 @@ var API = {
                 }
             }
         }
-    },
+    }
 
-    send: function(topic, payload) {
+    send(topic, payload) {
         var message = { topic: topic };
         if (payload) {
             message.payload = payload;
@@ -71,7 +73,7 @@ var API = {
             // console.log('API::send: buffering: ', message);
             this.buffer.push(message);
         }
-    },
+    }
 
     addHandler(topic, handler) {
         this.handlers[topic] = {
@@ -81,4 +83,4 @@ var API = {
     }
 }
 
-module.exports = API;
+export default new API()
