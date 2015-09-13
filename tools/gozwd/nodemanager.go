@@ -390,12 +390,37 @@ func handleNotification(notification *goopenzwave.Notification) {
 			nodeinfo.Time = time.Now()
 		}
 
-	case goopenzwave.NotificationTypeGroup:
-		// TODO this...
+	// case goopenzwave.NotificationTypeGroup:
+	// The associations for the node have changed. The application should
+	// rebuild any group information it holds about the node.
+	// TODO: this... requires GetAssociations...
 
-		//------------------------------------------------------------------------------
+	case goopenzwave.NotificationTypeNodeNew:
+		// A new node has been found (not already stored in zwcfg*.xml file).
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: New Node")
 
 	case goopenzwave.NotificationTypeNodeAdded:
+		// A new node has been added to OpenZWave's list. This may be due to a
+		// device being added to the Z-Wave network, or because the application
+		// is initializing itself.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Node Added")
+
 		// Create a NodeInfo from the notification then add it to the
 		// map.
 		nodeinfo := &NodeInfo{
@@ -406,14 +431,74 @@ func handleNotification(notification *goopenzwave.Notification) {
 		}
 		nodeinfos[nodeinfo.ID()] = nodeinfo
 
+		// Broadcast to all clients that the node has been added.
+		message := OutputMessage{
+			Topic:   "node-updated",
+			Payload: nodeinfo.Summary(),
+		}
+		clients.Broadcast(message)
+
 	case goopenzwave.NotificationTypeNodeRemoved:
-		// Remove the NodeInfo from the map.
+		// A node has been removed from OpenZWave's list. This may be due to a
+		// device being removed from the Z-Wave network, or because the
+		// application is closing.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Node Removed")
+
+		// Find the NodeInfo and remove it from the map.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
-		if _, found := nodeinfos[nodeinfoid]; found {
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
 			delete(nodeinfos, nodeinfoid)
+
+			// Broadcast to all clients that the node has been removed.
+			message := OutputMessage{
+				Topic:   "node-removed",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
+
+	case goopenzwave.NotificationTypeNodeProtocolInfo:
+		// Basic node information has been receievd, such as whether the node is
+		// a listening device, a routing device and its baud rate and basic,
+		// generic and specific types. It is after this notification that you
+		// can call Manager::GetNodeType to obtain a label containing the device
+		// description.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Node Protocol Info")
+
+		// Add the value to the correct node.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
 		}
 
 	case goopenzwave.NotificationTypeNodeNaming:
+		// One of the node names has changed (name, manufacturer, product).
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Node Name Changed")
+
 		// Find the NodeInfo in the map and broadcast to all clients that the
 		// node has updated.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
@@ -425,35 +510,281 @@ func handleNotification(notification *goopenzwave.Notification) {
 			clients.Broadcast(message)
 		}
 
-	// case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
-	// 	// Find the NodeInfo in the map and add/change the ValueID.
-	// 	nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
-	// 	if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-	// 		nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
-	// 	}
+	case goopenzwave.NotificationTypeNodeEvent:
+		// A node has triggered an event. This is commonly caused when a node
+		// sends a Basic_Set command to the controller. The event value is
+		// stored in the notification.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Node Event")
 
-	// 	// Broadcast to all clients that the node has updated.
-	// 	if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-	// 		message := OutputMessage{
-	// 			Topic:   "node-updated",
-	// 			Payload: nodeinfo.Summary(),
-	// 		}
-	// 		clients.Broadcast(message)
-	// 	}
+		// Change the value of the correct node.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
+			nodeinfo.Time = time.Now()
 
-	// case goopenzwave.NotificationTypeValueRemoved:
-	// 	// Find the NodeInfo in the map and remove the ValueID.
-	// 	nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
-	// 	if node, found := nodeinfos[nodeinfoid]; found {
-	// 		if _, foundVal := node.Values[notification.ValueID.IDString()]; foundVal {
-	// 			delete(node.Values, notification.ValueID.IDString())
-	// 		}
-	// 	}
+			// Broadcast to all clients that the node has updated.
+			message := OutputMessage{
+				Topic:   "node-updated",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
 
-	case goopenzwave.NotificationTypeAwakeNodesQueried, goopenzwave.NotificationTypeAllNodesQueried, goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
-		// The initial node query has completed.
-		initialQueryComplete = true
-		// TODO: broadcast all node info to connected clients.
+	case goopenzwave.NotificationTypePollingDisabled:
+		// Polling of a node has been successfully turned off by a call to
+		// Manager::DisablePoll.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Polling Disabled")
+
+	case goopenzwave.NotificationTypePollingEnabled:
+		// Polling of a node has been successfully turned on by a call to
+		// Manager::EnablePoll.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Polling Enabled")
+
+	case goopenzwave.NotificationTypeSceneEvent:
+		// Scene Activation Set received.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Scene Event")
+
+	case goopenzwave.NotificationTypeCreateButton:
+		// Handheld controller button event created.
+		log.WithFields(log.Fields{
+			"Home":   notification.HomeID,
+			"Node":   notification.NodeID,
+			"Button": *notification.ButtonID,
+		}).Infoln("Notification: Button Created")
+
+	case goopenzwave.NotificationTypeDeleteButton:
+		// Handheld controller button event deleted.
+		log.WithFields(log.Fields{
+			"Home":   notification.HomeID,
+			"Node":   notification.NodeID,
+			"Button": *notification.ButtonID,
+		}).Infoln("Notification: Button Deleted")
+
+	case goopenzwave.NotificationTypeButtonOn:
+		// Handheld controller button on pressed event.
+		log.WithFields(log.Fields{
+			"Home":   notification.HomeID,
+			"Node":   notification.NodeID,
+			"Button": *notification.ButtonID,
+		}).Infoln("Notification: Button On")
+
+	case goopenzwave.NotificationTypeButtonOff:
+		// Handheld controller button off pressed event.
+		log.WithFields(log.Fields{
+			"Home":   notification.HomeID,
+			"Node":   notification.NodeID,
+			"Button": *notification.ButtonID,
+		}).Infoln("Notification: Button Off")
+
+	case goopenzwave.NotificationTypeDriverReady:
+		// A driver for a PC Z-Wave controller has been added and is ready to
+		// use. The notification will contain the controller's Home ID, which is
+		// needed to call most of the Manager methods.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Driver Ready")
+
+	case goopenzwave.NotificationTypeDriverFailed:
+		// Driver failed to load.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Driver Failed")
+
+	case goopenzwave.NotificationTypeDriverReset:
+		// All nodes and values for this driver have been removed. This is sent
+		// instead of potentially hundreds of individual node and value
+		// notifications.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Driver Reset")
+
+		// Clear the nodeinfo map.
+		nodeinfos = make(NodeInfos)
+
+		// Broadcast to all clients that all nodes have been removed.
+		message := OutputMessage{
+			Topic: "nodes-removed",
+		}
+		clients.Broadcast(message)
+
+	case goopenzwave.NotificationTypeEssentialNodeQueriesComplete:
+		// The queries on a node that are essential to its operation have been
+		// completed. The node can now handle incoming messages.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Essential Node Queries Complete")
+
+	case goopenzwave.NotificationTypeNodeQueriesComplete:
+		// All the initialisation queries on a node have been completed.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Node Queries Complete")
+
+	case goopenzwave.NotificationTypeAwakeNodesQueried:
+		// All awake nodes have been queried, so client application can expected
+		// complete data for these nodes.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Awake Nodes Queried")
+
+	case goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
+		// All nodes have been queried but some dead nodes found.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: All Nodes Queried Some Dead")
+
+	case goopenzwave.NotificationTypeAllNodesQueried:
+		// All nodes have been queried, so client application can expected
+		// complete data.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: All Nodes Queried")
+
+	case goopenzwave.NotificationTypeNotification:
+		// An error has occured that we need to report.
+		switch *notification.Notification {
+		case goopenzwave.NotificationCodeMsgComplete:
+			// Completed messages.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification Message Complete")
+
+		case goopenzwave.NotificationCodeTimeout:
+			// Messages that timeout will send a Notification with this code.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification Timeout")
+
+		case goopenzwave.NotificationCodeNoOperation:
+			// Report on NoOperation message sent completion.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification No Operation Message Complete")
+
+		case goopenzwave.NotificationCodeAwake:
+			// Report when a sleeping node wakes up.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification Awake")
+
+		case goopenzwave.NotificationCodeSleep:
+			// Report when a node goes to sleep.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification Sleep")
+
+		case goopenzwave.NotificationCodeDead:
+			// Report when a node is presumed dead.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification Dead")
+
+		case goopenzwave.NotificationCodeAlive:
+			// Report when a node is revived.
+			log.WithFields(log.Fields{
+				"Home": notification.HomeID,
+				"Node": notification.NodeID,
+			}).Infoln("Notification: Notification Alive")
+		}
+
+	case goopenzwave.NotificationTypeDriverRemoved:
+		// The Driver is being removed (either due to Error or by request). Do
+		// not call any driver related methods after recieving this call.
+		log.WithFields(log.Fields{
+			"Home": notification.HomeID,
+			"Node": notification.NodeID,
+		}).Infoln("Notification: Driver Removed")
+
+		// Clear the nodeinfo map.
+		nodeinfos = make(NodeInfos)
+
+		// Broadcast to all clients that all nodes have been removed.
+		message := OutputMessage{
+			Topic: "nodes-removed",
+		}
+		clients.Broadcast(message)
+
+	case goopenzwave.NotificationTypeControllerCommand:
+		// When Controller Commands are executed, Notifications of
+		// Success/Failure etc are communicated via this Notification
+		// Notification::GetEvent returns Driver::ControllerCommand and
+		// Notification::GetNotification returns Driver::ControllerState.
+		log.WithFields(log.Fields{
+			"Home":  notification.HomeID,
+			"Event": *notification.Event,
+			"Error": *notification.Notification,
+		}).Infoln("Notification: Controller Command")
+
+	case goopenzwave.NotificationTypeNodeReset:
+		// The Device has been reset and thus removed from the NodeList in OZW.
+		log.WithFields(log.Fields{
+			"Home":     notification.HomeID,
+			"Node":     notification.NodeID,
+			"Genre":    notification.ValueID.Genre,
+			"Class":    notification.ValueID.CommandClassID,
+			"Instance": notification.ValueID.Instance,
+			"Index":    notification.ValueID.Index,
+			"Type":     notification.ValueID.Type,
+		}).Infoln("Notification: Node Reset")
+
+		// Find the NodeInfo and remove it from the map.
+		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
+		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			delete(nodeinfos, nodeinfoid)
+
+			// Broadcast to all clients that the node has been removed.
+			message := OutputMessage{
+				Topic:   "node-removed",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
+		}
 
 	default:
 		log.WithFields(log.Fields{
