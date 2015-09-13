@@ -154,7 +154,7 @@ type Notification struct {
 	Event        *uint8
 	ButtonID     *uint8
 	SceneID      *uint8
-	Notification *uint8
+	Notification *NotificationCode
 }
 
 // buildNotification builds a new Notification filled with the relevant
@@ -251,9 +251,24 @@ func buildNotification(n C.notification_t) *Notification {
 
 	case NotificationTypeNotification:
 		if notification.Notification == nil {
-			notification.Notification = new(uint8)
+			notification.Notification = new(NotificationCode)
 		}
-		*(notification.Notification) = uint8(C.notification_getNotification(n))
+		switch C.notification_getNotification(n) {
+		case C.notification_code_msgComplete:
+			*notification.Notification = NotificationCodeMsgComplete
+		case C.notification_code_timeout:
+			*notification.Notification = NotificationCodeTimeout
+		case C.notification_code_noOperation:
+			*notification.Notification = NotificationCodeNoOperation
+		case C.notification_code_awake:
+			*notification.Notification = NotificationCodeAwake
+		case C.notification_code_sleep:
+			*notification.Notification = NotificationCodeSleep
+		case C.notification_code_dead:
+			*notification.Notification = NotificationCodeDead
+		case C.notification_code_alive:
+			*notification.Notification = NotificationCodeAlive
+		}
 
 	case NotificationTypeControllerCommand:
 		if notification.Event == nil {
@@ -261,9 +276,9 @@ func buildNotification(n C.notification_t) *Notification {
 		}
 		*(notification.Event) = uint8(C.notification_getEvent(n))
 		if notification.Notification == nil {
-			notification.Notification = new(uint8)
+			notification.Notification = new(NotificationCode)
 		}
-		*(notification.Notification) = uint8(C.notification_getNotification(n))
+		*(notification.Notification) = NotificationCode(C.notification_getNotification(n))
 
 	case NotificationTypeSceneEvent:
 		if notification.SceneID == nil {
