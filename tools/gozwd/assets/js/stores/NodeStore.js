@@ -4,7 +4,6 @@ var api = require('../api');
 
 class NodeStore {
     constructor() {
-        // this.api = api;
         this.nodes = [];
         this.errorMessage = null;
 
@@ -16,14 +15,10 @@ class NodeStore {
             handleUpdateNode: NodeActions.UPDATE_NODE,
             handleUpdateFailed: NodeActions.UPDATE_FAILED,
         });
-
-        api.addHandler('nodes', NodeActions.updateNodes);
-        api.addHandler('node-updated', NodeActions.updateNode);
-        api.connect();
     }
 
     handleFetchNodes() {
-        this.nodes = {};
+        this.nodes = [];
         api.send('get-nodes');
     }
 
