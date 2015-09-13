@@ -147,8 +147,8 @@ func buildValueID(v C.valueid_t) *ValueID {
 	return vid
 }
 
-// StringID will create a string representation of the ID for use as a key.
-func (v *ValueID) StringID() string {
+// IDString will create a string representation of the ID for use as a key.
+func (v *ValueID) IDString() string {
 	return fmt.Sprintf("%d", v.ID)
 }
 

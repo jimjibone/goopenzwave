@@ -68,7 +68,7 @@ func (v *Values) Summary() map[string]ValueSummary {
 			Max:            valueid.GetMax(),
 			AsString:       valueid.GetAsString(),
 		}
-		summaries[valueid.StringID()] = summary
+		summaries[valueid.IDString()] = summary
 	}
 	return summaries
 }
@@ -305,7 +305,7 @@ func handleNotifcation(notification *goopenzwave.Notification) {
 		// Add the value to the correct node.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
+			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
 			nodeinfo.Time = time.Now()
 
 			// Broadcast to all clients that the node has updated.
@@ -332,8 +332,8 @@ func handleNotifcation(notification *goopenzwave.Notification) {
 		// Remove the value from the node.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			if _, foundVal := nodeinfo.Values[notification.ValueID.StringID()]; foundVal {
-				delete(nodeinfo.Values, notification.ValueID.StringID())
+			if _, foundVal := nodeinfo.Values[notification.ValueID.IDString()]; foundVal {
+				delete(nodeinfo.Values, notification.ValueID.IDString())
 			}
 			nodeinfo.Time = time.Now()
 
@@ -361,7 +361,7 @@ func handleNotifcation(notification *goopenzwave.Notification) {
 		// Change the value of the correct node.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
+			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
 			nodeinfo.Time = time.Now()
 
 			// Broadcast to all clients that the node has updated.
@@ -429,7 +429,7 @@ func handleNotifcation(notification *goopenzwave.Notification) {
 	// 	// Find the NodeInfo in the map and add/change the ValueID.
 	// 	nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 	// 	if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-	// 		nodeinfo.Values[notification.ValueID.StringID()] = notification.ValueID
+	// 		nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
 	// 	}
 
 	// 	// Broadcast to all clients that the node has updated.
@@ -445,8 +445,8 @@ func handleNotifcation(notification *goopenzwave.Notification) {
 	// 	// Find the NodeInfo in the map and remove the ValueID.
 	// 	nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 	// 	if node, found := nodeinfos[nodeinfoid]; found {
-	// 		if _, foundVal := node.Values[notification.ValueID.StringID()]; foundVal {
-	// 			delete(node.Values, notification.ValueID.StringID())
+	// 		if _, foundVal := node.Values[notification.ValueID.IDString()]; foundVal {
+	// 			delete(node.Values, notification.ValueID.IDString())
 	// 		}
 	// 	}
 
