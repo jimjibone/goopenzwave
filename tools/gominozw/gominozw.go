@@ -135,7 +135,7 @@ func main() {
 	for id, node := range Nodes {
 		fmt.Printf("\t%d: Node: %s Values:\n", id, node.Node)
 		for i := range node.Values {
-			fmt.Printf("\t\t%d: %s\n", i, node.Values[i].InfoString())
+			fmt.Printf("\t\t%d: %s\n", i, node.Values[i])
 		}
 	}
 
