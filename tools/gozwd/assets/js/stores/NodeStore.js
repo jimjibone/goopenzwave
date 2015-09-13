@@ -23,7 +23,7 @@ class NodeStore {
     }
 
     handleUpdateNodes(nodes) {
-        console.log('NodeStore::handleUpdateNodes:', nodes);
+        // console.log('NodeStore::handleUpdateNodes:', nodes);
         this.nodes = nodes;
         this.errorMessage = null;
     }
@@ -42,7 +42,7 @@ class NodeStore {
 
     handleUpdateNode(node) {
         // Update the existing node if it exists, otherwise add it.
-        console.log('NodeStore::handleUpdateNode:', node);
+        // console.log('NodeStore::handleUpdateNode:', node);
         var add = true;
         for (var i = 0, len = this.nodes.length; i < len; ++i) {
             if (this.nodes[i].node_info_id === node.node_info_id) {
