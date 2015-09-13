@@ -298,6 +298,9 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Instance": notification.ValueID.Instance,
 			"Index":    notification.ValueID.Index,
 			"Type":     notification.ValueID.Type,
+			"Label":    notification.ValueID.GetLabel(),
+			"Value":    notification.ValueID.GetAsString(),
+			"ID":       notification.ValueID.ID,
 		}).Infoln("Notification: Value Added")
 
 		// Add the value to the correct node.
@@ -324,6 +327,9 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Instance": notification.ValueID.Instance,
 			"Index":    notification.ValueID.Index,
 			"Type":     notification.ValueID.Type,
+			"Label":    notification.ValueID.GetLabel(),
+			"Value":    notification.ValueID.GetAsString(),
+			"ID":       notification.ValueID.ID,
 		}).Infoln("Notification: Value Removed")
 
 		// Remove the value from the node.
@@ -352,6 +358,9 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Instance": notification.ValueID.Instance,
 			"Index":    notification.ValueID.Index,
 			"Type":     notification.ValueID.Type,
+			"Label":    notification.ValueID.GetLabel(),
+			"Value":    notification.ValueID.GetAsString(),
+			"ID":       notification.ValueID.ID,
 		}).Infoln("Notification: Value Changed")
 
 		// Change the value of the correct node.
@@ -377,6 +386,9 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Instance": notification.ValueID.Instance,
 			"Index":    notification.ValueID.Index,
 			"Type":     notification.ValueID.Type,
+			"Label":    notification.ValueID.GetLabel(),
+			"Value":    notification.ValueID.GetAsString(),
+			"ID":       notification.ValueID.ID,
 		}).Infoln("Notification: Value Refreshed")
 
 		// Update the node value.
@@ -550,6 +562,8 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Instance": notification.ValueID.Instance,
 			"Index":    notification.ValueID.Index,
 			"Type":     notification.ValueID.Type,
+			"Label":    notification.ValueID.GetLabel(),
+			"ID":       notification.ValueID.ID,
 		}).Infoln("Notification: Polling Disabled")
 
 	case goopenzwave.NotificationTypePollingEnabled:
@@ -563,6 +577,8 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Instance": notification.ValueID.Instance,
 			"Index":    notification.ValueID.Index,
 			"Type":     notification.ValueID.Type,
+			"Label":    notification.ValueID.GetLabel(),
+			"ID":       notification.ValueID.ID,
 		}).Infoln("Notification: Polling Enabled")
 
 	case goopenzwave.NotificationTypeSceneEvent:
