@@ -1,22 +1,18 @@
 @import "palette";
 
-body {
-    background-color: $primary-color;
-}
-
 .heading, .nodes {
     padding-left: 1em;
     padding-right: 1em;
 }
 
 .heading {
+    background-color: $primary-color;
     color: $primary-color-text;
     box-shadow: 0 0 1em $divider-color;
     z-index: 1;
 }
 
 .nodes {
-    background-color: $primary-color-text;
     color: $primary-text-color;
 
     .node {
