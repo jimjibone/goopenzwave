@@ -41,53 +41,23 @@ var Node = React.createClass({
         //     return (<Value value={value} onChange={this.handleValueChange} />);
         // })}
 
+        // <button className="pure-button pure-button-primary" onClick={this.handleOnOff}>On/Off</button>
         return (
             <div key={this.props.node.node_info_id} className="pure-u-1-1 node">
                 <div className="pure-g">
-                    <div className="pure-u-1-1 pure-u-md-1-2">
+                    <div className="pure-u-1-1">
                         <h3>{title}</h3>
-                        <button className="pure-button pure-button-primary" onClick={this.handleOnOff}>On/Off</button>
-                        <form className="pure-form pure-form-aligned" onSubmit={this.handleSubmit}>
+                    </div>
+                    <div className="pure-u-1-1 pure-u-md-1-3">
+                        <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit}>
                             <fieldset>
-                                <div className="pure-control-group">
+                                <div className="pure-u-1-2">
                                     <label>Name</label>
-                                    <input type="text" value={this.state.node.node_name} onChange={this.handleNameChange} />
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.node_name} onChange={this.handleNameChange} />
                                 </div>
-                                <div className="pure-control-group">
+                                <div className="pure-u-1-2">
                                     <label>Location</label>
-                                    <input type="text" value={this.state.node.location} onChange={this.handleLocationChange} />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Type</label>
-                                    <input type="text" value={this.state.node.node_type} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Manufacturer</label>
-                                    <input type="text" value={this.state.node.manufacturer_name} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Product Name</label>
-                                    <input type="text" value={this.state.node.product_name} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Node ID</label>
-                                    <input type="text" value={this.state.node.node_id} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Home ID</label>
-                                    <input type="text" value={this.state.node.home_id} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Basic Type</label>
-                                    <input type="text" value={this.state.node.basic_type} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Generic Type</label>
-                                    <input type="text" value={this.state.node.generic_type} readOnly />
-                                </div>
-                                <div className="pure-control-group">
-                                    <label>Specific Type</label>
-                                    <input type="text" value={this.state.node.specific_type} readOnly />
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.location} onChange={this.handleLocationChange} />
                                 </div>
                                 <div className="pure-controls">
                                     <button type="submit" className="pure-button pure-button-primary" disabled={!changed}>Update</button>
@@ -95,8 +65,51 @@ var Node = React.createClass({
                             </fieldset>
                         </form>
                     </div>
-
-                    <div className="pure-u-1-1 pure-u-md-1-2">
+                    <div className="pure-u-1-1 pure-u-md-1-3">
+                        <form className="pure-form pure-form-stacked">
+                            <fieldset>
+                                <div className="pure-u-1-2">
+                                    <label>Type</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.node_type} readOnly />
+                                </div>
+                                <div className="pure-u-1-2">
+                                    <label>Manufacturer</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.manufacturer_name} readOnly />
+                                </div>
+                                <div className="pure-u-1-2">
+                                    <label>Product Name</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.product_name} readOnly />
+                                </div>
+                                <div className="pure-u-1-2">
+                                    <label>Node ID</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.node_id} readOnly />
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div className="pure-u-1-1 pure-u-md-1-3">
+                        <form className="pure-form pure-form-stacked">
+                            <fieldset>
+                                <div className="pure-u-1-2">
+                                    <label>Home ID</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.home_id} readOnly />
+                                </div>
+                                <div className="pure-u-1-2">
+                                    <label>Basic Type</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.basic_type} readOnly />
+                                </div>
+                                <div className="pure-u-1-2">
+                                    <label>Generic Type</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.generic_type} readOnly />
+                                </div>
+                                <div className="pure-u-1-2">
+                                    <label>Specific Type</label>
+                                    <input type="text" className="pure-u-23-24" value={this.state.node.specific_type} readOnly />
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div className="pure-u-1-1 pure-u-md-1-1">
                         <h3>Values</h3>
                         {values}
                     </div>
