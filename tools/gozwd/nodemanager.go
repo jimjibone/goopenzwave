@@ -517,6 +517,9 @@ func handleNotification(notification *goopenzwave.Notification) {
 		// node has updated.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
+			// Update the nodeinfo.
+			nodeinfo.Node = goopenzwave.NewNode(notification.HomeID, notification.NodeID)
+
 			message := OutputMessage{
 				Topic:   "node-updated",
 				Payload: nodeinfo.Summary(),
