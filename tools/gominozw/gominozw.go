@@ -115,8 +115,9 @@ func main() {
 			valueid := node.Values[i]
 
 			if valueid.CommandClassID == 0x20 {
-				// Enable polling with "intensity" of 2. Though, this is irrelevant with only one value polled.
-				manager.EnablePoll(valueid, 2)
+				// Enable polling with "intensity" of 2. Though, this is
+				// irrelevant with only one value polled.
+				valueid.EnablePoll(2)
 			}
 		}
 	}
