@@ -46,29 +46,27 @@ func (n *NodeInfo) Summary() NodeSummary {
 	}
 }
 
-type Values map[goopenzwave.ValueIDStringID]*goopenzwave.ValueID
+type Values map[string]*goopenzwave.ValueID
 
-func (v *Values) Summary() map[goopenzwave.ValueIDStringID]ValueSummary {
-	manager := goopenzwave.GetManager()
-	summaries := make(map[goopenzwave.ValueIDStringID]ValueSummary)
+func (v *Values) Summary() map[string]ValueSummary {
+	summaries := make(map[string]ValueSummary)
 	for _, valueid := range *v {
-		_, valueString := manager.GetValueAsString(valueid)
 		summary := ValueSummary{
 			ValueID:        valueid.ID,
 			NodeID:         valueid.NodeID,
 			Genre:          valueid.Genre,
 			CommandClassID: valueid.CommandClassID,
 			Type:           valueid.Type,
-			ReadOnly:       manager.IsValueReadOnly(valueid),
-			WriteOnly:      manager.IsValueWriteOnly(valueid),
-			Set:            manager.IsValueSet(valueid),
-			Polled:         manager.IsValuePolled(valueid),
-			Label:          manager.GetValueLabel(valueid),
-			Units:          manager.GetValueUnits(valueid),
-			Help:           manager.GetValueHelp(valueid),
-			Min:            manager.GetValueMin(valueid),
-			Max:            manager.GetValueMax(valueid),
-			AsString:       valueString,
+			ReadOnly:       valueid.IsReadOnly(),
+			WriteOnly:      valueid.IsWriteOnly(),
+			Set:            valueid.IsSet(),
+			Polled:         valueid.IsPolled(),
+			Label:          valueid.GetLabel(),
+			Units:          valueid.GetUnits(),
+			Help:           valueid.GetHelp(),
+			Min:            valueid.GetMin(),
+			Max:            valueid.GetMax(),
+			AsString:       valueid.GetAsString(),
 		}
 		summaries[valueid.StringID()] = summary
 	}
@@ -78,21 +76,21 @@ func (v *Values) Summary() map[goopenzwave.ValueIDStringID]ValueSummary {
 type NodeInfos map[NodeInfoID]*NodeInfo
 
 type NodeSummary struct {
-	NodeInfoID       NodeInfoID                                   `json:"node_info_id"`
-	HomeID           uint32                                       `json:"home_id"`
-	NodeID           uint8                                        `json:"node_id"`
-	BasicType        uint8                                        `json:"basic_type"`
-	GenericType      uint8                                        `json:"generic_type"`
-	SpecificType     uint8                                        `json:"specific_type"`
-	NodeType         string                                       `json:"node_type"`
-	ManufacturerName string                                       `json:"manufacturer_name"`
-	ProductName      string                                       `json:"product_name"`
-	NodeName         string                                       `json:"node_name"`
-	Location         string                                       `json:"location"`
-	ManufacturerID   string                                       `json:"manufacturer_id"`
-	ProductType      string                                       `json:"product_type"`
-	ProductID        string                                       `json:"product_id"`
-	Values           map[goopenzwave.ValueIDStringID]ValueSummary `json:"values"`
+	NodeInfoID       NodeInfoID              `json:"node_info_id"`
+	HomeID           uint32                  `json:"home_id"`
+	NodeID           uint8                   `json:"node_id"`
+	BasicType        uint8                   `json:"basic_type"`
+	GenericType      uint8                   `json:"generic_type"`
+	SpecificType     uint8                   `json:"specific_type"`
+	NodeType         string                  `json:"node_type"`
+	ManufacturerName string                  `json:"manufacturer_name"`
+	ProductName      string                  `json:"product_name"`
+	NodeName         string                  `json:"node_name"`
+	Location         string                  `json:"location"`
+	ManufacturerID   string                  `json:"manufacturer_id"`
+	ProductType      string                  `json:"product_type"`
+	ProductID        string                  `json:"product_id"`
+	Values           map[string]ValueSummary `json:"values"`
 }
 
 type ValueSummary struct {
@@ -125,7 +123,7 @@ var (
 )
 
 func NodeManagerRun(controllerPath string, wg *sync.WaitGroup) error {
-	// Setup the OpenZWave library.
+	// Setup the OpenZWave library options§.
 	options := goopenzwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
 	options.AddOptionLogLevel("SaveLogLevel", goopenzwave.LogLevelNone)
 	options.AddOptionLogLevel("QueueLogLevel", goopenzwave.LogLevelNone)
@@ -136,36 +134,38 @@ func NodeManagerRun(controllerPath string, wg *sync.WaitGroup) error {
 	options.Lock()
 
 	// Start the library and listen for notifications.
-	manager := goopenzwave.CreateManager()
-	err := manager.StartNotifications()
+	err := goopenzwave.Start(handleNotifcation)
 	if err != nil {
-		return fmt.Errorf("failed to start notifications: %s", err)
+		log.Fatalln("failed to start goopenzwave package:", err)
 	}
-	manager.AddDriver(controllerPath)
+
+	err = goopenzwave.AddDriver(controllerPath)
+	if err != nil {
+		log.Fatalln("failed to add goopenzwave driver:", err)
+	}
 
 	// For when we are finished...
 	defer func() {
 		// All done now finish up.
-		manager.RemoveDriver(controllerPath)
-		manager.StopNotifications()
-		goopenzwave.DestroyManager()
+		err := goopenzwave.RemoveDriver(controllerPath)
+		if err != nil {
+			log.Fatalln("failed to remove goopenzwave driver:", err)
+		}
+		err = goopenzwave.Stop()
+		if err != nil {
+			log.Fatalln("failed to stop goopenzwave package:", err)
+		}
 		goopenzwave.DestroyOptions()
 		wg.Done()
 	}()
 
-	// Now continuously listen for notifications or the stop signal.
+	// Now continuously listen for the stop signal.
 	running = true
 	for {
 		select {
 		case <-stop:
 			running = false
 			return nil
-
-		case notification := <-manager.Notifications:
-			err = handleNotifcation(notification)
-			if err != nil {
-				return fmt.Errorf("failed to handle notification: %s", err)
-			}
 		}
 	}
 }
@@ -220,7 +220,7 @@ func NodeManagerUpdateNode(nodesummary NodeSummary) error {
 	for oldvalueidstringid, oldvalueid := range nodeinfo.Values {
 		newvalue, found := nodesummary.Values[oldvalueidstringid]
 		if found {
-			_, oldvalueString := oldvalueid.GetAsString()
+			oldvalueString := oldvalueid.GetAsString()
 			if newvalue.AsString != oldvalueString {
 				log.WithFields(log.Fields{
 					"node":     nodesummary.NodeInfoID,
@@ -228,13 +228,14 @@ func NodeManagerUpdateNode(nodesummary NodeSummary) error {
 					"previous": oldvalueString,
 					"new":      newvalue.AsString,
 				}).Infoln("setting new value for node's value")
-				ok := oldvalueid.SetString(newvalue.AsString)
-				if !ok {
+				err := oldvalueid.SetString(newvalue.AsString)
+				if err != nil {
 					log.WithFields(log.Fields{
 						"node":     nodesummary.NodeInfoID,
 						"value":    newvalue.Label,
 						"previous": oldvalueString,
 						"new":      newvalue.AsString,
+						"error":    err,
 					}).Errorln("failed to set value as string")
 				}
 				updated = true
@@ -282,7 +283,7 @@ func NodeManagerToggleNode(nodeinfoid NodeInfoIDMessage) error {
 	return nil
 }
 
-func handleNotifcation(notification *goopenzwave.Notification) error {
+func handleNotifcation(notification *goopenzwave.Notification) {
 	// Switch based on notification type.
 	switch notification.Type {
 	case goopenzwave.NotificationTypeValueAdded:
@@ -401,7 +402,7 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 			HomeID: notification.HomeID,
 			NodeID: notification.NodeID,
 			Node:   goopenzwave.NewNode(notification.HomeID, notification.NodeID),
-			Values: make(map[goopenzwave.ValueIDStringID]*goopenzwave.ValueID),
+			Values: make(map[string]*goopenzwave.ValueID),
 		}
 		nodeinfos[nodeinfo.ID()] = nodeinfo
 
@@ -459,7 +460,4 @@ func handleNotifcation(notification *goopenzwave.Notification) error {
 			"notification": notification,
 		}).Warnln("unhandled notification received")
 	}
-
-	// TODO: return an error at some point.
-	return nil
 }

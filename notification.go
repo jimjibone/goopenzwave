@@ -12,48 +12,37 @@ import (
 // NotificationType defines a type for the notification type enum.
 type NotificationType int
 
-// NotificationCode defines a type for the notification code enum.
-type NotificationCode int
-
 const (
-	NotificationTypeValueAdded                   = NotificationType(C.notification_type_valueAdded)
-	NotificationTypeValueRemoved                 = NotificationType(C.notification_type_valueRemoved)
-	NotificationTypeValueChanged                 = NotificationType(C.notification_type_valueChanged)
-	NotificationTypeValueRefreshed               = NotificationType(C.notification_type_valueRefreshed)
-	NotificationTypeGroup                        = NotificationType(C.notification_type_group)
-	NotificationTypeNodeNew                      = NotificationType(C.notification_type_nodeNew)
-	NotificationTypeNodeAdded                    = NotificationType(C.notification_type_nodeAdded)
-	NotificationTypeNodeRemoved                  = NotificationType(C.notification_type_nodeRemoved)
-	NotificationTypeNodeProtocolInfo             = NotificationType(C.notification_type_nodeProtocolInfo)
-	NotificationTypeNodeNaming                   = NotificationType(C.notification_type_nodeNaming)
-	NotificationTypeNodeEvent                    = NotificationType(C.notification_type_nodeEvent)
-	NotificationTypePollingDisabled              = NotificationType(C.notification_type_pollingDisabled)
-	NotificationTypePollingEnabled               = NotificationType(C.notification_type_pollingEnabled)
-	NotificationTypeSceneEvent                   = NotificationType(C.notification_type_sceneEvent)
-	NotificationTypeCreateButton                 = NotificationType(C.notification_type_createButton)
-	NotificationTypeDeleteButton                 = NotificationType(C.notification_type_deleteButton)
-	NotificationTypeButtonOn                     = NotificationType(C.notification_type_buttonOn)
-	NotificationTypeButtonOff                    = NotificationType(C.notification_type_buttonOff)
-	NotificationTypeDriverReady                  = NotificationType(C.notification_type_driverReady)
-	NotificationTypeDriverFailed                 = NotificationType(C.notification_type_driverFailed)
-	NotificationTypeDriverReset                  = NotificationType(C.notification_type_driverReset)
-	NotificationTypeEssentialNodeQueriesComplete = NotificationType(C.notification_type_essentialNodeQueriesComplete)
-	NotificationTypeNodeQueriesComplete          = NotificationType(C.notification_type_nodeQueriesComplete)
-	NotificationTypeAwakeNodesQueried            = NotificationType(C.notification_type_awakeNodesQueried)
-	NotificationTypeAllNodesQueriedSomeDead      = NotificationType(C.notification_type_allNodesQueriedSomeDead)
-	NotificationTypeAllNodesQueried              = NotificationType(C.notification_type_allNodesQueried)
-	NotificationTypeNotification                 = NotificationType(C.notification_type_notification)
-	NotificationTypeDriverRemoved                = NotificationType(C.notification_type_driverRemoved)
-	NotificationTypeControllerCommand            = NotificationType(C.notification_type_controllerCommand)
-	NotificationTypeNodeReset                    = NotificationType(C.notification_type_nodeReset)
-
-	NotificationCodeMsgComplete = NotificationCode(C.notification_code_msgComplete)
-	NotificationCodeTimeout     = NotificationCode(C.notification_code_timeout)
-	NotificationCodeNoOperation = NotificationCode(C.notification_code_noOperation)
-	NotificationCodeAwake       = NotificationCode(C.notification_code_awake)
-	NotificationCodeSleep       = NotificationCode(C.notification_code_sleep)
-	NotificationCodeDead        = NotificationCode(C.notification_code_dead)
-	NotificationCodeAlive       = NotificationCode(C.notification_code_alive)
+	NotificationTypeValueAdded NotificationType = iota
+	NotificationTypeValueRemoved
+	NotificationTypeValueChanged
+	NotificationTypeValueRefreshed
+	NotificationTypeGroup
+	NotificationTypeNodeNew
+	NotificationTypeNodeAdded
+	NotificationTypeNodeRemoved
+	NotificationTypeNodeProtocolInfo
+	NotificationTypeNodeNaming
+	NotificationTypeNodeEvent
+	NotificationTypePollingDisabled
+	NotificationTypePollingEnabled
+	NotificationTypeSceneEvent
+	NotificationTypeCreateButton
+	NotificationTypeDeleteButton
+	NotificationTypeButtonOn
+	NotificationTypeButtonOff
+	NotificationTypeDriverReady
+	NotificationTypeDriverFailed
+	NotificationTypeDriverReset
+	NotificationTypeEssentialNodeQueriesComplete
+	NotificationTypeNodeQueriesComplete
+	NotificationTypeAwakeNodesQueried
+	NotificationTypeAllNodesQueriedSomeDead
+	NotificationTypeAllNodesQueried
+	NotificationTypeNotification
+	NotificationTypeDriverRemoved
+	NotificationTypeControllerCommand
+	NotificationTypeNodeReset
 )
 
 func (nt NotificationType) String() string {
@@ -122,6 +111,19 @@ func (nt NotificationType) String() string {
 	return "UNKNOWN"
 }
 
+// NotificationCode defines a type for the notification code enum.
+type NotificationCode int
+
+const (
+	NotificationCodeMsgComplete NotificationCode = iota // C.notification_code_msgComplete
+	NotificationCodeTimeout                             // C.notification_code_timeout
+	NotificationCodeNoOperation                         // C.notification_code_noOperation
+	NotificationCodeAwake                               // C.notification_code_awake
+	NotificationCodeSleep                               // C.notification_code_sleep
+	NotificationCodeDead                                // C.notification_code_dead
+	NotificationCodeAlive                               // C.notification_code_alive
+)
+
 func (nc NotificationCode) String() string {
 	switch nc {
 	case NotificationCodeMsgComplete:
@@ -155,36 +157,77 @@ type Notification struct {
 	Notification *uint8
 }
 
-func (n *Notification) String() string {
-	var pointed []string
-	if n.GroupIDX != nil {
-		pointed = append(pointed, fmt.Sprintf("GroupIDX: %d", *(n.GroupIDX)))
-	}
-	if n.Event != nil {
-		pointed = append(pointed, fmt.Sprintf("Event: %d", *(n.Event)))
-	}
-	if n.ButtonID != nil {
-		pointed = append(pointed, fmt.Sprintf("ButtonID: %d", *(n.ButtonID)))
-	}
-	if n.SceneID != nil {
-		pointed = append(pointed, fmt.Sprintf("SceneID: %d", *(n.SceneID)))
-	}
-	if n.Notification != nil {
-		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
-	}
-	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID)
-	for i := range pointed {
-		output = fmt.Sprintf("%s, %s", output, pointed[i])
-	}
-	return output
-}
-
+// buildNotification builds a new Notification filled with the relevant
+// information from the OpenZWave::Notification as received from the OpenZWave
+// library.
 func buildNotification(n C.notification_t) *Notification {
 	notification := &Notification{
-		Type:    NotificationType(C.notification_getType(n)),
 		HomeID:  uint32(C.notification_getHomeId(n)),
 		NodeID:  uint8(C.notification_getNodeId(n)),
 		ValueID: buildValueID(C.notification_getValueId(n)),
+	}
+
+	switch C.notification_getType(n) {
+	case C.notification_type_valueAdded:
+		notification.Type = NotificationTypeValueAdded
+	case C.notification_type_valueRemoved:
+		notification.Type = NotificationTypeValueRemoved
+	case C.notification_type_valueChanged:
+		notification.Type = NotificationTypeValueChanged
+	case C.notification_type_valueRefreshed:
+		notification.Type = NotificationTypeValueRefreshed
+	case C.notification_type_group:
+		notification.Type = NotificationTypeGroup
+	case C.notification_type_nodeNew:
+		notification.Type = NotificationTypeNodeNew
+	case C.notification_type_nodeAdded:
+		notification.Type = NotificationTypeNodeAdded
+	case C.notification_type_nodeRemoved:
+		notification.Type = NotificationTypeNodeRemoved
+	case C.notification_type_nodeProtocolInfo:
+		notification.Type = NotificationTypeNodeProtocolInfo
+	case C.notification_type_nodeNaming:
+		notification.Type = NotificationTypeNodeNaming
+	case C.notification_type_nodeEvent:
+		notification.Type = NotificationTypeNodeEvent
+	case C.notification_type_pollingDisabled:
+		notification.Type = NotificationTypePollingDisabled
+	case C.notification_type_pollingEnabled:
+		notification.Type = NotificationTypePollingEnabled
+	case C.notification_type_sceneEvent:
+		notification.Type = NotificationTypeSceneEvent
+	case C.notification_type_createButton:
+		notification.Type = NotificationTypeCreateButton
+	case C.notification_type_deleteButton:
+		notification.Type = NotificationTypeDeleteButton
+	case C.notification_type_buttonOn:
+		notification.Type = NotificationTypeButtonOn
+	case C.notification_type_buttonOff:
+		notification.Type = NotificationTypeButtonOff
+	case C.notification_type_driverReady:
+		notification.Type = NotificationTypeDriverReady
+	case C.notification_type_driverFailed:
+		notification.Type = NotificationTypeDriverFailed
+	case C.notification_type_driverReset:
+		notification.Type = NotificationTypeDriverReset
+	case C.notification_type_essentialNodeQueriesComplete:
+		notification.Type = NotificationTypeEssentialNodeQueriesComplete
+	case C.notification_type_nodeQueriesComplete:
+		notification.Type = NotificationTypeNodeQueriesComplete
+	case C.notification_type_awakeNodesQueried:
+		notification.Type = NotificationTypeAwakeNodesQueried
+	case C.notification_type_allNodesQueriedSomeDead:
+		notification.Type = NotificationTypeAllNodesQueriedSomeDead
+	case C.notification_type_allNodesQueried:
+		notification.Type = NotificationTypeAllNodesQueried
+	case C.notification_type_notification:
+		notification.Type = NotificationTypeNotification
+	case C.notification_type_driverRemoved:
+		notification.Type = NotificationTypeDriverRemoved
+	case C.notification_type_controllerCommand:
+		notification.Type = NotificationTypeControllerCommand
+	case C.notification_type_nodeReset:
+		notification.Type = NotificationTypeNodeReset
 	}
 
 	switch notification.Type {
@@ -230,4 +273,28 @@ func buildNotification(n C.notification_t) *Notification {
 	}
 
 	return notification
+}
+
+func (n *Notification) String() string {
+	var pointed []string
+	if n.GroupIDX != nil {
+		pointed = append(pointed, fmt.Sprintf("GroupIDX: %d", *(n.GroupIDX)))
+	}
+	if n.Event != nil {
+		pointed = append(pointed, fmt.Sprintf("Event: %d", *(n.Event)))
+	}
+	if n.ButtonID != nil {
+		pointed = append(pointed, fmt.Sprintf("ButtonID: %d", *(n.ButtonID)))
+	}
+	if n.SceneID != nil {
+		pointed = append(pointed, fmt.Sprintf("SceneID: %d", *(n.SceneID)))
+	}
+	if n.Notification != nil {
+		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
+	}
+	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID)
+	for i := range pointed {
+		output = fmt.Sprintf("%s, %s", output, pointed[i])
+	}
+	return output
 }
