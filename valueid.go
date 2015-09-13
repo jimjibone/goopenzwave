@@ -436,3 +436,30 @@ func (v *ValueID) PressButton() error {
 func (v *ValueID) ReleaseButton() error {
 	return ReleaseButton(v.HomeID, v.ID)
 }
+
+// EnablePoll enables the polling of a device's state. Returns true if polling
+// was enabled.
+func (v *ValueID) EnablePoll(intensity uint8) bool {
+	return EnablePoll(v.HomeID, v.ID, intensity)
+}
+
+// DisablePoll disables the polling of a device's state. Returns true if polling
+// was disabled.
+func (v *ValueID) DisablePoll() bool {
+	return DisablePoll(v.HomeID, v.ID)
+}
+
+// SetPollIntensity sets the frequency of polling.
+//
+//  - 0 = none
+//  - 1 = every time through the list
+//  - 2 = every other time
+//  - etc.
+func (v *ValueID) SetPollIntensity(intensity uint8) {
+	SetPollIntensity(v.HomeID, v.ID, intensity)
+}
+
+// GetPollIntensity returns the polling intensity of a device's state.
+func (v *ValueID) GetPollIntensity() uint8 {
+	return GetPollIntensity(v.HomeID, v.ID)
+}
