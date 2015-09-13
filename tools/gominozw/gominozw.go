@@ -86,15 +86,16 @@ func main() {
 	options.Lock()
 
 	// Start the library and listen for notifications.
-	manager := goopenzwave.CreateManager()
-	err := manager.StartNotifications()
+	err := goopenzwave.Start(handleNotifcation)
 	if err != nil {
-		fmt.Println("ERROR: failed to start notifications:", err)
+		log.Fatalln("failed to start goopenzwave package:", err)
 	}
-	manager.AddDriver(controllerPath)
 
-	// Now listen to the many notifications.
-	go processNotifications(manager)
+	// Add a driver using the supplied controller path.
+	err = goopenzwave.AddDriver(controllerPath)
+	if err != nil {
+		log.Fatalln("failed to add goopenzwave driver:", err)
+	}
 
 	// Wait here until the initial node query has completed.
 	<-InitialQueryComplete
@@ -138,8 +139,7 @@ func main() {
 	}
 
 	// All done now finish up.
-	manager.RemoveDriver(controllerPath)
-	manager.StopNotifications()
-	goopenzwave.DestroyManager()
+	goopenzwave.RemoveDriver(controllerPath)
+	goopenzwave.Stop()
 	goopenzwave.DestroyOptions()
 }
