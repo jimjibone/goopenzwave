@@ -5,7 +5,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/jimjibone/goopenzwave"
 	"sync"
-	"time"
 )
 
 type NodeInfo struct {
@@ -13,7 +12,6 @@ type NodeInfo struct {
 	NodeID uint8             `json:"node_id"`
 	Node   *goopenzwave.Node `json:"node"` //TODO: should not store Name etc. but provide getters and setters for these values.
 	Values Values            `json:"values"`
-	Time   time.Time         `json:"update-time"`
 }
 
 type NodeInfoID string
@@ -306,7 +304,6 @@ func handleNotification(notification *goopenzwave.Notification) {
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
 			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
-			nodeinfo.Time = time.Now()
 
 			// Broadcast to all clients that the node has updated.
 			message := OutputMessage{
@@ -335,7 +332,6 @@ func handleNotification(notification *goopenzwave.Notification) {
 			if _, foundVal := nodeinfo.Values[notification.ValueID.IDString()]; foundVal {
 				delete(nodeinfo.Values, notification.ValueID.IDString())
 			}
-			nodeinfo.Time = time.Now()
 
 			// Broadcast to all clients that the node has updated.
 			message := OutputMessage{
@@ -362,7 +358,6 @@ func handleNotification(notification *goopenzwave.Notification) {
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
 			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
-			nodeinfo.Time = time.Now()
 
 			// Broadcast to all clients that the node has updated.
 			message := OutputMessage{
@@ -384,10 +379,17 @@ func handleNotification(notification *goopenzwave.Notification) {
 			"Type":     notification.ValueID.Type,
 		}).Infoln("Notification: Value Refreshed")
 
-		// Update the update time of the correct node.
+		// Update the node value.
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
-			nodeinfo.Time = time.Now()
+			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
+
+			// Broadcast to all clients that the node has updated.
+			message := OutputMessage{
+				Topic:   "node-updated",
+				Payload: nodeinfo.Summary(),
+			}
+			clients.Broadcast(message)
 		}
 
 	// case goopenzwave.NotificationTypeGroup:
@@ -528,7 +530,6 @@ func handleNotification(notification *goopenzwave.Notification) {
 		nodeinfoid := CreateNodeInfoID(notification.HomeID, notification.NodeID)
 		if nodeinfo, found := nodeinfos[nodeinfoid]; found {
 			nodeinfo.Values[notification.ValueID.IDString()] = notification.ValueID
-			nodeinfo.Time = time.Now()
 
 			// Broadcast to all clients that the node has updated.
 			message := OutputMessage{
