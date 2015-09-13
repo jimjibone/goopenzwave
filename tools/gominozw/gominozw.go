@@ -16,61 +16,12 @@ type NodeInfo struct {
 }
 
 var Nodes = make(map[uint8]*NodeInfo)
-var InitialQueryComplete = make(chan bool)
-
-func processNotifications(m *goopenzwave.Manager) {
-	var sentInitialQueryComplete bool
-	for {
-		select {
-		case notification := <-m.Notifications:
-			fmt.Println(notification)
-
-			// Switch based on notification type.
-			switch notification.Type {
-			case goopenzwave.NotificationTypeNodeAdded:
-				// Create a NodeInfo from the notification then add it to the
-				// map.
-				nodeinfo := &NodeInfo{
-					HomeID: notification.HomeID,
-					NodeID: notification.NodeID,
-					Node:   goopenzwave.NewNode(notification.HomeID, notification.NodeID),
-					Values: make(map[uint64]*goopenzwave.ValueID),
-				}
-				Nodes[nodeinfo.NodeID] = nodeinfo
-
-			case goopenzwave.NotificationTypeNodeRemoved:
-				// Remove the NodeInfo from the map.
-				if _, found := Nodes[notification.NodeID]; found {
-					delete(Nodes, notification.NodeID)
-				}
-
-			case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
-				// Find the NodeInfo in the map and add/change the ValueID.
-				if node, found := Nodes[notification.NodeID]; found {
-					node.Values[notification.ValueID.ID] = notification.ValueID
-				}
-
-			case goopenzwave.NotificationTypeValueRemoved:
-				// Find the NodeInfo in the map and remove the ValueID.
-				if node, found := Nodes[notification.NodeID]; found {
-					if _, foundVal := node.Values[notification.ValueID.ID]; foundVal {
-						delete(node.Values, notification.ValueID.ID)
-					}
-				}
-
-			case goopenzwave.NotificationTypeAwakeNodesQueried, goopenzwave.NotificationTypeAllNodesQueried, goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
-				// The initial node query has completed.
-				if sentInitialQueryComplete == false {
-					InitialQueryComplete <- true
-				}
-			}
-		}
-	}
-}
+var initialQueryComplete = make(chan bool)
+var sentinitialQueryComplete = false
 
 func main() {
 	var controllerPath string
-	flag.StringVar(&controllerPath, "controller", "/dev/ttyACM0", "the path to your controller device")
+	flag.StringVar(&controllerPath, "controller", "/dev/ttyUSB0", "the path to your controller device")
 	flag.Parse()
 
 	fmt.Println("gominozw example starting with openzwave version:", goopenzwave.GetManagerVersionAsString())
@@ -86,19 +37,21 @@ func main() {
 	options.Lock()
 
 	// Start the library and listen for notifications.
-	err := goopenzwave.Start(handleNotifcation)
+	err := goopenzwave.Start(handleNotification)
 	if err != nil {
-		log.Fatalln("failed to start goopenzwave package:", err)
+		fmt.Println("ERROR: failed to start goopenzwave package:", err)
+		return
 	}
 
 	// Add a driver using the supplied controller path.
 	err = goopenzwave.AddDriver(controllerPath)
 	if err != nil {
-		log.Fatalln("failed to add goopenzwave driver:", err)
+		fmt.Println("ERROR: failed to add goopenzwave driver:", err)
+		return
 	}
 
 	// Wait here until the initial node query has completed.
-	<-InitialQueryComplete
+	<-initialQueryComplete
 	fmt.Println("Finished initial scan, now setting up polling...")
 
 	// Now we will enable polling for a variable. In this simple example, it
@@ -143,4 +96,48 @@ func main() {
 	goopenzwave.RemoveDriver(controllerPath)
 	goopenzwave.Stop()
 	goopenzwave.DestroyOptions()
+}
+
+func handleNotification(notification *goopenzwave.Notification) {
+	fmt.Println("received notification:", notification)
+
+	// Switch based on notification type.
+	switch notification.Type {
+	case goopenzwave.NotificationTypeNodeAdded:
+		// Create a NodeInfo from the notification then add it to the
+		// map.
+		nodeinfo := &NodeInfo{
+			HomeID: notification.HomeID,
+			NodeID: notification.NodeID,
+			Node:   goopenzwave.NewNode(notification.HomeID, notification.NodeID),
+			Values: make(map[uint64]*goopenzwave.ValueID),
+		}
+		Nodes[nodeinfo.NodeID] = nodeinfo
+
+	case goopenzwave.NotificationTypeNodeRemoved:
+		// Remove the NodeInfo from the map.
+		if _, found := Nodes[notification.NodeID]; found {
+			delete(Nodes, notification.NodeID)
+		}
+
+	case goopenzwave.NotificationTypeValueAdded, goopenzwave.NotificationTypeValueChanged:
+		// Find the NodeInfo in the map and add/change the ValueID.
+		if node, found := Nodes[notification.NodeID]; found {
+			node.Values[notification.ValueID.ID] = notification.ValueID
+		}
+
+	case goopenzwave.NotificationTypeValueRemoved:
+		// Find the NodeInfo in the map and remove the ValueID.
+		if node, found := Nodes[notification.NodeID]; found {
+			if _, foundVal := node.Values[notification.ValueID.ID]; foundVal {
+				delete(node.Values, notification.ValueID.ID)
+			}
+		}
+
+	case goopenzwave.NotificationTypeAwakeNodesQueried, goopenzwave.NotificationTypeAllNodesQueried, goopenzwave.NotificationTypeAllNodesQueriedSomeDead:
+		// The initial node query has completed.
+		if sentinitialQueryComplete == false {
+			initialQueryComplete <- true
+		}
+	}
 }
