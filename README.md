@@ -4,7 +4,7 @@ Go bindings for the [OpenZWave](https://github.com/OpenZWave/open-zwave) library
 
 ## Warning
 
-This package is still fairly new and so the API is changing pretty rapidly, so be casreful if you decide to use it. I expect the API to become stable soon, however, as it is largely based on the OpenZWave library. Things may change to make usage more like idiomatic Go.
+This package is still fairly new and so the API is changing pretty rapidly, so be careful if you decide to use it. I expect the API to become stable soon, however, as it is largely based on the OpenZWave library. Things may change to make usage more like idiomatic Go.
 
 Most of the OpenZWave library is wrapped now, but should you find anything missing please create a new issue or fork it, implement it yourself and submit a pull request.
 
