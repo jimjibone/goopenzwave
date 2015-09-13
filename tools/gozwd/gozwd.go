@@ -30,16 +30,18 @@ type OutputMessage struct {
 }
 
 type Client struct {
-	conn *websocket.Conn
-	send chan OutputMessage
-	recv chan ContainerMessage
+	conn  *websocket.Conn
+	send  chan OutputMessage
+	recv  chan ContainerMessage
+	close chan bool
 }
 
 func NewClient(conn *websocket.Conn) *Client {
 	return &Client{
-		conn: conn,
-		send: make(chan OutputMessage),
-		recv: make(chan ContainerMessage),
+		conn:  conn,
+		send:  make(chan OutputMessage),
+		recv:  make(chan ContainerMessage),
+		close: make(chan bool),
 	}
 }
 
@@ -48,6 +50,11 @@ func (c *Client) Send(message OutputMessage) {
 }
 
 func (c *Client) Recv() {
+	// Signal a close of the websocket when we exit this.
+	defer func() {
+		c.close <- true
+	}()
+
 	for {
 		_, p, err := c.conn.ReadMessage()
 		if err != nil {
@@ -151,6 +158,9 @@ func handleWS(w http.ResponseWriter, r *http.Request) {
 	// Process all inbound and outbound message.
 	for {
 		select {
+		case _ = <-client.close:
+			return
+
 		case inbound := <-client.recv:
 			switch inbound.Topic {
 			case "get-nodes":
