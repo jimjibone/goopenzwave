@@ -111,7 +111,9 @@ var Node = React.createClass({
                     </div>
                     <div className="pure-u-1-1 pure-u-md-1-1">
                         <h3>Values</h3>
-                        {values}
+                        <div className="pure-g">
+                            {values}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -205,42 +207,34 @@ var Value = React.createClass({
         var disabled = this.props.value.read_only;
 
         return (
-            <div key={this.props.stringid} className="pure-u-1-1 value">
-                <div className="pure-g">
-                    <div className="pure-u-1-1">
-                        <form className="pure-form pure-form-stacked">
-                            <fieldset>
-                                <legend>{this.props.value.label}</legend>
-                                {this.props.value.read_only ? <p>Read Only</p> : null}
-                                {this.props.value.write_only ? <p>Write Only</p> : null}
-                                <div className="pure-g">
-                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                                        <label>Units</label>
-                                        <input type="text" value={this.props.value.units} readOnly/>
-                                    </div>
-                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                                        <label>Value</label>
-                                        <input type="text" value={this.props.value.string} onChange={this.handleChange} disabled={disabled}/>
-                                    </div>
-                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                                        <label>Genre</label>
-                                        <input type="text" value={this.props.value.genre} readOnly/>
-                                    </div>
-                                    <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                                        <label>Type</label>
-                                        <input type="text" value={this.props.value.type} readOnly/>
-                                    </div>
-                                    {this.props.value.write_only ?
-                                        <div className="pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                                            <button className="pure-button" onClick={this.handleButton}>Press Button</button>
-                                        </div>
-                                        : null
-                                    }
-                                </div>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
+            <div className="pure-u-1-1 pure-u-md-1-2 pure-u-xl-1-4">
+                <form className="pure-form pure-form-stacked">
+                    <fieldset>
+                        {this.props.value.label ?
+                            <h4>{this.props.value.label} {this.props.value.read_only ? "(RO)" : null}{this.props.value.write_only ? "(WO)" : null}</h4>
+                            :
+                            <h4>UNKNOWN</h4>
+                        }
+                        <div className="pure-g">
+                            <div className="pure-u-1-4">
+                                <label>Units</label>
+                                <input type="text" className="pure-input-1" value={this.props.value.units} readOnly/>
+                            </div>
+                            <div className="pure-u-1-4">
+                                <label>Value</label>
+                                <input type="text" className="pure-input-1" value={this.props.value.string} onChange={this.handleChange} disabled={disabled}/>
+                            </div>
+                            <div className="pure-u-1-4">
+                                <label>Genre</label>
+                                <input type="text" className="pure-input-1" value={this.props.value.genre} readOnly/>
+                            </div>
+                            <div className="pure-u-1-4">
+                                <label>Type</label>
+                                <input type="text" className="pure-input-1" value={this.props.value.type} readOnly/>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
         );
 
