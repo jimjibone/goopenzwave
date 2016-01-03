@@ -305,9 +305,10 @@ func (n *Notification) String() string {
 	if n.Notification != nil {
 		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
 	}
-	output := fmt.Sprintf("Notification{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID)
+	output := fmt.Sprintf("{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID)
 	for i := range pointed {
 		output = fmt.Sprintf("%s, %s", output, pointed[i])
 	}
+	output = fmt.Sprintf("%s}", output)
 	return output
 }
