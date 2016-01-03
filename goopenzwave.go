@@ -1,7 +1,8 @@
 package goopenzwave
 
-// #cgo LDFLAGS: -lopenzwave -L/usr/local/lib
-// #cgo CPPFLAGS: -I/usr/local/include -I/usr/local/include/openzwave
+// #cgo pkg-config: libopenzwave
+// #cgo CFLAGS: -I/usr/local/include
+// #cgo CPPFLAGS: -I/usr/local/include
 // #include "manager.h"
 // #include "notification.h"
 // #include <stdlib.h>
