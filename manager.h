@@ -103,7 +103,7 @@ extern "C" {
 	bool manager_isNodeAwake(manager_t m, uint32_t homeId, uint8_t nodeId);
 	bool manager_isNodeFailed(manager_t m, uint32_t homeId, uint8_t nodeId);
 	string_t* manager_getNodeQueryStage(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	uint8_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId);
+	uint16_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId);
 	string_t* manager_getNodeDeviceTypeString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 	uint8_t manager_getNodeRole(manager_t m, uint32_t homeId, uint8_t nodeId);
 	string_t* manager_getNodeRoleString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */

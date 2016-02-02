@@ -226,7 +226,7 @@ func (n *Node) GetQueryStage() string {
 }
 
 // GetDeviceType Get the node device type as reported in the Z-Wave+ Info report.
-func (n *Node) GetDeviceType() uint8 {
+func (n *Node) GetDeviceType() uint16 {
 	return GetNodeDeviceType(n.HomeID, n.NodeID)
 }
 

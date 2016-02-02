@@ -446,7 +446,7 @@ string_t* manager_getNodeQueryStage(manager_t m, uint32_t homeId, uint8_t nodeId
 	return string_fromStdString(str);
 }
 
-uint8_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId)
+uint16_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	return man->GetNodeDeviceType(homeId, nodeId);

@@ -353,8 +353,8 @@ func GetNodeQueryStage(homeID uint32, nodeID uint8) string {
 
 // GetNodeDeviceType returns the node device type as reported in the Z-Wave+
 // Info report.
-func GetNodeDeviceType(homeID uint32, nodeID uint8) uint8 {
-	return uint8(C.manager_getNodeDeviceType(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID)))
+func GetNodeDeviceType(homeID uint32, nodeID uint8) uint16 {
+	return uint16(C.manager_getNodeDeviceType(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
 // GetNodeDeviceTypeString returns a string of the node device type as reported
