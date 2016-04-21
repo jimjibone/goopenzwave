@@ -108,10 +108,9 @@ func GetNodeSpecificType(homeID uint32, nodeID uint8) uint8 {
 // The label is taken from the Z-Wave specific, generic or basic type, depending
 // on which of those values are specified by the node.
 func GetNodeType(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeType(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeType(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeNeighbours returns the bitmap of this node's neighbors.
@@ -127,10 +126,9 @@ func GetNodeType(homeID uint32, nodeID uint8) string {
 // stored with the node data and accessed via this method rather than being
 // reported via a command class Value object.
 func GetNodeManufacturerName(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeManufacturerName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeManufacturerName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeProductName returns the product name of a device.
@@ -143,10 +141,9 @@ func GetNodeManufacturerName(homeID uint32, nodeID uint8) string {
 // stored with the node data and accessed via this method rather than being
 // reported via a command class Value object.
 func GetNodeProductName(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeProductName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeProductName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeName returns the name of a node.
@@ -158,10 +155,9 @@ func GetNodeProductName(homeID uint32, nodeID uint8) string {
 // reporting it via a command class Value object. The maximum length of a node
 // name is 16 characters.
 func GetNodeName(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeLocation returns the location of a node.
@@ -172,10 +168,9 @@ func GetNodeName(homeID uint32, nodeID uint8) string {
 // and provides access through this method and SetNodeLocation, rather than
 // reporting it via a command class Value object.
 func GetNodeLocation(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeLocation(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeLocation(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeManufacturerID returns the manufacturer ID of a device.
@@ -188,10 +183,9 @@ func GetNodeLocation(homeID uint32, nodeID uint8) string {
 // reported via a command class Value object) to retain a consistent approach
 // with the other manufacturer specific data.
 func GetNodeManufacturerID(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeManufacturerId(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeManufacturerId(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeProductType returns the product type of a device.
@@ -204,10 +198,9 @@ func GetNodeManufacturerID(homeID uint32, nodeID uint8) string {
 // command class Value object) to retain a consistent approach with the other
 // manufacturer specific data.
 func GetNodeProductType(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeProductType(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeProductType(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeProductID returns the product ID of a device.
@@ -220,10 +213,9 @@ func GetNodeProductType(homeID uint32, nodeID uint8) string {
 // class Value object) to retain a consistent approach with the other
 // manufacturer specific data.
 func GetNodeProductID(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeProductId(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeProductId(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // SetNodeManufacturerName sets the manufacturer name of a device.
@@ -236,9 +228,9 @@ func GetNodeProductID(homeID uint32, nodeID uint8) string {
 // stored with the node data and accessed via this method rather than being
 // reported via a command class Value object.
 func SetNodeManufacturerName(homeID uint32, nodeID uint8, manufacturerName string) {
-	cString := C.CString(manufacturerName)
-	C.manager_setNodeManufacturerName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cString)
-	C.free(unsafe.Pointer(cString))
+	cstr := C.CString(manufacturerName)
+	C.manager_setNodeManufacturerName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
+	defer C.free(unsafe.Pointer(cstr))
 }
 
 // SetNodeProductName sets the product name of a device.
@@ -251,9 +243,9 @@ func SetNodeManufacturerName(homeID uint32, nodeID uint8, manufacturerName strin
 // stored with the node data and accessed via this method rather than being
 // reported via a command class Value object.
 func SetNodeProductName(homeID uint32, nodeID uint8, productName string) {
-	cString := C.CString(productName)
-	C.manager_setNodeProductName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cString)
-	C.free(unsafe.Pointer(cString))
+	cstr := C.CString(productName)
+	C.manager_setNodeProductName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
+	defer C.free(unsafe.Pointer(cstr))
 }
 
 // SetNodeName sets the name of a node.
@@ -266,9 +258,9 @@ func SetNodeProductName(homeID uint32, nodeID uint8, productName string) {
 // Node Naming command class, the new name will be sent to the node. The maximum
 // length of a node name is 16 characters.
 func SetNodeName(homeID uint32, nodeID uint8, nodeName string) {
-	cString := C.CString(nodeName)
-	C.manager_setNodeName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cString)
-	C.free(unsafe.Pointer(cString))
+	cstr := C.CString(nodeName)
+	C.manager_setNodeName(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
+	defer C.free(unsafe.Pointer(cstr))
 }
 
 // SetNodeLocation sets the location of a node.
@@ -280,9 +272,9 @@ func SetNodeName(homeID uint32, nodeID uint8, nodeName string) {
 // reporting it via a command class Value object. If the device does support the
 // Node Naming command class, the new location will be sent to the node.
 func SetNodeLocation(homeID uint32, nodeID uint8, location string) {
-	cString := C.CString(location)
-	C.manager_setNodeLocation(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cString)
-	C.free(unsafe.Pointer(cString))
+	cstr := C.CString(location)
+	C.manager_setNodeLocation(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
+	defer C.free(unsafe.Pointer(cstr))
 }
 
 // SetNodeOn turns a node on.
@@ -322,12 +314,12 @@ func IsNodeInfoReceived(homeID uint32, nodeID uint8) bool {
 // GetNodeClassInformation returns true if the node has the defined class
 // available or not, and the class name and version if available.
 func GetNodeClassInformation(homeID uint32, nodeID uint8, commandClassID uint8) (bool, string, uint8) {
-	cClassName := C.string_emptyString()
+	var cClassName *C.char
 	var cClassVersion C.uint8_t
-	result := bool(C.manager_getNodeClassInformation(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), C.uint8_t(commandClassID), cClassName, &cClassVersion))
-	goClassName := C.GoString(cClassName.data)
+	result := bool(C.manager_getNodeClassInformation(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), C.uint8_t(commandClassID), &cClassName, &cClassVersion))
+	goClassName := C.GoString(cClassName)
 	goClassVersion := uint8(cClassVersion)
-	C.string_freeString(cClassName)
+	C.free(unsafe.Pointer(cClassName))
 	return result, goClassName, goClassVersion
 }
 
@@ -345,10 +337,9 @@ func IsNodeFailed(homeID uint32, nodeID uint8) bool {
 
 // GetNodeQueryStage returns the node's query stage as a string.
 func GetNodeQueryStage(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeQueryStage(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeQueryStage(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeDeviceType returns the node device type as reported in the Z-Wave+
@@ -360,10 +351,9 @@ func GetNodeDeviceType(homeID uint32, nodeID uint8) uint16 {
 // GetNodeDeviceTypeString returns a string of the node device type as reported
 // in the Z-Wave+ Info report.
 func GetNodeDeviceTypeString(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeDeviceTypeString(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeDeviceTypeString(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodeRole returns the node role as reported in the Z-Wave+ Info report.
@@ -374,10 +364,9 @@ func GetNodeRole(homeID uint32, nodeID uint8) uint8 {
 // GetNodeRoleString returns a string of the node role as reported in the
 // Z-Wave+ Info report.
 func GetNodeRoleString(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodeRoleString(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodeRoleString(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetNodePlusType returns the node PlusType as reported in the Z-Wave+ Info
@@ -389,10 +378,9 @@ func GetNodePlusType(homeID uint32, nodeID uint8) uint8 {
 // GetNodePlusTypeString returns a string of the node PlusType as reported in
 // the Z-Wave+ Info report.
 func GetNodePlusTypeString(homeID uint32, nodeID uint8) string {
-	cString := C.manager_getNodePlusTypeString(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getNodePlusTypeString(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // SetNodeConfigParam sets the value of a configurable parameter in a device.

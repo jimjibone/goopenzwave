@@ -22,8 +22,8 @@ import (
 // methods.
 func AddDriver(controllerPath string) error {
 	cControllerPath := C.CString(controllerPath)
+	defer C.free(unsafe.Pointer(cControllerPath))
 	ok := bool(C.manager_addDriver(cmanager, cControllerPath))
-	C.free(unsafe.Pointer(cControllerPath))
 	if ok == false {
 		return fmt.Errorf("controller already exists")
 	}
@@ -38,8 +38,8 @@ func AddDriver(controllerPath string) error {
 // handled automatically.
 func RemoveDriver(controllerPath string) error {
 	cControllerPath := C.CString(controllerPath)
+	defer C.free(unsafe.Pointer(cControllerPath))
 	ok := bool(C.manager_removeDriver(cmanager, cControllerPath))
-	C.free(unsafe.Pointer(cControllerPath))
 	if ok == false {
 		return fmt.Errorf("controller not found")
 	}
@@ -87,10 +87,9 @@ func IsBridgeController(homeID uint32) bool {
 // GetLibraryVersion returns a string version of the Z-Wave API library used by
 // a controller.
 func GetLibraryVersion(homeID uint32) string {
-	cString := C.manager_getLibraryVersion(cmanager, C.uint32_t(homeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getLibraryVersion(cmanager, C.uint32_t(homeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetLibraryTypeName returns a string containing the Z-Wave API library type
@@ -110,10 +109,9 @@ func GetLibraryVersion(homeID uint32) string {
 // test of whether a controller is a Bridge Controller, use the
 // IsBridgeController method.
 func GetLibraryTypeName(homeID uint32) string {
-	cString := C.manager_getLibraryTypeName(cmanager, C.uint32_t(homeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getLibraryTypeName(cmanager, C.uint32_t(homeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetSendQueueCount returns the count of messages in the outgoing send queue.
@@ -131,10 +129,9 @@ func LogDriverStatistics(homeID uint32) {
 
 // GetControllerPath returns a string of the controller interface path.
 func GetControllerPath(homeID uint32) string {
-	cString := C.manager_getControllerPath(cmanager, C.uint32_t(homeID))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getControllerPath(cmanager, C.uint32_t(homeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetDriverStatistics Retrieve statistics from driver.

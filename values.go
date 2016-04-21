@@ -13,29 +13,29 @@ import (
 func GetValueLabel(homeID uint32, valueID uint64) string {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.manager_getValueLabel(cmanager, cvalueid)
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
-	return gostring
+	cstr := C.manager_getValueLabel(cmanager, cvalueid)
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return gostr
 }
 
 // SetValueLabel sets the user-friendly label for the value.
 func SetValueLabel(homeID uint32, valueID uint64, value string) {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.CString(value)
-	C.manager_setValueLabel(cmanager, cvalueid, cstring)
-	C.free(unsafe.Pointer(cstring))
+	cstr := C.CString(value)
+	C.manager_setValueLabel(cmanager, cvalueid, cstr)
+	C.free(unsafe.Pointer(cstr))
 }
 
 // GetValueUnits returns the units that the value is measured in.
 func GetValueUnits(homeID uint32, valueID uint64) string {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.manager_getValueUnits(cmanager, cvalueid)
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
-	return gostring
+	cstr := C.manager_getValueUnits(cmanager, cvalueid)
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return gostr
 }
 
 // SetValueUnits sets the units that the value is measured in.
@@ -51,10 +51,10 @@ func SetValueUnits(homeID uint32, valueID uint64, value string) {
 func GetValueHelp(homeID uint32, valueID uint64) string {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.manager_getValueHelp(cmanager, cvalueid)
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
-	return gostring
+	cstr := C.manager_getValueHelp(cmanager, cvalueid)
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return gostr
 }
 
 // SetValueHelp sets a help string describing the value's purpose and usage.
@@ -178,11 +178,11 @@ func GetValueAsShort(homeID uint32, valueID uint64) (int16, error) {
 func GetValueAsString(homeID uint32, valueID uint64) string {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.string_emptyString()
-	_ = bool(C.manager_getValueAsString(cmanager, cvalueid, cstring))
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
-	return gostring
+	var cstr *C.char
+	_ = C.manager_getValueAsString(cmanager, cvalueid, &cstr)
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return gostr
 }
 
 // GetValueAsRaw returns the value as a raw byte slice. It will also return an
@@ -207,14 +207,14 @@ func GetValueAsRaw(homeID uint32, valueID uint64) ([]byte, error) {
 func GetValueListSelectionAsString(homeID uint32, valueID uint64) (string, error) {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.string_emptyString()
-	ok := bool(C.manager_getValueListSelectionAsString(cmanager, cvalueid, cstring))
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
+	var cstr *C.char
+	ok := bool(C.manager_getValueListSelectionAsString(cmanager, cvalueid, &cstr))
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
 	if ok == false {
-		return gostring, fmt.Errorf("value is not of list type")
+		return gostr, fmt.Errorf("value is not of list type")
 	}
-	return gostring, nil
+	return gostr, nil
 }
 
 // GetValueListSelectionAsInt32 returns selected item from a list as an integer.
@@ -235,18 +235,18 @@ func GetValueListSelectionAsInt32(homeID uint32, valueID uint64) (int32, error) 
 func GetValueListItems(homeID uint32, valueID uint64) ([]string, error) {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstringlist := C.string_emptyStringList()
-	ok := bool(C.manager_getValueListItems(cmanager, cvalueid, cstringlist))
-	gostringlist := make([]string, int(cstringlist.length))
+	var clist *C.zwlist_t
+	ok := bool(C.manager_getValueListItems(cmanager, cvalueid, &clist))
+	golist := make([]string, int(C.zwlist_size(clist)))
 	if ok == false {
 		return nil, fmt.Errorf("value is not of list type")
 	}
-	for i := 0; i < int(cstringlist.length); i++ {
-		cstring := C.string_stringAt(cstringlist, C.size_t(i))
-		gostringlist[i] = C.GoString(cstring.data)
+	for i := 0; i < int(C.zwlist_size(clist)); i++ {
+		cstr := C.zwlist_at(clist, C.int(i))
+		golist[i] = C.GoString(cstr)
 	}
-	C.string_freeStringList(cstringlist)
-	return gostringlist, nil
+	C.zwlist_free(clist)
+	return golist, nil
 }
 
 // GetValueFloatPrecision returns the float value's precision. It will also

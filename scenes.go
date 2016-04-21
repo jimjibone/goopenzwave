@@ -177,14 +177,14 @@ func GetSceneValueAsShort(sceneID uint8, homeID uint32, valueID uint64) (int16, 
 func GetSceneValueAsString(sceneID uint8, homeID uint32, valueID uint64) (string, error) {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.string_emptyString()
-	ok := bool(C.manager_sceneGetValueAsString(cmanager, C.uint8_t(sceneID), cvalueid, cstring))
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
+	var cstr *C.char
+	ok := bool(C.manager_sceneGetValueAsString(cmanager, C.uint8_t(sceneID), cvalueid, &cstr))
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
 	if ok == false {
-		return gostring, fmt.Errorf("string value was not obtained")
+		return gostr, fmt.Errorf("string value was not obtained")
 	}
-	return gostring, nil
+	return gostr, nil
 }
 
 // GetSceneValueListSelectionString returns a scene's value list as a string and
@@ -192,14 +192,14 @@ func GetSceneValueAsString(sceneID uint8, homeID uint32, valueID uint64) (string
 func GetSceneValueListSelectionString(sceneID uint8, homeID uint32, valueID uint64) (string, error) {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cstring := C.string_emptyString()
-	ok := bool(C.manager_sceneGetValueListSelectionString(cmanager, C.uint8_t(sceneID), cvalueid, cstring))
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
+	var cstr *C.char
+	ok := bool(C.manager_sceneGetValueListSelectionString(cmanager, C.uint8_t(sceneID), cvalueid, &cstr))
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
 	if ok == false {
-		return gostring, fmt.Errorf("string list value was not obtained")
+		return gostr, fmt.Errorf("string list value was not obtained")
 	}
-	return gostring, nil
+	return gostr, nil
 }
 
 // GetSceneValueListSelectionInt32 returns a scene's value list as an integer
@@ -319,10 +319,10 @@ func SetSceneValueListSelectionInt32(sceneID uint8, homeID uint32, valueID uint6
 
 // GetSceneLabel returns a label for the particular scene.
 func GetSceneLabel(sceneID uint8) string {
-	cstring := C.manager_getSceneLabel(cmanager, C.uint8_t(sceneID))
-	gostring := C.GoString(cstring.data)
-	C.string_freeString(cstring)
-	return gostring
+	cstr := C.manager_getSceneLabel(cmanager, C.uint8_t(sceneID))
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return gostr
 }
 
 // SetSceneLabel sets a label for the particular scene.

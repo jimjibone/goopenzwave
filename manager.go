@@ -6,6 +6,7 @@ package goopenzwave
 import "C"
 import (
 	"fmt"
+	"unsafe"
 )
 
 var (
@@ -39,18 +40,16 @@ func destroyManager() {
 
 // GetManagerVersionAsString Get the Version Number of OZW as a string.
 func GetManagerVersionAsString() string {
-	cString := C.manager_getVersionAsString()
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getVersionAsString()
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // GetManagerVersionLongAsString Get the Version Number including Git commit of OZW as a string.
 func GetManagerVersionLongAsString() string {
-	cString := C.manager_getVersionLongAsString()
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getVersionLongAsString()
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // ManagerVersion represents the OpenZWave library version as major and minor

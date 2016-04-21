@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "string_helpers.h"
+#include "zwhelpers.h"
 #include "loglevel.h"
 
 #ifdef __cplusplus
@@ -27,7 +27,7 @@ extern "C" {
     bool options_addOptionString(options_t o, const char* name, const char* value, bool append);
     bool options_getOptionAsBool(options_t o, const char* name, bool* o_value);
     bool options_getOptionAsInt(options_t o, const char* name, int32_t* o_value);
-    bool options_getOptionAsString(options_t o, const char* name, string_t* o_value);
+    bool options_getOptionAsString(options_t o, const char* name, char **o_value);
 //TODO  OptionType options_getOptionType(string const &_name);
     bool options_areLocked(options_t o);
 

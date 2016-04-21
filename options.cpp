@@ -1,6 +1,7 @@
 #include "options.h"
 #include <openzwave/Options.h>
 #include <string.h>
+#include <stdlib.h>
 
 //
 // Static public member functions.
@@ -76,13 +77,16 @@ bool options_getOptionAsInt(options_t o, const char* name, int32_t* o_value)
     return opts->GetOptionAsInt(inStr, o_value);
 }
 
-bool options_getOptionAsString(options_t o, const char* name, string_t* o_value)
+bool options_getOptionAsString(options_t o, const char* name, char **o_value)
 {
     OpenZWave::Options *opts = (OpenZWave::Options*)o;
     std::string inStr(name);
-    std::string outStr;
-    bool result = opts->GetOptionAsString(inStr, &outStr);
-    string_copyStdString(o_value, outStr);
+    std::string str;
+    bool result = opts->GetOptionAsString(inStr, &str);
+    if (*o_value) {
+        free(*o_value);
+    }
+    *o_value = zwhelper_makeCString(str);
     return result;
 }
 

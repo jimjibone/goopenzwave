@@ -111,11 +111,11 @@ func (o *Options) GetOptionAsInt(name string) (bool, int32) {
 // GetOptionAsString get the value of a string option.
 func (o *Options) GetOptionAsString(name string) (bool, string) {
 	cName := C.CString(name)
-	cString := C.string_emptyString()
-	result := bool(C.options_getOptionAsString(o.options, cName, cString))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return result, goString
+	var cstr *C.char
+	result := bool(C.options_getOptionAsString(o.options, cName, &cstr))
+	gostr := C.GoString(cstr)
+	C.free(unsafe.Pointer(cstr))
+	return result, gostr
 }
 
 // GetOptionType get the type of value stored in an option.

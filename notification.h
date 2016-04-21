@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "string_helpers.h"
+#include "zwhelpers.h"
 #include "valueid.h"
 
 #ifdef __cplusplus
@@ -70,7 +70,7 @@ extern "C" {
     uint8_t notification_getSceneId(notification_t n);
     uint8_t notification_getNotification(notification_t n);
     uint8_t notification_getByte(notification_t n);
-    string_t* notification_getAsString(notification_t n);
+    char* notification_getAsString(notification_t n);
 
 #ifdef __cplusplus
 }

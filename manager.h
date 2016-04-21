@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "string_helpers.h"
+#include "zwhelpers.h"
 #include "options.h"
 #include "notification.h"
 
@@ -22,8 +22,8 @@ extern "C" {
 	manager_t manager_create();
 	manager_t manager_get();
 	void manager_destroy();
-	string_t* manager_getVersionAsString(); /*!< C string must be freed. */
-	string_t* manager_getVersionLongAsString(); /*!< C string must be freed. */
+	char* manager_getVersionAsString(); /*!< C string must be freed. */
+	char* manager_getVersionLongAsString(); /*!< C string must be freed. */
 	void manager_getVersion(uint16_t *major, uint16_t *minor);
 
 	//
@@ -44,12 +44,12 @@ extern "C" {
 	bool manager_isPrimaryController(manager_t m, uint32_t homeId);
 	bool manager_isStaticUpdateController(manager_t m, uint32_t homeId);
 	bool manager_isBridgeController(manager_t m, uint32_t homeId);
-	string_t* manager_getLibraryVersion(manager_t m, uint32_t homeId);  /*!< C string must be freed. */
-	string_t* manager_getLibraryTypeName(manager_t m, uint32_t homeId); /*!< C string must be freed. */
+	char* manager_getLibraryVersion(manager_t m, uint32_t homeId);  /*!< C string must be freed. */
+	char* manager_getLibraryTypeName(manager_t m, uint32_t homeId); /*!< C string must be freed. */
 	int32_t manager_getSendQueueCount(manager_t m, uint32_t homeId);
 	void manager_logDriverStatistics(manager_t m, uint32_t homeId);
 //TODO driver_controllerInterface_t manager_getControllerInterfaceType(manager_t m, uint32_t homeId);
-	string_t* manager_getControllerPath(manager_t m, uint32_t homeId);  /*!< C string must be freed. */
+	char* manager_getControllerPath(manager_t m, uint32_t homeId);  /*!< C string must be freed. */
 
 	//
 	// Polling Z-Wave devices.
@@ -82,15 +82,15 @@ extern "C" {
 	uint8_t manager_getNodeBasic(manager_t m, uint32_t homeId, uint8_t nodeId);
 	uint8_t manager_getNodeGeneric(manager_t m, uint32_t homeId, uint8_t nodeId);
 	uint8_t manager_getNodeSpecific(manager_t m, uint32_t homeId, uint8_t nodeId);
-	string_t* manager_getNodeType(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeType(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 //TODO uint32_t manager_getNodeNeighbors(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t **nodeNeighbors);
-	string_t* manager_getNodeManufacturerName(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	string_t* manager_getNodeProductName(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	string_t* manager_getNodeName(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	string_t* manager_getNodeLocation(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	string_t* manager_getNodeManufacturerId(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	string_t* manager_getNodeProductType(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
-	string_t* manager_getNodeProductId(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeManufacturerName(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeProductName(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeName(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeLocation(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeManufacturerId(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeProductType(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeProductId(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 	void manager_setNodeManufacturerName(manager_t m, uint32_t homeId, uint8_t nodeId, const char* manufacturerName);
 	void manager_setNodeProductName(manager_t m, uint32_t homeId, uint8_t nodeId, const char* productName);
 	void manager_setNodeName(manager_t m, uint32_t homeId, uint8_t nodeId, const char* nodeName);
@@ -99,26 +99,26 @@ extern "C" {
 	void manager_setNodeOff(manager_t m, uint32_t homeId, uint8_t nodeId);
 	void manager_setNodeLevel(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t level);
 	bool manager_isNodeInfoReceived(manager_t m, uint32_t homeId, uint8_t nodeId);
-	bool manager_getNodeClassInformation(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t commandClassId, string_t *o_name, uint8_t *o_version);
+	bool manager_getNodeClassInformation(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t commandClassId, char **o_name, uint8_t *o_version);
 	bool manager_isNodeAwake(manager_t m, uint32_t homeId, uint8_t nodeId);
 	bool manager_isNodeFailed(manager_t m, uint32_t homeId, uint8_t nodeId);
-	string_t* manager_getNodeQueryStage(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeQueryStage(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 	uint16_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId);
-	string_t* manager_getNodeDeviceTypeString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeDeviceTypeString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 	uint8_t manager_getNodeRole(manager_t m, uint32_t homeId, uint8_t nodeId);
-	string_t* manager_getNodeRoleString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodeRoleString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 	uint8_t manager_getNodePlusType(manager_t m, uint32_t homeId, uint8_t nodeId);
-	string_t* manager_getNodePlusTypeString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
+	char* manager_getNodePlusTypeString(manager_t m, uint32_t homeId, uint8_t nodeId); /*!< C string must be freed. */
 
 	//
 	// Values.
 	//
 
-	string_t* manager_getValueLabel(manager_t m, valueid_t valueid);
+	char* manager_getValueLabel(manager_t m, valueid_t valueid);
 	void manager_setValueLabel(manager_t m, valueid_t valueid, const char* value);
-	string_t* manager_getValueUnits(manager_t m, valueid_t valueid);
+	char* manager_getValueUnits(manager_t m, valueid_t valueid);
 	void manager_setValueUnits(manager_t m, valueid_t valueid, const char* value);
-	string_t* manager_getValueHelp(manager_t m, valueid_t valueid);
+	char* manager_getValueHelp(manager_t m, valueid_t valueid);
 	void manager_setValueHelp(manager_t m, valueid_t valueid, const char* value);
 	int32_t manager_getValueMin(manager_t m, valueid_t valueid);
 	int32_t manager_getValueMax(manager_t m, valueid_t valueid);
@@ -131,11 +131,11 @@ extern "C" {
 	bool manager_getValueAsFloat(manager_t m, valueid_t valueid, float *o_value);
 	bool manager_getValueAsInt(manager_t m, valueid_t valueid, int32_t *o_value);
 	bool manager_getValueAsShort(manager_t m, valueid_t valueid, int16_t *o_value);
-	bool manager_getValueAsString(manager_t m, valueid_t valueid, string_t *o_value);
+	bool manager_getValueAsString(manager_t m, valueid_t valueid, char **o_value);
 	bool manager_getValueAsRaw(manager_t m, valueid_t valueid, bytes_t *o_value);
-	bool manager_getValueListSelectionAsString(manager_t m, valueid_t valueid, string_t *o_value);
+	bool manager_getValueListSelectionAsString(manager_t m, valueid_t valueid, char **o_value);
 	bool manager_getValueListSelectionAsInt32(manager_t m, valueid_t valueid, int32_t *o_value);
-	bool manager_getValueListItems(manager_t m, valueid_t valueid, stringlist_t *o_value);
+	bool manager_getValueListItems(manager_t m, valueid_t valueid, zwlist_t **o_value);
 	bool manager_getValueFloatPrecision(manager_t m, valueid_t valueid, uint8_t *o_value);
 	bool manager_setValueBool(manager_t m, valueid_t valueid, bool value);
 	bool manager_setValueUint8(manager_t m, valueid_t valueid, uint8_t value);
@@ -184,7 +184,7 @@ extern "C" {
 	uint32_t manager_getAssociations(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx, uint8_t **o_associations);
 //TODO uint32_t manager_getAssociations(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx, instanceassociation_t **o_associations);
 	uint8_t manager_getMaxAssociations(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx);
-	string_t* manager_getGroupLabel(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx);
+	char* manager_getGroupLabel(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx);
 	void manager_addAssociation(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx, uint8_t targetNodeId, uint8_t instance);
 	void manager_removeAssociation(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx, uint8_t targetNodeId, uint8_t instance);
 
@@ -253,8 +253,8 @@ extern "C" {
 	bool manager_sceneGetValueAsFloat(manager_t m, uint8_t sceneId, valueid_t valueid, float *o_value);
 	bool manager_sceneGetValueAsInt(manager_t m, uint8_t sceneId, valueid_t valueid, int32_t *o_value);
 	bool manager_sceneGetValueAsShort(manager_t m, uint8_t sceneId, valueid_t valueid, int16_t *o_value);
-	bool manager_sceneGetValueAsString(manager_t m, uint8_t sceneId, valueid_t valueid, string_t *o_value);
-	bool manager_sceneGetValueListSelectionString(manager_t m, uint8_t sceneId, valueid_t valueid, string_t *o_value);
+	bool manager_sceneGetValueAsString(manager_t m, uint8_t sceneId, valueid_t valueid, char **o_value);
+	bool manager_sceneGetValueListSelectionString(manager_t m, uint8_t sceneId, valueid_t valueid, char **o_value);
 	bool manager_sceneGetValueListSelectionInt32(manager_t m, uint8_t sceneId, valueid_t valueid, int32_t *o_value);
 	bool manager_setSceneValueBool(manager_t m, uint8_t sceneId, valueid_t valueid, bool value);
 	bool manager_setSceneValueUint8(manager_t m, uint8_t sceneId, valueid_t valueid, uint8_t value);
@@ -264,7 +264,7 @@ extern "C" {
 	bool manager_setSceneValueString(manager_t m, uint8_t sceneId, valueid_t valueid, const char* value);
 	bool manager_setSceneValueListSelectionString(manager_t m, uint8_t sceneId, valueid_t valueid, const char* value);
 	bool manager_setSceneValueListSelectionInt32(manager_t m, uint8_t sceneId, valueid_t valueid, int32_t value);
-	string_t* manager_getSceneLabel(manager_t m, uint8_t sceneId);
+	char* manager_getSceneLabel(manager_t m, uint8_t sceneId);
 	void manager_setSceneLabel(manager_t m, uint8_t sceneId, const char* value);
 	bool manager_sceneExists(manager_t m, uint8_t sceneId);
 	bool manager_activateScene(manager_t m, uint8_t sceneId);

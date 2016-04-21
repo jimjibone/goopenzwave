@@ -3,6 +3,7 @@ package goopenzwave
 // #include "manager.h"
 // #include <stdlib.h>
 import "C"
+import "unsafe"
 
 // GetNumGroups returns the number of association groups reported by this node.
 //
@@ -36,10 +37,9 @@ func GetMaxAssociations(homeID uint32, nodeID uint8, groupIDx uint8) uint8 {
 // GetGroupLabel returns a label for the particular group of a node. This label
 // is populated by the device specific configuration files.
 func GetGroupLabel(homeID uint32, nodeID uint8, groupIDx uint8) string {
-	cString := C.manager_getGroupLabel(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), C.uint8_t(groupIDx))
-	goString := C.GoString(cString.data)
-	C.string_freeString(cString)
-	return goString
+	cstr := C.manager_getGroupLabel(cmanager, C.uint32_t(homeID), C.uint8_t(nodeID), C.uint8_t(groupIDx))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
 // AddAssociation adds a node to an association group.
