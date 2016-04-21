@@ -13,7 +13,7 @@ string_t* string_emptyString()
 void string_initString(string_t *string, size_t size)
 {
     if (string->data != NULL) {
-        delete string->data;
+        free(string->data);
     }
     string->length = 0;
 
@@ -29,9 +29,9 @@ void string_initString(string_t *string, size_t size)
 void string_freeString(string_t *string)
 {
     if (string->data != NULL) {
-        delete string->data;
+        free(string->data);
     }
-    delete string;
+    free(string);
 }
 
 bytes_t* string_emptyBytes()
@@ -45,7 +45,7 @@ bytes_t* string_emptyBytes()
 void string_initBytes(bytes_t *bytes, size_t size)
 {
     if (bytes->data != NULL) {
-        delete bytes->data;
+        free(bytes->data);
     }
     bytes->length = 0;
 
@@ -71,9 +71,9 @@ uint8_t string_byteAt(bytes_t *bytes, size_t position)
 void string_freeBytes(bytes_t *bytes)
 {
     if (bytes->data != NULL) {
-        delete bytes->data;
+        free(bytes->data);
     }
-    delete bytes;
+    free(bytes);
 }
 
 stringlist_t* string_emptyStringList()
@@ -94,16 +94,16 @@ void string_freeStringList(stringlist_t *list)
         string_freeString(list->list[i]);
     }
     if (list->list != NULL) {
-        delete list->list;
+        free(list->list);
     }
-    delete list;
+    free(list);
 }
 
 void string_copyStdString(string_t *cstr, std::string &string)
 {
     // Free existing string from cstr.
     if (cstr->data != NULL) {
-        delete cstr->data;
+        free(cstr->data);
     }
 
     // Copy string into a new cstr->data.
@@ -138,7 +138,7 @@ void string_copyStdStringList(stringlist_t *clist, std::vector<std::string> &lis
         string_freeString(clist->list[i]);
     }
     if (clist->list != NULL) {
-        delete clist->list;
+        free(clist->list);
     }
 
     // Prepare the list.
