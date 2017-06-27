@@ -26,7 +26,7 @@ zwlist_t* zwlist_new();
  * @param  list The zwlist_t object to operate on.
  * @return      The number of items in the zwlist_t.
  */
-int zwlist_size(zwlist_t *list);
+size_t zwlist_size(zwlist_t *list);
 
 /**
  * zwlist_at returns a copy of the item from the given position in the list. The
@@ -35,7 +35,7 @@ int zwlist_size(zwlist_t *list);
  * @param  pos  The position of the item to return within the list.
  * @return      A copy of the item string. Free when finished.
  */
-char* zwlist_at(zwlist_t *list, int pos);
+char* zwlist_at(zwlist_t *list, size_t pos);
 
 /**
  * zwlist_free frees the zwlist_t object.

@@ -10,14 +10,14 @@ zwlist_t *zwlist_new()
     return (zwlist_t*)vec;
 }
 
-int zwlist_size(zwlist_t *list)
+size_t zwlist_size(zwlist_t *list)
 {
     assert(list);
     std::vector<std::string> *vec = (std::vector<std::string>*)list;
     return vec->size();
 }
 
-char* zwlist_at(zwlist_t *list, int pos)
+char* zwlist_at(zwlist_t *list, size_t pos)
 {
     assert(list);
     std::vector<std::string> *vec = (std::vector<std::string>*)list;

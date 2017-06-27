@@ -243,7 +243,7 @@ func GetValueListItems(homeID uint32, valueID uint64) ([]string, error) {
 		return nil, fmt.Errorf("value is not of list type")
 	}
 	for i := 0; i < int(C.zwlist_size(clist)); i++ {
-		cstr := C.zwlist_at(clist, C.int(i))
+		cstr := C.zwlist_at(clist, C.size_t(i))
 		golist[i] = C.GoString(cstr)
 	}
 	C.zwlist_free(clist)
