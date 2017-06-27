@@ -6,7 +6,6 @@
 #include <stddef.h>
 #include "zwbytes.h"
 #include "zwlist.h"
-#include "gzw_helpers.h"
 #include "gzw_options.h"
 #include "gzw_notification.h"
 
