@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "zwlist.h"
 #include "gzw_helpers.h"
 #include "gzw_options.h"
 #include "gzw_notification.h"
