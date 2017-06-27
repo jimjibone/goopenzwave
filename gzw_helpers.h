@@ -9,26 +9,6 @@
 extern "C" {
 #endif
 
-/*
- *
- * C types and functions.
- *
- */
-
-/**
- * Container for byte arrays.
- */
-typedef struct {
-    uint8_t *data;
-    size_t length;
-} bytes_t;
-
-bytes_t* string_emptyBytes();
-void string_initBytes(bytes_t *bytes, size_t size);
-void string_setByteAt(bytes_t *bytes, uint8_t value, size_t position);
-uint8_t string_byteAt(bytes_t *bytes, size_t position);
-void string_freeBytes(bytes_t *bytes);
-
 #ifdef __cplusplus
 } // end extern "C"
 

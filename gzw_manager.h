@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "zwbytes.h"
 #include "zwlist.h"
 #include "gzw_helpers.h"
 #include "gzw_options.h"
@@ -133,7 +134,7 @@ extern "C" {
 	bool manager_getValueAsInt(manager_t m, valueid_t valueid, int32_t *o_value);
 	bool manager_getValueAsShort(manager_t m, valueid_t valueid, int16_t *o_value);
 	bool manager_getValueAsString(manager_t m, valueid_t valueid, char **o_value);
-	bool manager_getValueAsRaw(manager_t m, valueid_t valueid, bytes_t *o_value);
+	bool manager_getValueAsRaw(manager_t m, valueid_t valueid, zwbytes_t *o_value);
 	bool manager_getValueListSelectionAsString(manager_t m, valueid_t valueid, char **o_value);
 	bool manager_getValueListSelectionAsInt32(manager_t m, valueid_t valueid, int32_t *o_value);
 	bool manager_getValueListItems(manager_t m, valueid_t valueid, zwlist_t **o_value);
@@ -143,7 +144,7 @@ extern "C" {
 	bool manager_setValueFloat(manager_t m, valueid_t valueid, float value);
 	bool manager_setValueInt32(manager_t m, valueid_t valueid, int32_t value);
 	bool manager_setValueInt16(manager_t m, valueid_t valueid, int16_t value);
-	bool manager_setValueBytes(manager_t m, valueid_t valueid, bytes_t *value);
+	bool manager_setValueBytes(manager_t m, valueid_t valueid, zwbytes_t *value);
 	bool manager_setValueString(manager_t m, valueid_t valueid, const char* value);
 	bool manager_setValueListSelection(manager_t m, valueid_t valueid, const char* selectedItem);
 	bool manager_refreshValue(manager_t m, valueid_t valueid);

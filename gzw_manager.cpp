@@ -626,12 +626,11 @@ bool manager_getValueAsString(manager_t m, valueid_t valueid, char **o_value)
 	return result;
 }
 
-bool manager_getValueAsRaw(manager_t m, valueid_t valueid, bytes_t *o_value)
+bool manager_getValueAsRaw(manager_t m, valueid_t valueid, zwbytes_t *o_value)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	string_initBytes(o_value, 255);
-	return man->GetValueAsRaw(*val, &(o_value->data), (uint8_t*)&(o_value->length));
+	return man->GetValueAsRaw(*val, &(o_value->data), (uint8_t*)&(o_value->size));
 }
 
 bool manager_getValueListSelectionAsString(manager_t m, valueid_t valueid, char **o_value)
@@ -709,11 +708,11 @@ bool manager_setValueInt16(manager_t m, valueid_t valueid, int16_t value)
 	return man->SetValue(*val, value);
 }
 
-bool manager_setValueBytes(manager_t m, valueid_t valueid, bytes_t *value)
+bool manager_setValueBytes(manager_t m, valueid_t valueid, zwbytes_t *value)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	return man->SetValue(*val, value->data, (uint8_t)value->length);
+	return man->SetValue(*val, value->data, (uint8_t)value->size);
 }
 
 bool manager_setValueString(manager_t m, valueid_t valueid, const char* value)
