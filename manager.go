@@ -38,33 +38,34 @@ func destroyManager() {
 	C.manager_destroy()
 }
 
-// GetManagerVersionAsString Get the Version Number of OZW as a string.
-func GetManagerVersionAsString() string {
+// GetVersionAsString returns the Version Number of OZW as a string.
+func GetVersionAsString() string {
 	cstr := C.manager_getVersionAsString()
 	defer C.free(unsafe.Pointer(cstr))
 	return C.GoString(cstr)
 }
 
-// GetManagerVersionLongAsString Get the Version Number including Git commit of OZW as a string.
-func GetManagerVersionLongAsString() string {
+// GetVersionLongAsString returns the Version Number including Git commit of OZW
+// as a string.
+func GetVersionLongAsString() string {
 	cstr := C.manager_getVersionLongAsString()
 	defer C.free(unsafe.Pointer(cstr))
 	return C.GoString(cstr)
 }
 
-// ManagerVersion represents the OpenZWave library version as major and minor
-// integers.
-type ManagerVersion struct {
+// Version represents the OpenZWave library version as major and minor integers.
+type Version struct {
 	Major int
 	Minor int
 }
 
-// GetManagerVersion Get the Version Number as the Version Struct (Only Major/Minor returned).
-func GetManagerVersion() ManagerVersion {
+// GetVersion returns the Version Number as the Version Struct (Only Major/Minor
+// returned).
+func GetVersion() Version {
 	var cMajor C.uint16_t
 	var cMinor C.uint16_t
 	C.manager_getVersion(&cMajor, &cMinor)
-	return ManagerVersion{
+	return Version{
 		Major: int(cMajor),
 		Minor: int(cMinor),
 	}
