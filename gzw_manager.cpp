@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "gzw_manager.h"
 #include <openzwave/Manager.h>
 #include <openzwave/Notification.h>
 #include <openzwave/Defs.h>

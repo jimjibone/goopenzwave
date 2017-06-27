@@ -1,4 +1,4 @@
-#include "notification.h"
+#include "gzw_notification.h"
 #include <openzwave/Notification.h>
 #include <string.h>
 

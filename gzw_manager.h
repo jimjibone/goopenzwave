@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "zwhelpers.h"
-#include "options.h"
-#include "notification.h"
+#include "gzw_helpers.h"
+#include "gzw_options.h"
+#include "gzw_notification.h"
 
 #ifdef __cplusplus
 extern "C" {

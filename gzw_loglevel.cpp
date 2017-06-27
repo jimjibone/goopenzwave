@@ -1,4 +1,4 @@
-#include "loglevel.h"
+#include "gzw_loglevel.h"
 
 OpenZWave::LogLevel loglevel_toLogLevel(loglevel_t level)
 {

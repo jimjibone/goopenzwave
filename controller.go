@@ -1,6 +1,6 @@
 package goopenzwave
 
-// #include "manager.h"
+// #include "gzw_manager.h"
 import "C"
 
 // ResetController performs a hard reset on a PC Z-Wave Controller.

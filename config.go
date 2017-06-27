@@ -1,6 +1,6 @@
 package goopenzwave
 
-// #include "manager.h"
+// #include "gzw_manager.h"
 import "C"
 
 // WriteConfig saves the Z-Wave network configuration. This is so that the

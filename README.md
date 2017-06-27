@@ -24,7 +24,7 @@ This package does not include the OpenZWave library, so you will need to install
 go get github.com/jimjibone/goopenzwave
 ```
 
-_Notice how there was no need to run `make` :wink:_
+_Notice how there was no need to run `make`_ :wink:
 
 ## Examples/Tools
 

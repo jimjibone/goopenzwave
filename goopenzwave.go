@@ -3,8 +3,8 @@ package goopenzwave
 // #cgo pkg-config: libopenzwave
 // #cgo CFLAGS: -I/usr/local/include
 // #cgo CPPFLAGS: -I/usr/local/include
-// #include "manager.h"
-// #include "notification.h"
+// #include "gzw_manager.h"
+// #include "gzw_notification.h"
 // #include <stdlib.h>
 import "C"
 import (

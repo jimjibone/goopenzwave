@@ -1,6 +1,6 @@
 package goopenzwave
 
-// #include "manager.h"
+// #include "gzw_manager.h"
 // #include <stdlib.h>
 import "C"
 import "unsafe"

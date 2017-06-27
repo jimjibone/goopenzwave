@@ -1,4 +1,4 @@
-#include "options.h"
+#include "gzw_options.h"
 #include <openzwave/Options.h>
 #include <string.h>
 #include <stdlib.h>

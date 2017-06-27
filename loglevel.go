@@ -1,6 +1,6 @@
 package goopenzwave
 
-// #include "loglevel.h"
+// #include "gzw_loglevel.h"
 // #include <stdlib.h>
 import "C"
 

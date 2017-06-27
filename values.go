@@ -1,7 +1,7 @@
 package goopenzwave
 
-// #include "manager.h"
-// #include "valueid.h"
+// #include "gzw_manager.h"
+// #include "gzw_valueid.h"
 // #include <stdlib.h>
 import "C"
 import (

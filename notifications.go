@@ -1,7 +1,7 @@
 package goopenzwave
 
-// #include "manager.h"
-// #include "notification.h"
+// #include "gzw_manager.h"
+// #include "gzw_notification.h"
 // #include <stdlib.h>
 import "C"
 import (

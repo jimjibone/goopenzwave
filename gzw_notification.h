@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "zwhelpers.h"
-#include "valueid.h"
+#include "gzw_helpers.h"
+#include "gzw_valueid.h"
 
 #ifdef __cplusplus
 extern "C" {
