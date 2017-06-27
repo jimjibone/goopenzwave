@@ -228,11 +228,17 @@ func buildNotification(n C.notification_t) *Notification {
 	}
 
 	switch notification.Type {
-	case NotificationTypeCreateButton, NotificationTypeDeleteButton, NotificationTypeButtonOn, NotificationTypeButtonOff:
-		if notification.ButtonID == nil {
-			notification.ButtonID = new(uint8)
+	case NotificationTypeValueAdded, NotificationTypeValueRemoved, NotificationTypeValueChanged, NotificationTypeValueRefreshed:
+		notification.ValueID = buildValueID(C.notification_getValueId(n))
+
+	case NotificationTypeGroup:
+		if notification.GroupIDX == nil {
+			notification.GroupIDX = new(uint8)
 		}
-		*(notification.ButtonID) = uint8(C.notification_getButtonId(n))
+		*(notification.GroupIDX) = uint8(C.notification_getGroupIdx(n))
+
+	case NotificationTypeNodeNew, NotificationTypeNodeAdded, NotificationTypeNodeRemoved, NotificationTypeNodeProtocolInfo, NotificationTypeNodeNaming:
+		// No notification info.
 
 	case NotificationTypeNodeEvent:
 		if notification.Event == nil {
@@ -240,11 +246,26 @@ func buildNotification(n C.notification_t) *Notification {
 		}
 		*(notification.Event) = uint8(C.notification_getEvent(n))
 
-	case NotificationTypeGroup:
-		if notification.GroupIDX == nil {
-			notification.GroupIDX = new(uint8)
+	case NotificationTypePollingDisabled, NotificationTypePollingEnabled:
+		// No notification info.
+
+	case NotificationTypeSceneEvent:
+		if notification.SceneID == nil {
+			notification.SceneID = new(uint8)
 		}
-		*(notification.GroupIDX) = uint8(C.notification_getGroupIdx(n))
+		*(notification.SceneID) = uint8(C.notification_getSceneId(n))
+
+	case NotificationTypeCreateButton, NotificationTypeDeleteButton, NotificationTypeButtonOn, NotificationTypeButtonOff:
+		if notification.ButtonID == nil {
+			notification.ButtonID = new(uint8)
+		}
+		*(notification.ButtonID) = uint8(C.notification_getButtonId(n))
+
+	case NotificationTypeDriverReady, NotificationTypeDriverFailed, NotificationTypeDriverReset:
+		// No notification info.
+
+	case NotificationTypeEssentialNodeQueriesComplete, NotificationTypeNodeQueriesComplete, NotificationTypeAwakeNodesQueried, NotificationTypeAllNodesQueriedSomeDead, NotificationTypeAllNodesQueried:
+		// No notification info.
 
 	case NotificationTypeNotification:
 		if notification.Notification == nil {
@@ -267,6 +288,9 @@ func buildNotification(n C.notification_t) *Notification {
 			*notification.Notification = NotificationCodeAlive
 		}
 
+	case NotificationTypeDriverRemoved:
+		// No notification info.
+
 	case NotificationTypeControllerCommand:
 		if notification.Event == nil {
 			notification.Event = new(uint8)
@@ -277,11 +301,8 @@ func buildNotification(n C.notification_t) *Notification {
 		}
 		*(notification.Notification) = NotificationCode(C.notification_getNotification(n))
 
-	case NotificationTypeSceneEvent:
-		if notification.SceneID == nil {
-			notification.SceneID = new(uint8)
-		}
-		*(notification.SceneID) = uint8(C.notification_getSceneId(n))
+	case NotificationTypeNodeReset:
+		// No notification info.
 	}
 
 	return notification
