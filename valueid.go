@@ -151,7 +151,7 @@ func (v *ValueID) IDString() string {
 }
 
 func (v *ValueID) String() string {
-	return fmt.Sprintf("{Label: %q, String: %q, Units: %q, RO: %t, WO: %t, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, HomeID: %d, ID: %d}",
+	return fmt.Sprintf("{Label: %q, String: %q, Units: %q, RO: %t, WO: %t, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, HomeID: 0x%x, ID: 0x%x}",
 		v.GetLabel(),
 		v.GetAsString(),
 		v.GetUnits(),

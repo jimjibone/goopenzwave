@@ -1,9 +1,8 @@
 #include "gzw_manager.h"
+#include <string.h>
 #include <openzwave/Manager.h>
 #include <openzwave/Notification.h>
 #include <openzwave/Defs.h>
-
-#include <iostream>
 
 //
 // Construction.
@@ -28,14 +27,12 @@ void manager_destroy()
 
 char* manager_getVersionAsString()
 {
-	std::string str = OpenZWave::Manager::getVersionAsString();
-	return zwhelper_makeCString(str);
+	return strdup(OpenZWave::Manager::getVersionAsString().c_str());
 }
 
 char* manager_getVersionLongAsString()
 {
-	std::string str = OpenZWave::Manager::getVersionLongAsString();
-	return zwhelper_makeCString(str);
+	return strdup(OpenZWave::Manager::getVersionLongAsString().c_str());
 }
 
 void manager_getVersion(uint16_t *major, uint16_t *minor)
@@ -118,15 +115,13 @@ bool manager_isBridgeController(manager_t m, uint32_t homeId)
 char* manager_getLibraryVersion(manager_t m, uint32_t homeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetLibraryVersion(homeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetLibraryVersion(homeId).c_str());
 }
 
 char* manager_getLibraryTypeName(manager_t m, uint32_t homeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetLibraryTypeName(homeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetLibraryTypeName(homeId).c_str());
 }
 
 int32_t manager_getSendQueueCount(manager_t m, uint32_t homeId)
@@ -150,8 +145,7 @@ void manager_logDriverStatistics(manager_t m, uint32_t homeId)
 char* manager_getControllerPath(manager_t m, uint32_t homeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetControllerPath(homeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetControllerPath(homeId).c_str());
 }
 
 //
@@ -302,8 +296,7 @@ uint8_t manager_getNodeSpecific(manager_t m, uint32_t homeId, uint8_t nodeId)
 char* manager_getNodeType(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeType(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeType(homeId, nodeId).c_str());
 }
 
 //TODO uint32_t manager_getNodeNeighbors(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t **nodeNeighbors)
@@ -315,50 +308,43 @@ char* manager_getNodeType(manager_t m, uint32_t homeId, uint8_t nodeId)
 char* manager_getNodeManufacturerName(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeManufacturerName(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeManufacturerName(homeId, nodeId).c_str());
 }
 
 char* manager_getNodeProductName(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeProductName(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeProductName(homeId, nodeId).c_str());
 }
 
 char* manager_getNodeName(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeName(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeName(homeId, nodeId).c_str());
 }
 
 char* manager_getNodeLocation(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeLocation(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeLocation(homeId, nodeId).c_str());
 }
 
 char* manager_getNodeManufacturerId(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeManufacturerId(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeManufacturerId(homeId, nodeId).c_str());
 }
 
 char* manager_getNodeProductType(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeProductType(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeProductType(homeId, nodeId).c_str());
 }
 
 char* manager_getNodeProductId(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeProductId(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeProductId(homeId, nodeId).c_str());
 }
 
 void manager_setNodeManufacturerName(manager_t m, uint32_t homeId, uint8_t nodeId, const char* manufacturerName)
@@ -422,7 +408,7 @@ bool manager_getNodeClassInformation(manager_t m, uint32_t homeId, uint8_t nodeI
 	if (*o_name) {
 		free(*o_name);
 	}
-	*o_name = zwhelper_makeCString(str);
+	*o_name = strdup(str.c_str());
 	return result;
 }
 
@@ -441,8 +427,7 @@ bool manager_isNodeFailed(manager_t m, uint32_t homeId, uint8_t nodeId)
 char* manager_getNodeQueryStage(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeQueryStage(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeQueryStage(homeId, nodeId).c_str());
 }
 
 uint16_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId)
@@ -454,8 +439,7 @@ uint16_t manager_getNodeDeviceType(manager_t m, uint32_t homeId, uint8_t nodeId)
 char* manager_getNodeDeviceTypeString(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeDeviceTypeString(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeDeviceTypeString(homeId, nodeId).c_str());
 }
 
 uint8_t manager_getNodeRole(manager_t m, uint32_t homeId, uint8_t nodeId)
@@ -467,8 +451,7 @@ uint8_t manager_getNodeRole(manager_t m, uint32_t homeId, uint8_t nodeId)
 char* manager_getNodeRoleString(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodeRoleString(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodeRoleString(homeId, nodeId).c_str());
 }
 
 uint8_t manager_getNodePlusType(manager_t m, uint32_t homeId, uint8_t nodeId)
@@ -480,8 +463,7 @@ uint8_t manager_getNodePlusType(manager_t m, uint32_t homeId, uint8_t nodeId)
 char* manager_getNodePlusTypeString(manager_t m, uint32_t homeId, uint8_t nodeId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetNodePlusTypeString(homeId, nodeId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetNodePlusTypeString(homeId, nodeId).c_str());
 }
 
 //
@@ -492,8 +474,7 @@ char* manager_getValueLabel(manager_t m, valueid_t valueid)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	std::string str = man->GetValueLabel(*val);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetValueLabel(*val).c_str());
 }
 
 void manager_setValueLabel(manager_t m, valueid_t valueid, const char* value)
@@ -508,8 +489,7 @@ char* manager_getValueUnits(manager_t m, valueid_t valueid)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	std::string str = man->GetValueUnits(*val);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetValueUnits(*val).c_str());
 }
 
 void manager_setValueUnits(manager_t m, valueid_t valueid, const char* value)
@@ -524,8 +504,7 @@ char* manager_getValueHelp(manager_t m, valueid_t valueid)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	std::string str = man->GetValueHelp(*val);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetValueHelp(*val).c_str());
 }
 
 void manager_setValueHelp(manager_t m, valueid_t valueid, const char* value)
@@ -622,16 +601,15 @@ bool manager_getValueAsString(manager_t m, valueid_t valueid, char **o_value)
 	if (*o_value) {
 		free(*o_value);
 	}
-	*o_value = zwhelper_makeCString(str);
+	*o_value = strdup(str.c_str());
 	return result;
 }
 
-bool manager_getValueAsRaw(manager_t m, valueid_t valueid, bytes_t *o_value)
+bool manager_getValueAsRaw(manager_t m, valueid_t valueid, zwbytes_t *o_value)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	string_initBytes(o_value, 255);
-	return man->GetValueAsRaw(*val, &(o_value->data), (uint8_t*)&(o_value->length));
+	return man->GetValueAsRaw(*val, &(o_value->data), (uint8_t*)&(o_value->size));
 }
 
 bool manager_getValueListSelectionAsString(manager_t m, valueid_t valueid, char **o_value)
@@ -643,7 +621,7 @@ bool manager_getValueListSelectionAsString(manager_t m, valueid_t valueid, char 
 	if (*o_value) {
 		free(*o_value);
 	}
-	*o_value = zwhelper_makeCString(str);
+	*o_value = strdup(str.c_str());
 	return result;
 }
 
@@ -709,11 +687,11 @@ bool manager_setValueInt16(manager_t m, valueid_t valueid, int16_t value)
 	return man->SetValue(*val, value);
 }
 
-bool manager_setValueBytes(manager_t m, valueid_t valueid, bytes_t *value)
+bool manager_setValueBytes(manager_t m, valueid_t valueid, zwbytes_t *value)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
 	OpenZWave::ValueID *val = (OpenZWave::ValueID*)valueid;
-	return man->SetValue(*val, value->data, (uint8_t)value->length);
+	return man->SetValue(*val, value->data, (uint8_t)value->size);
 }
 
 bool manager_setValueString(manager_t m, valueid_t valueid, const char* value)
@@ -876,8 +854,7 @@ uint8_t manager_getMaxAssociations(manager_t m, uint32_t homeId, uint8_t nodeId,
 char* manager_getGroupLabel(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetGroupLabel(homeId, nodeId, groupIdx);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetGroupLabel(homeId, nodeId, groupIdx).c_str());
 }
 
 void manager_addAssociation(manager_t m, uint32_t homeId, uint8_t nodeId, uint8_t groupIdx, uint8_t targetNodeId, uint8_t instance)
@@ -1215,7 +1192,7 @@ bool manager_sceneGetValueAsString(manager_t m, uint8_t sceneId, valueid_t value
 	if (*o_value) {
 		free(*o_value);
 	}
-	*o_value = zwhelper_makeCString(str);
+	*o_value = strdup(str.c_str());
 	return result;
 }
 
@@ -1228,7 +1205,7 @@ bool manager_sceneGetValueListSelectionString(manager_t m, uint8_t sceneId, valu
 	if (*o_value) {
 		free(*o_value);
 	}
-	*o_value = zwhelper_makeCString(str);
+	*o_value = strdup(str.c_str());
 	return result;
 }
 
@@ -1300,8 +1277,7 @@ bool manager_setSceneValueListSelectionInt32(manager_t m, uint8_t sceneId, value
 char* manager_getSceneLabel(manager_t m, uint8_t sceneId)
 {
 	OpenZWave::Manager *man = (OpenZWave::Manager*)m;
-	std::string str = man->GetSceneLabel(sceneId);
-	return zwhelper_makeCString(str);
+	return strdup(man->GetSceneLabel(sceneId).c_str());
 }
 
 void manager_setSceneLabel(manager_t m, uint8_t sceneId, const char* value)

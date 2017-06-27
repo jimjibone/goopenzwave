@@ -86,7 +86,7 @@ bool options_getOptionAsString(options_t o, const char* name, char **o_value)
     if (*o_value) {
         free(*o_value);
     }
-    *o_value = zwhelper_makeCString(str);
+    *o_value = strdup(str.c_str());
     return result;
 }
 

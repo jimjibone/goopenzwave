@@ -160,9 +160,8 @@ type Notification struct {
 // library.
 func buildNotification(n C.notification_t) *Notification {
 	notification := &Notification{
-		HomeID:  uint32(C.notification_getHomeId(n)),
-		NodeID:  uint8(C.notification_getNodeId(n)),
-		ValueID: buildValueID(C.notification_getValueId(n)),
+		HomeID: uint32(C.notification_getHomeId(n)),
+		NodeID: uint8(C.notification_getNodeId(n)),
 	}
 
 	switch C.notification_getType(n) {
@@ -229,11 +228,17 @@ func buildNotification(n C.notification_t) *Notification {
 	}
 
 	switch notification.Type {
-	case NotificationTypeCreateButton, NotificationTypeDeleteButton, NotificationTypeButtonOn, NotificationTypeButtonOff:
-		if notification.ButtonID == nil {
-			notification.ButtonID = new(uint8)
+	case NotificationTypeValueAdded, NotificationTypeValueRemoved, NotificationTypeValueChanged, NotificationTypeValueRefreshed:
+		notification.ValueID = buildValueID(C.notification_getValueId(n))
+
+	case NotificationTypeGroup:
+		if notification.GroupIDX == nil {
+			notification.GroupIDX = new(uint8)
 		}
-		*(notification.ButtonID) = uint8(C.notification_getButtonId(n))
+		*(notification.GroupIDX) = uint8(C.notification_getGroupIdx(n))
+
+	case NotificationTypeNodeNew, NotificationTypeNodeAdded, NotificationTypeNodeRemoved, NotificationTypeNodeProtocolInfo, NotificationTypeNodeNaming:
+		// No notification info.
 
 	case NotificationTypeNodeEvent:
 		if notification.Event == nil {
@@ -241,11 +246,26 @@ func buildNotification(n C.notification_t) *Notification {
 		}
 		*(notification.Event) = uint8(C.notification_getEvent(n))
 
-	case NotificationTypeGroup:
-		if notification.GroupIDX == nil {
-			notification.GroupIDX = new(uint8)
+	case NotificationTypePollingDisabled, NotificationTypePollingEnabled:
+		// No notification info.
+
+	case NotificationTypeSceneEvent:
+		if notification.SceneID == nil {
+			notification.SceneID = new(uint8)
 		}
-		*(notification.GroupIDX) = uint8(C.notification_getGroupIdx(n))
+		*(notification.SceneID) = uint8(C.notification_getSceneId(n))
+
+	case NotificationTypeCreateButton, NotificationTypeDeleteButton, NotificationTypeButtonOn, NotificationTypeButtonOff:
+		if notification.ButtonID == nil {
+			notification.ButtonID = new(uint8)
+		}
+		*(notification.ButtonID) = uint8(C.notification_getButtonId(n))
+
+	case NotificationTypeDriverReady, NotificationTypeDriverFailed, NotificationTypeDriverReset:
+		// No notification info.
+
+	case NotificationTypeEssentialNodeQueriesComplete, NotificationTypeNodeQueriesComplete, NotificationTypeAwakeNodesQueried, NotificationTypeAllNodesQueriedSomeDead, NotificationTypeAllNodesQueried:
+		// No notification info.
 
 	case NotificationTypeNotification:
 		if notification.Notification == nil {
@@ -268,6 +288,9 @@ func buildNotification(n C.notification_t) *Notification {
 			*notification.Notification = NotificationCodeAlive
 		}
 
+	case NotificationTypeDriverRemoved:
+		// No notification info.
+
 	case NotificationTypeControllerCommand:
 		if notification.Event == nil {
 			notification.Event = new(uint8)
@@ -278,11 +301,8 @@ func buildNotification(n C.notification_t) *Notification {
 		}
 		*(notification.Notification) = NotificationCode(C.notification_getNotification(n))
 
-	case NotificationTypeSceneEvent:
-		if notification.SceneID == nil {
-			notification.SceneID = new(uint8)
-		}
-		*(notification.SceneID) = uint8(C.notification_getSceneId(n))
+	case NotificationTypeNodeReset:
+		// No notification info.
 	}
 
 	return notification
@@ -290,6 +310,9 @@ func buildNotification(n C.notification_t) *Notification {
 
 func (n *Notification) String() string {
 	var pointed []string
+	if n.ValueID != nil {
+		pointed = append(pointed, fmt.Sprintf("ValueID: %s", n.ValueID))
+	}
 	if n.GroupIDX != nil {
 		pointed = append(pointed, fmt.Sprintf("GroupIDX: %d", *(n.GroupIDX)))
 	}
@@ -303,12 +326,12 @@ func (n *Notification) String() string {
 		pointed = append(pointed, fmt.Sprintf("SceneID: %d", *(n.SceneID)))
 	}
 	if n.Notification != nil {
-		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
+		pointed = append(pointed, fmt.Sprintf("Notification: %s", *(n.Notification)))
 	}
-	output := fmt.Sprintf("{Type: %s, HomeID: %d, NodeID: %d, ValueID: %s", n.Type, n.HomeID, n.NodeID, n.ValueID)
+	output := fmt.Sprintf("<%s, HomeID: 0x%x, NodeID: %d", n.Type, n.HomeID, n.NodeID)
 	for i := range pointed {
 		output = fmt.Sprintf("%s, %s", output, pointed[i])
 	}
-	output = fmt.Sprintf("%s}", output)
+	output = fmt.Sprintf("%s>", output)
 	return output
 }

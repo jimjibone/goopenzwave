@@ -2,6 +2,8 @@ package goopenzwave
 
 // #include "gzw_manager.h"
 // #include "gzw_valueid.h"
+// #include "zwbytes.h"
+// #include "zwlist.h"
 // #include <stdlib.h>
 import "C"
 import (
@@ -190,14 +192,14 @@ func GetValueAsString(homeID uint32, valueID uint64) string {
 func GetValueAsRaw(homeID uint32, valueID uint64) ([]byte, error) {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cbytes := C.string_emptyBytes()
-	ok := bool(C.manager_getValueAsRaw(cmanager, cvalueid, cbytes))
+	zwbytes := C.zwbytes_new()
+	ok := bool(C.manager_getValueAsRaw(cmanager, cvalueid, zwbytes))
 	if ok == false {
 		return nil, fmt.Errorf("value is not of raw type")
 	}
-	gobytes := make([]byte, int(cbytes.length))
-	for i := 0; i < int(cbytes.length); i++ {
-		gobytes[i] = byte(C.string_byteAt(cbytes, C.size_t(i)))
+	gobytes := make([]byte, zwbytes.size)
+	for i := 0; i < int(zwbytes.size); i++ {
+		gobytes[i] = byte(C.zwbytes_at(zwbytes, C.size_t(i)))
 	}
 	return gobytes, nil
 }
@@ -242,7 +244,7 @@ func GetValueListItems(homeID uint32, valueID uint64) ([]string, error) {
 		return nil, fmt.Errorf("value is not of list type")
 	}
 	for i := 0; i < int(C.zwlist_size(clist)); i++ {
-		cstr := C.zwlist_at(clist, C.int(i))
+		cstr := C.zwlist_at(clist, C.size_t(i))
 		golist[i] = C.GoString(cstr)
 	}
 	C.zwlist_free(clist)
@@ -364,13 +366,13 @@ func SetValueInt16(homeID uint32, valueID uint64, value int16) error {
 func SetValueBytes(homeID uint32, valueID uint64, value []byte) error {
 	cvalueid := C.valueid_create(C.uint32_t(homeID), C.uint64_t(valueID))
 	defer C.valueid_free(cvalueid)
-	cbytes := C.string_emptyBytes()
-	C.string_initBytes(cbytes, C.size_t(len(value)))
+	zwbytes := C.zwbytes_new()
+	C.zwbytes_reserve(zwbytes, C.size_t(len(value)))
 	for i := range value {
-		C.string_setByteAt(cbytes, C.uint8_t(value[i]), C.size_t(i))
+		C.zwbytes_set(zwbytes, C.size_t(i), C.uint8_t(value[i]))
 	}
-	ok := bool(C.manager_setValueBytes(cmanager, cvalueid, cbytes))
-	C.string_freeBytes(cbytes)
+	ok := bool(C.manager_setValueBytes(cmanager, cvalueid, zwbytes))
+	C.zwbytes_free(zwbytes)
 	if ok == false {
 		return fmt.Errorf("value is not of raw type")
 	}

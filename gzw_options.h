@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "gzw_helpers.h"
 #include "gzw_loglevel.h"
 
 #ifdef __cplusplus
