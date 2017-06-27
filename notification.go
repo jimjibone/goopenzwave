@@ -326,9 +326,9 @@ func (n *Notification) String() string {
 		pointed = append(pointed, fmt.Sprintf("SceneID: %d", *(n.SceneID)))
 	}
 	if n.Notification != nil {
-		pointed = append(pointed, fmt.Sprintf("Notification: %d", *(n.Notification)))
+		pointed = append(pointed, fmt.Sprintf("Notification: %s", *(n.Notification)))
 	}
-	output := fmt.Sprintf("<%s, HomeID: %x, NodeID: %d", n.Type, n.HomeID, n.NodeID)
+	output := fmt.Sprintf("<%s, HomeID: 0x%x, NodeID: %d", n.Type, n.HomeID, n.NodeID)
 	for i := range pointed {
 		output = fmt.Sprintf("%s, %s", output, pointed[i])
 	}

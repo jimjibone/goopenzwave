@@ -24,7 +24,7 @@ func NewNode(homeID uint32, nodeID uint8) *Node {
 // String will return a string containing some useful information about the
 // Node.
 func (n *Node) String() string {
-	return fmt.Sprintf("Node{HomeID: %d, NodeID: %d, BasicType: %d, "+
+	return fmt.Sprintf("Node{HomeID: 0x%x, NodeID: %d, BasicType: %d, "+
 		"GenericType: %d, SpecificType: %d, NodeType: %q, "+
 		"ManufacturerName: %q, ProductName: %q, NodeName: %q, Location: %q, "+
 		"ManufacturerID: %q, ProductType: %q, ProductID: %q}",
