@@ -1,9 +1,8 @@
 *.o
 *.a
 OZW_Log.txt
+ozwcache_*.xml
 zwcfg_*.xml
 zwscene.xml
-/tools/gominozw/gominozw
-/tools/gozwd/gozwd
-/tools/gozwd/public
-/tools/gozwd/node_modules
+/gominozw/gominozw
+/gominozw/gominozw.exe
