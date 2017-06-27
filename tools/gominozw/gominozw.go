@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/jimjibone/goopenzwave"
 	"os"
 	"os/signal"
+
+	"github.com/jimjibone/goopenzwave"
 )
 
 type NodeInfo struct {
@@ -24,7 +25,7 @@ func main() {
 	flag.StringVar(&controllerPath, "controller", "/dev/ttyUSB0", "the path to your controller device")
 	flag.Parse()
 
-	fmt.Println("gominozw example starting with openzwave version:", goopenzwave.GetManagerVersionAsString())
+	fmt.Println("gominozw started with openzwave version:", goopenzwave.GetVersionLongAsString())
 
 	// Setup the OpenZWave library.
 	options := goopenzwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
@@ -86,9 +87,10 @@ func main() {
 	// Print out what we know about the network.
 	fmt.Println("Nodes:")
 	for id, node := range Nodes {
-		fmt.Printf("\t%d: Node: %s Values:\n", id, node.Node)
+		fmt.Printf("\t%3d: Node: %s\n", id, node.Node)
+		fmt.Printf("\t     Values: (%d)\n", len(node.Values))
 		for i := range node.Values {
-			fmt.Printf("\t\t%d: %s\n", i, node.Values[i])
+			fmt.Printf("\t\t0x%x: %s\n", i, node.Values[i])
 		}
 	}
 
@@ -99,7 +101,7 @@ func main() {
 }
 
 func handleNotification(notification *goopenzwave.Notification) {
-	fmt.Println("received notification:", notification)
+	fmt.Println("Received notification:", notification)
 
 	// Switch based on notification type.
 	switch notification.Type {
