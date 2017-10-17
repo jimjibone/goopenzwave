@@ -22,13 +22,15 @@ var sentinitialQueryComplete = false
 
 func main() {
 	var controllerPath string
+	var configPath string
 	flag.StringVar(&controllerPath, "controller", "/dev/ttyUSB0", "the path to your controller device")
+	flag.StringVar(&configPath, "config", "/usr/local/etc/openzwave/", "the path to open-zwave config")
 	flag.Parse()
 
 	fmt.Println("gominozw started with openzwave version:", goopenzwave.GetVersionLongAsString())
 
 	// Setup the OpenZWave library.
-	options := goopenzwave.CreateOptions("/usr/local/etc/openzwave/", "", "")
+	options := goopenzwave.CreateOptions(configPath, "", "")
 	options.AddOptionLogLevel("SaveLogLevel", goopenzwave.LogLevelNone)
 	options.AddOptionLogLevel("QueueLogLevel", goopenzwave.LogLevelNone)
 	options.AddOptionInt("DumpTrigger", 4)

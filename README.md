@@ -8,15 +8,13 @@ This package is still fairly new and so the API is changing pretty rapidly, so b
 
 Most of the C++ OpenZWave library is wrapped now, but should you find anything missing please create a new issue or fork it, implement it yourself and submit a pull request.
 
-## Prerequisites
+## Building
 
-This package does not include the OpenZWave library, so you will need to install the library yourself. Below are some instructions for various platforms.
+This package contains the open-zwave C++ library as a submodule which needs to be built before using goopenzwave.
 
-### Mac OS X and Linux (Ubuntu)
-
-1. Clone the OpenZWave git repository: `git clone git@github.com:OpenZWave/open-zwave.git`
-2. Go into the directory and run Make: `cd open-zwave && make` (get :coffee: at this point)
-3. Install the library: `make install` (may need to run as root)
+1. `git submodule update --init`
+2. `cd open-zwave`
+3. `make -j4 && PREFIX="$(pwd)/../.lib" make install` (use all of your cores or get :coffee:)
 
 ## Installation
 
@@ -24,7 +22,7 @@ This package does not include the OpenZWave library, so you will need to install
 go get github.com/jimjibone/goopenzwave
 ```
 
-_Notice how there was no need to run `make`_ :wink:
+Note: If you plan on distributing an executable with the goopenzwave package, make sure to copy the open-zwave config directory, found in `.lib/etc/openzwave`.
 
 ## Example: `gominozw`
 
@@ -38,3 +36,16 @@ To install and use:
 go install github.com/jimjibone/goopenzwave/gominozw
 gominozw --controller /dev/ttyYourUSBDevice
 ```
+
+## Notes
+
+### Crashes instantly on Mac OS 10.12
+
+Do you see something like this when trying to run something with the goopenzwave package?
+
+```
+$ ./gominozw -h
+zsh: killed     ./gominozw -h
+```
+
+You should try building with the `-ldflags=-s` option. E.g.: `go build -ldflags=-s`. More info at [golang/go#19734](https://github.com/golang/go/issues/19734).

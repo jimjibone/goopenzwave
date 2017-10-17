@@ -4,5 +4,8 @@ OZW_Log.txt
 ozwcache_*.xml
 zwcfg_*.xml
 zwscene.xml
+/.lib
 /gominozw/gominozw
 /gominozw/gominozw.exe
+/open-zwave/*.dylib
+/open-zwave/ozw_config
