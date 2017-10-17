@@ -22,6 +22,8 @@ This package contains the open-zwave C++ library as a submodule which needs to b
 go get github.com/jimjibone/goopenzwave
 ```
 
+Note: If you plan on distributing an executable with the goopenzwave package, make sure to copy the open-zwave config directory, found in `.lib/etc/openzwave`.
+
 ## Example: `gominozw`
 
 This package comes with a basic example, `gominozw`, which is a replica of the original C++ OpenZWave MinOZW utility, now written in Go.
