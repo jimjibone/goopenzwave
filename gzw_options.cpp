@@ -1,5 +1,5 @@
 #include "gzw_options.h"
-#include <openzwave/Options.h>
+#include <Options.h>
 #include <string.h>
 #include <stdlib.h>
 

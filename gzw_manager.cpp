@@ -1,8 +1,8 @@
 #include "gzw_manager.h"
 #include <string.h>
-#include <openzwave/Manager.h>
-#include <openzwave/Notification.h>
-#include <openzwave/Defs.h>
+#include <Manager.h>
+#include <Notification.h>
+#include <Defs.h>
 
 //
 // Construction.

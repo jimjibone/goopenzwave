@@ -13,8 +13,7 @@ Most of the C++ OpenZWave library is wrapped now, but should you find anything m
 This package contains the open-zwave C++ library as a submodule which needs to be built before using goopenzwave.
 
 1. `git submodule update --init`
-2. `cd open-zwave`
-3. `make -j4 && PREFIX="$(pwd)/../.lib" make install` (use all of your cores or get :coffee:)
+2. `cd open-zwave && make`
 
 ## Installation
 
@@ -39,7 +38,7 @@ gominozw --controller /dev/ttyYourUSBDevice
 
 ## Notes
 
-### Crashes instantly on Mac OS 10.12
+### Crashes instantly on macOS 10.12
 
 Do you see something like this when trying to run something with the goopenzwave package?
 

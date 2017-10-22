@@ -1,5 +1,5 @@
 #include "gzw_valueid.h"
-#include <openzwave/value_classes/ValueID.h>
+#include <value_classes/ValueID.h>
 
 //
 // Public member functions.

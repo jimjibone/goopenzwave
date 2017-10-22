@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 #ifdef __cplusplus
-#include <openzwave/platform/Log.h>
+#include <platform/Log.h>
 extern "C" {
 #endif
 

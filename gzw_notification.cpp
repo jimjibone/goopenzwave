@@ -1,5 +1,5 @@
 #include "gzw_notification.h"
-#include <openzwave/Notification.h>
+#include <Notification.h>
 #include <string.h>
 
 //
