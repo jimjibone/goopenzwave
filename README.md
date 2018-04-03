@@ -13,7 +13,8 @@ Most of the C++ OpenZWave library is wrapped now, but should you find anything m
 This package contains the open-zwave C++ library as a submodule which needs to be built before using goopenzwave.
 
 1. `git submodule update --init`
-2. `cd open-zwave && make`
+2. `cd open-zwave`
+3. `PREFIX=$(pwd)/../.lib/ make install`
 
 ## Installation
 
