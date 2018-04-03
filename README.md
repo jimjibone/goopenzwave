@@ -38,6 +38,15 @@ gominozw --controller /dev/ttyYourUSBDevice
 
 ## Notes
 
+### open-zwave build fails with `fatal error: libudev.h: No such file or directory` on Debian/Ubuntu
+
+Try installing libudev with apt and build again.
+
+```sh
+apt-get install libudev-dev
+cd open-zwave && make
+```
+
 ### Crashes instantly on macOS 10.12
 
 Do you see something like this when trying to run something with the goopenzwave package?
