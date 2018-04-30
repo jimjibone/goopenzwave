@@ -39,6 +39,12 @@ gominozw --controller /dev/ttyYourUSBDevice
 
 ## Notes
 
+### Step 3 fails when trying to copy `libopenzwave.pc`
+
+When running step 3 of the above guide you may see an error message at the end of `make`'s execution claiming that it could not copy `libopenzwave.pc`. For example: `cp: cannot create regular file '//usr/local/lib/x86_64-linux-gnu/pkgconfig/libopenzwave.pc': Permission denied`.
+
+This can be safely ignored as this package does not require the pkg-config files.
+
 ### open-zwave build fails with `fatal error: libudev.h: No such file or directory` on Debian/Ubuntu
 
 Try installing libudev with apt and build again.
