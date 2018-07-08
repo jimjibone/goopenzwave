@@ -1,5 +1,6 @@
 package goopenzwave
 
+// #cgo pkg-config: libopenzwave
 // #include "gzw_manager.h"
 // #include "gzw_notification.h"
 // #include <stdlib.h>
