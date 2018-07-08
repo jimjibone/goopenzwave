@@ -21,6 +21,7 @@ Example install from source:
 2. `cd open-zwave`
 3. `make -j$(nproc)`
 4. `sudo make install`
+5. You may need to call `sudo ldconfig` now on linux systems
 5. See the [open-zwave/INSTALL](https://github.com/OpenZWave/open-zwave/blob/master/INSTALL) file for more information
 
 
