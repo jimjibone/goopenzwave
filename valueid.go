@@ -150,11 +150,13 @@ func (v *ValueID) IDString() string {
 	return fmt.Sprintf("%d", v.ID)
 }
 
-func (v *ValueID) String() string {
-	return fmt.Sprintf("{Label: %q, String: %q, Units: %q, RO: %t, WO: %t, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, HomeID: 0x%x, ID: 0x%x}",
+func (v *ValueID) StringFull() string {
+	return fmt.Sprintf("{Label: %s, Value: %s, Units: %q, Min: %d, Max: %d, RO: %t, WO: %t, Genre: %s, CommandClassID: %d, Instance: %d, Index: %d, Type: %s, Help: %s, HomeID: 0x%x, ID: 0x%x}",
 		v.GetLabel(),
 		v.GetAsString(),
 		v.GetUnits(),
+		v.GetMin(),
+		v.GetMax(),
 		v.IsReadOnly(),
 		v.IsWriteOnly(),
 		v.Genre,
@@ -162,8 +164,43 @@ func (v *ValueID) String() string {
 		v.Instance,
 		v.Index,
 		v.Type,
+		v.GetHelp(),
 		v.HomeID,
 		v.ID)
+}
+
+func (v *ValueID) String() string {
+	units := ""
+	minmax := ""
+	ro := ""
+	wo := ""
+	help := ""
+	if v.GetUnits() != "" {
+		units = " (" + v.GetUnits() + ")"
+	}
+	if v.GetMin() != 0 || v.GetMax() != 0 {
+		minmax = fmt.Sprintf(" [%d -> %d]", v.GetMin(), v.GetMax())
+	}
+	if v.IsReadOnly() {
+		ro = ", readonly"
+	}
+	if v.IsWriteOnly() {
+		wo = ", writeonly"
+	}
+	if v.GetHelp() != "" {
+		help = ", help: " + v.GetHelp()
+	}
+	return fmt.Sprintf("{%s (%s): %s%s%s%s%s, genre: %s%s}",
+		v.GetLabel(),
+		v.Type,
+		v.GetAsString(),
+		units,
+		minmax,
+		ro,
+		wo,
+		v.Genre,
+		help,
+	)
 }
 
 // GetLabel returns the user-friendly label for the value.

@@ -2,27 +2,35 @@
 
 Go bindings for the [OpenZWave](https://github.com/OpenZWave/open-zwave) library.
 
+
 ## Warning
 
 This package is still fairly new and so the API is changing pretty rapidly, so be careful if you decide to use it. However, the API will try to mimic the C++ OpenZWave library as much as possible, if it doesn't already, so there shouldn't be many breaking changes.
 
 Most of the C++ OpenZWave library is wrapped now, but should you find anything missing please create a new issue or fork it, implement it yourself and submit a pull request.
 
-## Building
 
-This package contains the open-zwave C++ library as a submodule which needs to be built before using goopenzwave.
+## Installing OpenZWave
 
-1. `git submodule update --init`
+This package requires a system installation of [OpenZWave](https://github.com/OpenZWave/open-zwave). pkg-config is then used during the build of this package to get the open-zwave library and headers.
+
+Note that package managers may install an old version of the library so a manual build/install from source is preferred.
+
+Example install from source:
+1. `git clone https://github.com/OpenZWave/open-zwave.git`
 2. `cd open-zwave`
-3. `PREFIX=$(pwd)/../.lib/ make install`
+3. `make -j$(nproc)`
+4. `sudo make install`
+5. You may need to call `sudo ldconfig` now on linux systems
+5. See the [open-zwave/INSTALL](https://github.com/OpenZWave/open-zwave/blob/master/INSTALL) file for more information
 
-## Installation
+
+## Get the Package
 
 ```
 go get github.com/jimjibone/goopenzwave
 ```
 
-Note: If you plan on distributing an executable with the goopenzwave package, make sure to copy the open-zwave config directory, found in `.lib/etc/openzwave`.
 
 ## Example: `gominozw`
 
@@ -37,13 +45,8 @@ go install github.com/jimjibone/goopenzwave/gominozw
 gominozw --controller /dev/ttyYourUSBDevice
 ```
 
+
 ## Notes
-
-### Step 3 fails when trying to copy `libopenzwave.pc`
-
-When running step 3 of the above guide you may see an error message at the end of `make`'s execution claiming that it could not copy `libopenzwave.pc`. For example: `cp: cannot create regular file '//usr/local/lib/x86_64-linux-gnu/pkgconfig/libopenzwave.pc': Permission denied`.
-
-This can be safely ignored as this package does not require the pkg-config files.
 
 ### open-zwave build fails with `fatal error: libudev.h: No such file or directory` on Debian/Ubuntu
 
@@ -53,6 +56,7 @@ Try installing libudev with apt and build again.
 apt-get install libudev-dev
 cd open-zwave && make
 ```
+
 
 ### Crashes instantly on macOS 10.12
 
