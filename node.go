@@ -1,256 +1,419 @@
 package goopenzwave
 
-import (
-	"fmt"
-)
+// #cgo pkg-config: libopenzwave
+// #include <stdlib.h>
+// #include <stdint.h>
+// #include "node_wrap.h"
+// #include "util.h"
+import "C"
+import "unsafe"
 
-// Node contains all necessary information for a Node from the OpenZWave
-// library. Create a new Node by using the `NewNode` function with the HomeID
-// and NodeID as supplied from a Notification.
-type Node struct {
-	HomeID uint32
-	NodeID uint8
+// Refresh a Node and Reload it into OZW.
+//
+// Causes the node's Supported CommandClasses and Capabilities to be obtained
+// from the Z-Wave network. This method would normally be called automatically
+// by OpenZWave, but if you know that a node's capabilities or command classes
+// has been changed, calling this method will force a refresh of that information.
+// This call shouldn't be needed except in special circumstances.
+// Returns true if the request was sent successfully.
+func RefreshNodeInfo(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_refresh_node_info(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-// NewNode will create a new Node object filled with the data available from the
-// Manager based on the homeID and nodeID.
-func NewNode(homeID uint32, nodeID uint8) *Node {
-	return &Node{
-		HomeID: homeID,
-		NodeID: nodeID,
+// Trigger the fetching of dynamic value data for a node.
+//
+// Causes the node's values to be requested from the Z-Wave network. This is the
+// same as the query state starting from the associations state.
+// Returns true if the request was sent successfully.
+func RequestNodeState(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_request_node_state(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Trigger the fetching of just the dynamic value data for a node.
+//
+// Causes the node's values to be requested from the Z-Wave network. This is the
+// same as the query state starting from the dynamic state.
+// Returns true if the request was sent successfully.
+func RequestNodeDynamic(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_request_node_dynamic(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Request the values of all known configurable parameters from a device.
+func RequestNodeAllConfigParams(homeID uint32, nodeID uint8) {
+	C.ozw_RequestAllConfigParams(C.uint32_t(homeID), C.uint8_t(nodeID))
+}
+
+// Get whether the node is a listening device that does not go to sleep.
+//
+// Returns true if the request was sent successfully.
+func IsNodeListeningDevice(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_listening_device(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get whether the node is a frequent listening device that goes to sleep but can be woken up by a beam. Useful to determine node and controller consistency.
+//
+// Returns true if the request was sent successfully.
+func IsNodeFrequentListeningDevice(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_frequent_listening_device(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get whether the node is a beam capable device.
+//
+// Returns true if the request was sent successfully.
+func IsNodeBeamingDevice(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_beaming_device(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get whether the node is a routing device that passes messages to other nodes
+//
+// Returns true if the request was sent successfully.
+func IsNodeRoutingDevice(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_routing_device(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the security attribute for a node. True if node supports security features.
+//
+// Returns true if the request was sent successfully.
+func IsNodeSecurityDevice(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_security_device(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the maximum baud rate of a node's communications.
+//
+// Returns the baud rate in bits per second.
+func GetNodeMaxBaudRate(homeID uint32, nodeID uint8) uint32 {
+	return uint32(C.manager_get_node_max_baud_rate(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the version number of a node.
+//
+// Returns the node's version number.
+func GetNodeVersion(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_version(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the security byte of a node
+//
+// Returns the node's security byte.
+func GetNodeSecurity(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_security(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Is this a ZWave+ Supported Node?
+//
+// Returns If this node is a Z-Wave Plus Node.
+func IsNodeZWavePlus(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_zwave_plus(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the basic type of a node.
+//
+// Returns the node's basic type.
+func GetNodeBasic(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_basic(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the generic type of a node. Set instance to 0 if not required.
+//
+// Returns the node's generic type.
+//
+// TODO: utilise instance argument in v1.6+
+func GetNodeGeneric(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_generic(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get the specific type of a node. Set instance to 0 if not required.
+//
+// Returns the node's specific type.
+//
+// TODO: utilise instance argument in v1.6+
+func GetNodeSpecific(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_specific(C.uint32_t(homeID), C.uint8_t(nodeID)))
+}
+
+// Get a human-readable label describing the node.
+//
+// The label is taken from the Z-Wave specific, generic or basic type, depending on which of those values are specified by the node.
+// Returns A string containing the label text.
+func GetNodeType(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_type(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
+}
+
+// Get the bitmap of this node's neighbors. See SyncronizeNodeNeighbors.
+//
+// Returns an array of uint8s to hold the neighbor bitmap.
+func GetNodeNeighbors(homeID uint32, nodeID uint8) []uint8 {
+	cres := C.manager_get_node_neighbors(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cres))
+	getval := func(i uint32) uint32 {
+		return *(*uint32)(C.ptr_at((*unsafe.Pointer)(unsafe.Pointer(cres)), C.uint32_t(i)))
 	}
+	size := getval(0)
+	var res []uint8
+	for i := uint32(0); i < size; i++ {
+		res = append(res, uint8(getval(i+1)))
+	}
+	return res
 }
 
-// String will return a string containing some useful information about the
-// Node.
-func (n *Node) String() string {
-	return fmt.Sprintf("Node{HomeID: 0x%x, NodeID: %d, BasicType: %d, "+
-		"GenericType: %d, SpecificType: %d, NodeType: %q, "+
-		"ManufacturerName: %q, ProductName: %q, NodeName: %q, Location: %q, "+
-		"ManufacturerID: %q, ProductType: %q, ProductID: %q}",
-		n.HomeID,
-		n.NodeID,
-		GetNodeBasicType(n.HomeID, n.NodeID),
-		GetNodeGenericType(n.HomeID, n.NodeID),
-		GetNodeSpecificType(n.HomeID, n.NodeID),
-		GetNodeType(n.HomeID, n.NodeID),
-		GetNodeManufacturerName(n.HomeID, n.NodeID),
-		GetNodeProductName(n.HomeID, n.NodeID),
-		GetNodeName(n.HomeID, n.NodeID),
-		GetNodeLocation(n.HomeID, n.NodeID),
-		GetNodeManufacturerID(n.HomeID, n.NodeID),
-		GetNodeProductType(n.HomeID, n.NodeID),
-		GetNodeProductID(n.HomeID, n.NodeID),
-	)
+// Update the List of Neighbors on a particular node.
+//
+// This retrieves the latest copy of the Neighbor lists for a particular node and should be called
+// before calling GetNodeNeighbors to ensure OZW returns the most recent list of Neighbors.
+func SyncronizeNodeNeighbors(homeID uint32, nodeID uint8) {
+	C.manager_syncronize_node_neighbors(C.uint32_t(homeID), C.uint8_t(nodeID))
 }
 
-// RefeshInfo Trigger the fetching of fixed data about a node. Causes the node's data to be obtained from the Z-Wave network in the same way as if it had just been added. This method would normally be called automatically by OpenZWave, but if you know that a node has been changed, calling this method will force a refresh of all of the data held by the library. This can be especially useful for devices that were asleep when the application was first run. This is the same as the query state starting from the beginning.
-func (n *Node) RefeshInfo() bool {
-	return RefreshNodeInfo(n.HomeID, n.NodeID)
+// Get the manufacturer name of a device.
+//
+// The manufacturer name would normally be handled by the Manufacturer Specific command class,
+// taking the manufacturer ID reported by the device and using it to look up the name from the
+// manufacturer_specific.xml file in the OpenZWave config folder.
+// However, there are some devices that do not support the command class, so to enable the user
+// to manually set the name, it is stored with the node data and accessed via this method rather
+// than being reported via a command class Value object.
+//
+// Returns a string containing the node's manufacturer name.
+//
+// See SetNodeManufacturerName, GetNodeProductName, SetNodeProductName.
+func GetNodeManufacturerName(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_manufacturer_name(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// RequestState Trigger the fetching of dynamic value data for a node. Causes the node's values to be requested from the Z-Wave network. This is the same as the query state starting from the associations state.
-func (n *Node) RequestState() bool {
-	return RequestNodeState(n.HomeID, n.NodeID)
+// Get the product name of a device.
+//
+// The product name would normally be handled by the Manufacturer Specific command class,
+// taking the product Type and ID reported by the device and using it to look up the name from the
+// manufacturer_specific.xml file in the OpenZWave config folder.
+// However, there are some devices that do not support the command class, so to enable the user
+// to manually set the name, it is stored with the node data and accessed via this method rather
+// than being reported via a command class Value object.
+//
+// Returns a string containing the node's product name.
+//
+// See SetNodeProductName, GetNodeManufacturerName, SetNodeManufacturerName.
+func GetNodeProductName(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_product_name(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// RequestDynamic Trigger the fetching of just the dynamic value data for a node. Causes the node's values to be requested from the Z-Wave network. This is the same as the query state starting from the dynamic state.
-func (n *Node) RequestDynamic() bool {
-	return RequestNodeDynamic(n.HomeID, n.NodeID)
+// Get the name of a node.
+//
+// The node name is a user-editable label for the node that would normally be handled by the
+// Node Naming command class, but many devices do not support it.  So that a node can always
+// be named, OpenZWave stores it with the node data, and provides access through this method
+// and SetNodeName, rather than reporting it via a command class Value object.
+// The maximum length of a node name is 16 characters.
+//
+// Returns a string containing the node's name.
+//
+// See SetNodeName, GetNodeLocation, SetNodeLocation.
+func GetNodeName(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_name(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// IsListeningDevice Get whether the node is a listening device that does not go to sleep.
-func (n *Node) IsListeningDevice() bool {
-	return IsNodeListeningDevice(n.HomeID, n.NodeID)
+// Get the location of a node.
+//
+// The node location is a user-editable string that would normally be handled by the Node Naming
+// command class, but many devices do not support it.  So that a node can always report its
+// location, OpenZWave stores it with the node data, and provides access through this method
+// and SetNodeLocation, rather than reporting it via a command class Value object.
+//
+// Returns a string containing the node's location.
+//
+// See SetNodeLocation, GetNodeName, SetNodeName.
+func GetNodeLocation(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_location(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// IsFrequentListeningDevice Get whether the node is a frequent listening device that goes to sleep but can be woken up by a beam. Useful to determine node and controller consistency.
-func (n *Node) IsFrequentListeningDevice() bool {
-	return IsNodeFrequentListeningDevice(n.HomeID, n.NodeID)
+// Get the manufacturer ID of a device.
+//
+// The manufacturer ID is a four digit hex code and would normally be handled by the Manufacturer
+// Specific command class, but not all devices support it.  Although the value reported by this
+// method will be an empty string if the command class is not supported and cannot be set by the
+// user, the manufacturer ID is still stored with the node data (rather than being reported via a
+// command class Value object) to retain a consistent approach with the other manufacturer specific data.
+//
+// Returns A string containing the node's manufacturer ID, or an empty string if the manufacturer
+// specific command class is not supported by the device.
+//
+// See GetNodeProductType, GetNodeProductId, GetNodeManufacturerName, GetNodeProductName.
+//
+// TODO: Change the return to uint16 in 2.0 time frame
+func GetNodeManufacturerID(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_manufacturer_id(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// IsBeamingDevice Get whether the node is a beam capable device.
-func (n *Node) IsBeamingDevice() bool {
-	return IsNodeBeamingDevice(n.HomeID, n.NodeID)
+// Get the product type of a device.
+//
+// The product type is a four digit hex code and would normally be handled by the Manufacturer Specific
+// command class, but not all devices support it.  Although the value reported by this method will
+// be an empty string if the command class is not supported and cannot be set by the user, the product
+// type is still stored with the node data (rather than being reported via a command class Value object)
+// to retain a consistent approach with the other manufacturer specific data.
+//
+// Returns a string containing the node's product type, or an empty string if the manufacturer
+// specific command class is not supported by the device.
+//
+// See GetNodeManufacturerId, GetNodeProductId, GetNodeManufacturerName, GetNodeProductName.
+//
+// TODO: Change the return to uint16 in 2.0 time frame
+func GetNodeProductType(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_product_type(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// IsRoutingDevice Get whether the node is a routing device that passes messages to other nodes.
-func (n *Node) IsRoutingDevice() bool {
-	return IsNodeRoutingDevice(n.HomeID, n.NodeID)
+// Get the product ID of a device.
+//
+// The product ID is a four digit hex code and would normally be handled by the Manufacturer Specific
+// command class, but not all devices support it.  Although the value reported by this method will
+// be an empty string if the command class is not supported and cannot be set by the user, the product
+// ID is still stored with the node data (rather than being reported via a command class Value object)
+// to retain a consistent approach with the other manufacturer specific data.
+//
+// Returns a string containing the node's product ID, or an empty string if the manufacturer
+// specific command class is not supported by the device.
+//
+// See GetNodeManufacturerId, GetNodeProductType, GetNodeManufacturerName, GetNodeProductName.
+//
+// TODO: Change the return to uint16 in 2.0 time frame
+func GetNodeProductId(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_product_type(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// IsSecurityDevice Get the security attribute for a node. True if node supports security features.
-func (n *Node) IsSecurityDevice() bool {
-	return IsNodeSecurityDevice(n.HomeID, n.NodeID)
+// Set the manufacturer name of a device.
+//
+// The manufacturer name would normally be handled by the Manufacturer Specific command class,
+// taking the manufacturer ID reported by the device and using it to look up the name from the
+// manufacturer_specific.xml file in the OpenZWave config folder.
+// However, there are some devices that do not support the command class, so to enable the user
+// to manually set the name, it is stored with the node data and accessed via this method rather
+// than being reported via a command class Value object.
+//
+// See GetNodeManufacturerName, GetNodeProductName, SetNodeProductName.
+func SetNodeManufacturerName(homeID uint32, nodeID uint8, manufacturerName string) {
+	cstr := C.CString(manufacturerName)
+	defer C.free(unsafe.Pointer(cstr))
+	C.manager_set_node_manufacturer_name(C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
 }
 
-// GetMaxBaudRate Get the maximum baud rate of a node's communications.
-func (n *Node) GetMaxBaudRate() uint32 {
-	return GetNodeMaxBaudRate(n.HomeID, n.NodeID)
+// Set the product name of a device.
+//
+// The product name would normally be handled by the Manufacturer Specific command class,
+// taking the product Type and ID reported by the device and using it to look up the name from the
+// manufacturer_specific.xml file in the OpenZWave config folder.
+// However, there are some devices that do not support the command class, so to enable the user
+// to manually set the name, it is stored with the node data and accessed via this method rather
+// than being reported via a command class Value object.
+//
+// See GetNodeProductName, GetNodeManufacturerName, SetNodeManufacturerName.
+func SetNodeProductName(homeID uint32, nodeID uint8, productName string) {
+	cstr := C.CString(productName)
+	defer C.free(unsafe.Pointer(cstr))
+	C.manager_set_node_product_name(C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
 }
 
-// GetVersion Get the version number of a node.
-func (n *Node) GetVersion() uint8 {
-	return GetNodeVersion(n.HomeID, n.NodeID)
+// Set the name of a node.
+//
+// The node name is a user-editable label for the node that would normally be handled by the
+// Node Naming command class, but many devices do not support it.  So that a node can always
+// be named, OpenZWave stores it with the node data, and provides access through this method
+// and GetNodeName, rather than reporting it via a command class Value object.
+// If the device does support the Node Naming command class, the new name will be sent to the node.
+// The maximum length of a node name is 16 characters.
+//
+// See GetNodeName, GetNodeLocation, SetNodeLocation.
+func SetNodeName(homeID uint32, nodeID uint8, nodeName string) {
+	cstr := C.CString(nodeName)
+	defer C.free(unsafe.Pointer(cstr))
+	C.manager_set_node_name(C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
 }
 
-// GetSecurity Get the security byte of a node.
-func (n *Node) GetSecurity() uint8 {
-	return GetNodeSecurity(n.HomeID, n.NodeID)
+// Set the location of a node.
+//
+// The node location is a user-editable string that would normally be handled by the Node Naming
+// command class, but many devices do not support it.  So that a node can always report its
+// location, OpenZWave stores it with the node data, and provides access through this method
+// and GetNodeLocation, rather than reporting it via a command class Value object.
+// If the device does support the Node Naming command class, the new location will be sent to the node.
+//
+// See GetNodeLocation, GetNodeName, SetNodeName.
+func SetNodeLocation(homeID uint32, nodeID uint8, location string) {
+	cstr := C.CString(location)
+	defer C.free(unsafe.Pointer(cstr))
+	C.manager_set_node_location(C.uint32_t(homeID), C.uint8_t(nodeID), cstr)
 }
 
-// IsZWavePlus Is this a ZWave+ Supported Node?
-func (n *Node) IsZWavePlus() bool {
-	return IsNodeZWavePlus(n.HomeID, n.NodeID)
+// Get whether the node information has been received.
+//
+// Returns true if the node information has been received yet.
+func IsNodeInfoReceived(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_info_received(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-// GetBasicType Get the basic type of a node.
-func (n *Node) GetBasicType() uint8 {
-	return GetNodeBasicType(n.HomeID, n.NodeID)
+// Get whether the node has the defined class available or not.
+//
+// Returns true if the node does have the class instantiated, will return name & version.
+func GetNodeClassInformation(homeID uint32, nodeID uint8, commandClassId uint8) (className string, classVersion uint8, hasClass bool) {
+	res := C.manager_get_node_class_information(C.uint32_t(homeID), C.uint8_t(nodeID), C.uint8_t(commandClassId))
+	defer C.manager_free_node_class_information(res)
+	return C.GoString(res.className), uint8(res.classVersion), bool(res.ok)
 }
 
-// GetGenericType Get the generic type of a node.
-func (n *Node) GetGenericType() uint8 {
-	return GetNodeGenericType(n.HomeID, n.NodeID)
+// Get whether the node is awake or asleep.
+//
+// Returns true if the node is awake.
+func IsNodeAwake(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_awake(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-// GetSpecificType Get the specific type of a node.
-func (n *Node) GetSpecificType() uint8 {
-	return GetNodeSpecificType(n.HomeID, n.NodeID)
+// Get whether the node is working or has failed.
+//
+// Returns true if the node has failed and is no longer part of the network.
+func IsNodeFailed(homeID uint32, nodeID uint8) bool {
+	return bool(C.manager_is_node_failed(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-// GetType Get a human-readable label describing the node The label is taken from the Z-Wave specific, generic or basic type, depending on which of those values are specified by the node.
-func (n *Node) GetType() string {
-	return GetNodeType(n.HomeID, n.NodeID)
+// Get whether the node's query stage as a string.
+//
+// Returns name of current query stage as a string..
+func GetNodeQueryStage(homeID uint32, nodeID uint8) string {
+	cstr := C.manager_get_node_query_stage(C.uint32_t(homeID), C.uint8_t(nodeID))
+	defer C.free(unsafe.Pointer(cstr))
+	return C.GoString(cstr)
 }
 
-// TODO: implement node.GetNeighbors
-// GetNeighbors Get the bitmap of this node's neighbors.
-// func (n *Node) GetNeighbors() bool
-// 	return GetNodeNeighbors(n.HomeID, n.NodeID)
-// }
-
-// GetManufacturerName Get the manufacturer name of a device The manufacturer name would normally be handled by the Manufacturer Specific commmand class, taking the manufacturer ID reported by the device and using it to look up the name from the manufacturer_specific.xml file in the OpenZWave config folder. However, there are some devices that do not support the command class, so to enable the user to manually set the name, it is stored with the node data and accessed via this method rather than being reported via a command class Value object.
-func (n *Node) GetManufacturerName() string {
-	return GetNodeManufacturerName(n.HomeID, n.NodeID)
+// Get the node device type as reported in the Z-Wave+ Info report.
+//
+// Returns the node's DeviceType.
+func GetNodeDeviceType(homeID uint32, nodeID uint8) uint16 {
+	return uint16(C.manager_get_node_device_type(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-// GetProductName Get the product name of a device The product name would normally be handled by the Manufacturer Specific commmand class, taking the product Type and ID reported by the device and using it to look up the name from the manufacturer_specific.xml file in the OpenZWave config folder. However, there are some devices that do not support the command class, so to enable the user to manually set the name, it is stored with the node data and accessed via this method rather than being reported via a command class Value object.
-func (n *Node) GetProductName() string {
-	return GetNodeProductName(n.HomeID, n.NodeID)
+// Get the node role as reported in the Z-Wave+ Info report.
+//
+// Returns the node's user icon..
+func GetNodeRole(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_role(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
 
-// GetName Get the name of a node The node name is a user-editable label for the node that would normally be handled by the Node Naming commmand class, but many devices do not support it. So that a node can always be named, OpenZWave stores it with the node data, and provides access through this method and SetNodeName, rather than reporting it via a command class Value object. The maximum length of a node name is 16 characters.
-func (n *Node) GetName() string {
-	return GetNodeName(n.HomeID, n.NodeID)
-}
-
-// GetLocation Get the location of a node The node location is a user-editable string that would normally be handled by the Node Naming commmand class, but many devices do not support it. So that a node can always report its location, OpenZWave stores it with the node data, and provides access through this method and SetNodeLocation, rather than reporting it via a command class Value object.
-func (n *Node) GetLocation() string {
-	return GetNodeLocation(n.HomeID, n.NodeID)
-}
-
-// GetManufacturerID Get the manufacturer ID of a device The manufacturer ID is a four digit hex code and would normally be handled by the Manufacturer Specific commmand class, but not all devices support it. Although the value reported by this method will be an empty string if the command class is not supported and cannot be set by the user, the manufacturer ID is still stored with the node data (rather than being reported via a command class Value object) to retain a consistent approach with the other manufacturer specific data.
-func (n *Node) GetManufacturerID() string {
-	return GetNodeManufacturerID(n.HomeID, n.NodeID)
-}
-
-// GetProductType Get the product type of a device The product type is a four digit hex code and would normally be handled by the Manufacturer Specific commmand class, but not all devices support it. Although the value reported by this method will be an empty string if the command class is not supported and cannot be set by the user, the product type is still stored with the node data (rather than being reported via a command class Value object) to retain a consistent approach with the other manufacturer specific data.
-func (n *Node) GetProductType() string {
-	return GetNodeProductType(n.HomeID, n.NodeID)
-}
-
-// GetProductID Get the product ID of a device The product ID is a four digit hex code and would normally be handled by the Manufacturer Specific commmand class, but not all devices support it. Although the value reported by this method will be an empty string if the command class is not supported and cannot be set by the user, the product ID is still stored with the node data (rather than being reported via a command class Value object) to retain a consistent approach with the other manufacturer specific data.
-func (n *Node) GetProductID() string {
-	return GetNodeProductID(n.HomeID, n.NodeID)
-}
-
-// SetManufacturerName Set the manufacturer name of a device The manufacturer name would normally be handled by the Manufacturer Specific commmand class, taking the manufacturer ID reported by the device and using it to look up the name from the manufacturer_specific.xml file in the OpenZWave config folder. However, there are some devices that do not support the command class, so to enable the user to manually set the name, it is stored with the node data and accessed via this method rather than being reported via a command class Value object.
-func (n *Node) SetManufacturerName(name string) {
-	SetNodeManufacturerName(n.HomeID, n.NodeID, name)
-}
-
-// SetProductName Set the product name of a device The product name would normally be handled by the Manufacturer Specific commmand class, taking the product Type and ID reported by the device and using it to look up the name from the manufacturer_specific.xml file in the OpenZWave config folder. However, there are some devices that do not support the command class, so to enable the user to manually set the name, it is stored with the node data and accessed via this method rather than being reported via a command class Value object.
-func (n *Node) SetProductName(name string) {
-	SetNodeProductName(n.HomeID, n.NodeID, name)
-}
-
-// SetName Set the name of a node The node name is a user-editable label for the node that would normally be handled by the Node Naming commmand class, but many devices do not support it. So that a node can always be named, OpenZWave stores it with the node data, and provides access through this method and GetNodeName, rather than reporting it via a command class Value object. If the device does support the Node Naming command class, the new name will be sent to the node. The maximum length of a node name is 16 characters.
-func (n *Node) SetName(name string) {
-	SetNodeName(n.HomeID, n.NodeID, name)
-}
-
-// SetLocation Set the location of a node The node location is a user-editable string that would normally be handled by the Node Naming commmand class, but many devices do not support it. So that a node can always report its location, OpenZWave stores it with the node data, and provides access through this method and GetNodeLocation, rather than reporting it via a command class Value object. If the device does support the Node Naming command class, the new location will be sent to the node.
-func (n *Node) SetLocation(location string) {
-	SetNodeLocation(n.HomeID, n.NodeID, location)
-}
-
-// SetOn Turns a node on This is a helper method to simplify basic control of a node. It is the equivalent of changing the level reported by the node's Basic command class to 255, and will generate a ValueChanged notification from that class. This command will turn on the device at its last known level, if supported by the device, otherwise it will turn it on at 100%.
-func (n *Node) SetOn() {
-	SetNodeOn(n.HomeID, n.NodeID)
-}
-
-// SetOff Turns a node off This is a helper method to simplify basic control of a node. It is the equivalent of changing the level reported by the node's Basic command class to zero, and will generate a ValueChanged notification from that class.
-func (n *Node) SetOff() {
-	SetNodeOff(n.HomeID, n.NodeID)
-}
-
-// SetLevel Sets the basic level of a node This is a helper method to simplify basic control of a node. It is the equivalent of changing the value reported by the node's Basic command class and will generate a ValueChanged notification from that class.
-func (n *Node) SetLevel(level uint8) {
-	SetNodeLevel(n.HomeID, n.NodeID, level)
-}
-
-// IsInfoReceived Get whether the node information has been received.
-func (n *Node) IsInfoReceived() bool {
-	return IsNodeInfoReceived(n.HomeID, n.NodeID)
-}
-
-// GetClassInformation Get whether the node has the defined class available or not.
-func (n *Node) GetClassInformation(commandClassID uint8) (bool, string, uint8) {
-	return GetNodeClassInformation(n.HomeID, n.NodeID, commandClassID)
-}
-
-// IsAwake Get whether the node is awake or asleep.
-func (n *Node) IsAwake() bool {
-	return IsNodeAwake(n.HomeID, n.NodeID)
-}
-
-// IsFailed Get whether the node is working or has failed.
-func (n *Node) IsFailed() bool {
-	return IsNodeFailed(n.HomeID, n.NodeID)
-}
-
-// GetQueryStage Get whether the node's query stage as a string.
-func (n *Node) GetQueryStage() string {
-	return GetNodeQueryStage(n.HomeID, n.NodeID)
-}
-
-// GetDeviceType Get the node device type as reported in the Z-Wave+ Info report.
-func (n *Node) GetDeviceType() uint16 {
-	return GetNodeDeviceType(n.HomeID, n.NodeID)
-}
-
-// GetDeviceTypeString Get the node device type as reported in the Z-Wave+ Info report.
-func (n *Node) GetDeviceTypeString() string {
-	return GetNodeDeviceTypeString(n.HomeID, n.NodeID)
-}
-
-// GetRole Get the node device type as reported in the Z-Wave+ Info report.
-func (n *Node) GetRole() uint8 {
-	return GetNodeRole(n.HomeID, n.NodeID)
-}
-
-// GetRoleString Get the node role as reported in the Z-Wave+ Info report.
-func (n *Node) GetRoleString() string {
-	return GetNodeRoleString(n.HomeID, n.NodeID)
-}
-
-// GetPlusType Get the node PlusType as reported in the Z-Wave+ Info report.
-func (n *Node) GetPlusType() uint8 {
-	return GetNodePlusType(n.HomeID, n.NodeID)
-}
-
-// GetPlusTypeString Get the node PlusType as reported in the Z-Wave+ Info report.
-func (n *Node) GetPlusTypeString() string {
-	return GetNodePlusTypeString(n.HomeID, n.NodeID)
+// Get the node PlusType as reported in the Z-Wave+ Info report.
+//
+// Returns the node's PlusType.
+func GetNodePlusType(homeID uint32, nodeID uint8) uint8 {
+	return uint8(C.manager_get_node_plus_type(C.uint32_t(homeID), C.uint8_t(nodeID)))
 }
